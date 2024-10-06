@@ -11,9 +11,21 @@ use Illuminate\Http\Request;
 
 class EmailController extends Controller
 {
+    public function sendWelcomeEmail()
+    {
+        $title = 'Welcome to the laracoding.com example email';
+        $body = 'Thank you for participating!';
+
+        Mail::to('daniloangelo.baluyot@dec.com.ph')->send(new ResetPassword($title, $body));
+
+        return "Email sent successfully!";
+    }
+	
 	
 	 public function sendTemporaryPasswordtoEmail(Request $request)
     {
+		
+		//ALTER TABLE `user_tb` ADD COLUMN `user_email_address` VARCHAR(100) NULL DEFAULT NULL AFTER `user_access`;
 		
 		$request->validate(
 						['user_email_address'    		=> 'required',], 
@@ -26,12 +38,12 @@ class EmailController extends Controller
 			
 			if($request->user_email_address == $user->user_email_address){
 				
-						$title = 'Reset Password';
-						$body = 'Your password has been changed successfully. Please use below password to log in.';
-						$user_id = $user->user_id;
-						$name = $user->user_real_name;
-						$user_name = $user->user_name;
-						$user_password = '';
+						$title 			= 'Teves Billing System Portal: Password Reset';
+						$body 			= 'Your password has been changed successfully. Please use below password to log in.';
+						$user_id 		= $user->user_id;
+						$name 			= $user->user_real_name;
+						$user_name 		= $user->user_name;
+						$user_password 	= '';
 
 						Mail::to($user->user_email_address)->send(new ResetPassword($title, $body, $name, $user_id, $user_name, $user_password));
 

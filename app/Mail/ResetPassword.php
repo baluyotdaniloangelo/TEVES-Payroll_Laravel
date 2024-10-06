@@ -101,10 +101,9 @@ class ResetPassword extends Mailable
 			
 		}
 		
-        return $this->view('emails.welcome', compact('title', 'body', 'name', 'user_name', 'user_new_password'))->subject($title);
+        return $this->view('emails.welcome', compact('title', 'body', 'name', 'user_name', 'user_new_password'))->subject($title);	
 		
     }
-	
 	
 	public function generateRandomString($length = 6) {
 		

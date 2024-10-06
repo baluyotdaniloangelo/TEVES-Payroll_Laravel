@@ -16,17 +16,17 @@
                   <div class="pt-4 pb-0">
 				  
 				  <div class="d-flex justify-content-center py-4">
-					<img src="{{asset('client_logo/logo-2.png')}}" alt="" style="width:120px;">
+					<img src="{{asset('client_logo/logo-r.png')}}" alt="" style="width:120px;">
 				  </div>
                   
-				  <h5 class="card-title text-center pb-0 fs-6" style="font-weight:bold !important; padding:0px !important; color: #00000;">Teves Billing System Portal:Reset Password</h5>
+				  <h5 class="card-title text-center pb-0 fs-6" style="font-weight:bold !important; padding:0px !important; color: #00000;">Centralized Automated Meter Reading</h5>
                   </div>
 							
 									
 				  <form class="g-2 needs-validation" id="ResetUserPasswordform">
                     					
                     <div class="col-12">
-                      <p>Please Enter your Email Address Registered to your User Account</p>
+                      <p>Please Enter your Email Address Registered to your CAMR User Account</p>
 					  
                       
                     </div>
@@ -76,7 +76,7 @@
 				&nbsp;
 				</div>
                 <div class="modal-footer footer_modal_bg">
-					<button type="button" class="btn btn-primary" data-bs-dismiss="modal"><i class="bi bi-x-circle navbar_icon"></i> Close</button>
+					<button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="close_email_confirm"><i class="bi bi-x-circle navbar_icon"></i> Close</button>
                 </div>
             </div>
         </div>
@@ -117,6 +117,9 @@
 					document.getElementById("ResetUserPasswordform").reset();
 					
 					document.getElementById('ResetUserPasswordform').className = "g-3 needs-validation";
+					
+					// sleep(5000);
+					//window.location.href = "/";
 				
 				  }
 				},
@@ -142,5 +145,16 @@
 				}
 			   });
 	  });
+
+	$("#close_email_confirm").click(function(event){
+			
+			event.preventDefault();
+			window.location.href = "/";
+			
+	  });	  
+// function sleep(delay) {
+    // var start = new Date().getTime();
+    // while (new Date().getTime() < start + delay);
+// }
 </script>
 @endsection

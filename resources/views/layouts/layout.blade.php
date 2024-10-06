@@ -1,237 +1,194 @@
 @include('layouts.header')
 </head>
-<!--
-Use to automatically hide the Side Nav Bar
-<body class="toggle-sidebar">-->
 
+<body>
 @yield('content')
+ 
+@include('layouts.footer')
 
-
 <?php
 
-if (Request::is('billing')){
+if (Request::is('site')){
+
 ?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.billing_script')
+   
+
+@include('layouts.site_script')
 <?php
-}else if (Request::is('so')){
+
+}
+
+else if (Request::is('site_details/'.@$SiteData[0]->site_id)){
+
 ?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.so_billing_script')
+ 
+@include('layouts.site_details_script')
+@include('layouts.site_details_gateway_script')
+@include('layouts.site_details_meter_script')
+@include('layouts.site_details_meter_location_script')
 <?php
 }
-else if (Request::is('create_so_billing')){
+else if (Request::is('site_details_2/'.@$SiteData[0]->site_id)){
+
 ?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.so_billing_script')
+ 
+@include('layouts.site_details_script')
+@include('layouts.site_details_gateway_script')
+@include('layouts.site_details_meter_script')
+@include('layouts.site_details_meter_location_script')
+
 <?php
 }
-else if (Request::is('so_add_product/*')){
+elseif (Request::is('user')){
 ?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.update_so_billing_script')
-<?php
-}
-else if (Request::is('product')){
-?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.product_script')
-<?php
-}
-else if (Request::path()==('update_product_information')){
-?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.update_product_info_script')
-<?php
-}
-else if (Request::is('client')){
-?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.client_script')
-<?php
-}
-else if (Request::is('branch')){
-?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.branch_script')
-<?php
-}
-else if (Request::is('supplier')){
-?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.supplier_script')
-<?php
-}
-else if (Request::is('create_recievable')){
-?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.create_recievable_script')
-<?php
-}
-else if (Request::is('billing_history')){
-?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.billing_history_script')
-<?php
-}
-else if (Request::is('soa_summary_history')){
-?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.soa_summary_report_script')
-<?php
-}
-else if (Request::is('user')){
-?>
-<body class="">
-@include('layouts.footer')
 @include('layouts.user_script')
 <?php
 }
-else if (Request::is('receivables')){
+elseif (Request::is('company')){
 ?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.receivables_script')
-<?php
-}
-
-else if (Request::is('salesorder')){
-?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.salesorder_script')
-<?php
-}
-/* Request::path(); for Get Method*/
-else if (Request::path()==('sales_order_form')){
-?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.sales_order_form_script')
-@include('layouts.sales_order_form_delivery_script')
-<?php
-}
-/* Request::path(); for Get Method*/
-else if (Request::path()==('receivable_from_billing_form')){
-?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.receivable_from_billing_form_script')
-<?php
-}
-
-else if (Request::is('purchaseorder')){
-?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.purchaseorder_script')
-<?php
-}
-else if (Request::is('purchaseorder_v2')){
-	?>
-	<body class="">
-	@include('layouts.footer')
-	@include('layouts.purchaseorder_script_v2')
-	<?php
-}
-else if (Request::is('purchase_order_form/*')){
-	?>
-	<meta name="csrf-token" content="{{csrf_token()}}">
-	<body class="">
-	@include('layouts.footer')
-	@include('layouts.purchase_order_form_script')
-	@include('layouts.purchase_order_form_delivery_script')
-	<?php
-}
-else if (Request::is('cashier_report')){
-?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.cashier_report_script')
-<?php
-}
-else if (Request::is('cashiers_report_form/*')){
-?>
-<body class="">
-@include('layouts.footer')
-@include('layouts.cashier_report_form_script')
-@include('layouts.cashier_report_form_script_p7')
-@include('layouts.cashier_report_form_script_p8')
-<?php
-}
-else if (Request::is('monthly_sales')){
-?>
-<body class="">
-@include('layouts.footer_chart')
-<script type="text/javascript">
-
-	var original_api_url = {{ $MonthlyChart->id }}_api_url;
-	/*On Load page view current year*/
  
-    $(".select_year").change(function(){
-        var year = $(this).val();
-    {{ $MonthlyChart->id }}_refresh(original_api_url + "?year="+year);
-    });
+
+@include('layouts.company_script')
+<?php
+}
+elseif (Request::is('division')){
+?>
+   
+@include('layouts.division_script')
+<?php
+}
+elseif (Request::is('sap_report')){
+?>
+@include('layouts.generate_sap_report_script')
+<?php
+}
+elseif (Request::is('consumption_report')){
+?>
+  <!-- <style>
+   .dt-scroll-headInner{
+    width: 100% !important;
+	}
+   .table.dataTable{
+	width: 100% !important;
+	} 
+   </style>-->
+@include('layouts.generate_meter_consumption_report_script')
+<?php
+}
+elseif (Request::is('demand_report')){
+?>
+@include('layouts.generate_meter_demand_report_script')
+<?php
+}
+elseif (Request::is('raw_report')){
+?>
+@include('layouts.generate_raw_report_datatable_script')
+<?php
+}elseif (Request::is('site_report')){
+?>
+  <!-- <style>
+   .dt-scroll-headInner{
+    width: 100% !important;
+	}
+   .table.dataTable{
+	width: 100% !important;
+	} 
+   </style>-->
+@include('layouts.generate_site_report_script')
+
+<?php
+
+}
+?>
+</body>
+
+
+<script>
+
 	
-	$('body').on('click','#reloadMonthlyData',function(){
-			
-			event.preventDefault();
-			let year 		= $("#select_year").val();
-			
-			  $.ajax({
-				url: "/reload_monthly_sales_per_year",
+	document.getElementById("account_user_real_name").addEventListener('change', doThing_account_settings);
+	document.getElementById("account_user_name").addEventListener('change', doThing_account_settings);
+	document.getElementById("user_email_address").addEventListener('change', doThing_account_settings);
+
+	document.getElementById("account_user_password").addEventListener('change', doThing_account_settings);
+	
+	function doThing_account_settings(){
+		
+		let user_real_name 			= $("input[name=account_user_real_name]").val();
+		let user_name 				= $("input[name=account_user_name]").val();
+		let user_password 			= $("input[name=account_user_password]").val();
+		let user_email_address 		= $("input[name=user_email_address]").val();
+		
+		$.ajax({
+				url: "/user_info",
 				type:"POST",
 				data:{
-				  year:year,
+				  UserID:{{$data->user_id}},
 				  _token: "{{ csrf_token() }}"
 				},
 				success:function(response){
 				  console.log(response);
-
-					/*Reload Chart*/
-					reload_monthly_chart(year);
-
+				  if(response) {				
+				  
+				  
+				  if(user_password!==''){
+						
+						// alert('S1');
+						if(response.user_real_name===user_real_name && response.user_name===user_name && response.user_email_address===user_email_address){
+							
+							document.getElementById("account-user").disabled = false;
+							
+						}else{
+							
+							document.getElementById("account-user").disabled = false;
+							
+						}
+					
+				  }else{
+					  
+					  // alert('S2');
+					  if(response.user_real_name===user_real_name && response.user_name===user_name && response.user_email_address===user_email_address){
+							
+							document.getElementById("account-user").disabled = true;
+							// $('#user_email_addressError').text('');
+							// document.getElementById('user_email_addressError').className = "valid-feedback";
+							
+						}else{
+							
+							document.getElementById("account-user").disabled = false;
+							
+						}
+					  
+				  }
+				  
+				  }
 				},
 				error: function(error) {
 				 console.log(error);
 					alert(error);
 				}
-			   });	
-	});
-	
-	 function reload_monthly_chart(year){
-		 {{ $MonthlyChart->id }}_refresh(original_api_url + "?year="+year);
-	 }
-	 
-</script>
-<?php
-}
-?>
-<script>
-	const AccountUserform = document.querySelector('#AccountUserform');
-	
-	AccountUserform.addEventListener('change', function() {
-		//enable
-		document.getElementById("account-user").disabled = false;
-	});
+			   });		 
+	   
+    }	
+		
 
+	function doThing_account_settings_PW(){
+       // alert('Horray! Someone wrote "' + this.value + '"!');
+	   if(this.value==''){
+		   document.getElementById("account-user").disabled = true;
+	   }else{
+		   document.getElementById("account-user").disabled = false;
+	   }
+    }	
+	
 	<!--Selected Account For Update-->
 	$('body').on('click','#accountUser',function(){
 			
 			event.preventDefault();
-		
+			$('#AccountUserform')[0].reset();
+			$('#user_email_addressError').text('');
+			document.getElementById('user_email_addressError').className = "valid-feedback";
+				  
 			  $.ajax({
 				url: "/user_info",
 				type:"POST",
@@ -274,9 +231,9 @@ else if (Request::is('monthly_sales')){
 
 			document.getElementById('AccountUserform').className = "g-2 needs-validation was-validated";
 
-			let user_real_name 		= $("input[name=account_user_real_name]").val();
-			let user_name 			= $("input[name=account_user_name]").val();
-			let user_password 		= $("input[name=account_user_password]").val();
+			let user_real_name 			= $("input[name=account_user_real_name]").val();
+			let user_name 				= $("input[name=account_user_name]").val();
+			let user_password 			= $("input[name=account_user_password]").val();
 			let user_email_address 		= $("input[name=user_email_address]").val();
 			
 			$.ajax({
@@ -295,18 +252,22 @@ else if (Request::is('monthly_sales')){
 				  if(response) {
 					  					
 					$('#account_user_real_nameError').text('');
-					$('#account_switch_timerError').text('');		
-					$('#account_user_typeError').text('');
+					$('#account_switch_timerError').text('');	
+					$('#account_switch_timerError').text('');	
 					$('#user_email_addressError').text('');	
 					
 					$('.success_modal_bg').html(response.success);
 					$('#SuccessModal').modal('toggle');
 					//$('#UserProfileModal').modal('toggle');
+					$('#UserProfileModal').modal('toggle');	
+					document.getElementById("account-user").disabled = true;
 				  
 				  }
 				},
 				error: function(error) {
 				 console.log(error);	
+				 
+				 document.getElementById("account-user").disabled = true;
 				 
 				if(error.responseJSON.errors.user_real_name=="The user real name has already been taken."){
 							  
@@ -331,9 +292,24 @@ else if (Request::is('monthly_sales')){
 				  
 				}else{
 					
-				  $('#account_user_nameError').text(error.responseJSON.errors.user_real_name);
+				  $('#account_user_nameError').text(error.responseJSON.errors.user_name);
 				  document.getElementById('account_user_nameError').className = "invalid-feedback";		
 				
+				}
+				
+				if(error.responseJSON.errors.user_email_address=="The user email address has already been taken."){
+							  
+				  $('#user_email_addressError').html("<b>"+ user_email_address +"</b> has already been taken.");
+				  document.getElementById('user_email_addressError').className = "invalid-feedback";
+				  document.getElementById('user_email_address').className = "form-control is-invalid";
+				  $('#user_email_address').val("");
+				  
+				}else{
+					
+				  $('#user_email_addressError').text(error.responseJSON.errors.user_email_address);
+				  document.getElementById('user_email_addressError').className = "invalid-feedback";		
+				  document.getElementById('user_email_address').className = "form-control is-invalid";
+				  
 				}
 					
 				  $('#account_user_passwordError').text(error.responseJSON.errors.user_password);
@@ -348,7 +324,4 @@ else if (Request::is('monthly_sales')){
 
 		
 </script>
-
-</body>
-
 </html>

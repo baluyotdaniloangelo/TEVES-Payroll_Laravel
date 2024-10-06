@@ -3,27 +3,18 @@
    <script src="{{asset('Datatables/responsive/3.0.2/js/dataTables.responsive.js')}}"></script>
    <script src="{{asset('Datatables/responsive/3.0.2/js/responsive.dataTables.js')}}"></script>
    <script type="text/javascript">
+   // $(window).resize(function(){location.reload();});
 	<!--Load Table-->				
 	$(function () {
 				
 		var switchTable = $('#userList').DataTable({
-			"language": {
-						"lengthMenu":'<select class="dt-input">'+
-			             '<option value="10">10</option>'+
-			             '<option value="20">20</option>'+
-			             '<option value="30">30</option>'+
-			             '<option value="40">40</option>'+
-			             '<option value="50">50</option>'+
-			             '<option value="-1">All</option>'+
-			             '</select> '
-			    },
-			/*processing: true,*/
+			processing: true,
 			responsive: true,
 			serverSide: true,
 			stateSave: true,/*Remember Searches*/
 			scrollCollapse: true,
-			scrollCollapse: true,
 			scrollY: '500px',
+			// scrollX: '100%',
 			ajax: {
 				url : "{{ route('UserList') }}",
 				method : 'POST',
@@ -39,18 +30,18 @@
 					{data: 'created_at_dt_format', name: 'switch_status', orderable: true, searchable: false, className: "text-left"},
 					{data: 'updated_at_dt_format', name: 'switch_status', orderable: true, searchable: false, className: "text-left"},
 					{data: 'action', name: 'action', orderable: false, searchable: false, className: "text-center"},
-			],
-			columnDefs: [
-					{ className: 'text-center', targets: [0, 4, 5, 6, 7] },
-			],
+			 ],
+			// columnDefs: [
+					 // { className: 'text-center', targets: [5, 6, 7] },
+			// ],
 			
 		});
 		  /*Add Options*/
 		  $('<div class="btn-group" role="group" aria-label="Basic outlined example"style="margin-top: -50px; position: absolute;">'+
-		  '<button type="button" class="btn btn-success new_item bi bi-plus-circle" data-bs-toggle="modal" data-bs-target="#CreateUserModal" onclick="ResetFormUser()"></button>'+
+		  '<button type="button" class="btn btn-success new_item bi bi-plus-circle" data-bs-toggle="modal" data-bs-target="#CreateUserModal" onclick="ResetFormUser();";> User</button>'+
 		  '</div>').appendTo('#user_option');
-		  
-		  autoAdjustColumns(switchTable);
+
+		autoAdjustColumns(switchTable);
 
 		 /*Adjust Table Column*/
 		 function autoAdjustColumns(table) {
@@ -60,41 +51,43 @@
 			 });
 			 resizeObserver.observe(container);
 		 }	
+
 	});
-	
-	
+
+
 	function ChangeAccessType_Add(){
 
-		let user_type 				= $("#user_type").val();
-		var user_type_selected 		= $('#user_type').find(":selected").val();
+		let user_type 			= $("#user_type").val();
+		var user_type_selected = $('#user_type').find(":selected").val();
 		
 
 		if(user_type_selected=='Admin'){
 			document.getElementById('user_access').value = 'ALL';
 		}
 		else{
-			document.getElementById('user_access').value = 'BYBRANCH';
+			document.getElementById('user_access').value = 'BYSITE';
 		}
+		
 		
 	}
 	
-
+	
 	function ChangeAccessType_Update(){
 
-		let user_type 				= $("#update_user_type").val();
-		var user_type_selected 		= $('#update_user_type').find(":selected").val();
+		let user_type 			= $("#update_user_type").val();
+		var user_type_selected = $('#update_user_type').find(":selected").val();
 		
 
 		if(user_type_selected=='Admin'){
 			document.getElementById('update_user_access').value = 'ALL';
 		}
 		else{
-			document.getElementById('update_user_access').value = 'BYBRANCH';
+			document.getElementById('update_user_access').value = 'BYSITE';
 		}
+		
 		
 	}
 
-	
 	<!--Save New Site-->
 	$("#save-user").click(function(event){
 			
@@ -110,9 +103,9 @@
 			
 			let user_real_name 		= $("input[name=user_real_name]").val();
 			let user_name 			= $("input[name=user_name]").val();
+			let user_email_address 	= $("input[name=user_email_address_management]").val();
 			let user_password 		= $("input[name=user_password]").val();
 			let user_type 			= $("#user_type").val();
-			let user_email_address 	= $("input[name=user_email_address_management]").val();
 			let user_access 		= $("#user_access").val();
 			let user_job_title 		= $("input[name=user_job_title]").val();
 			
@@ -122,9 +115,9 @@
 				data:{
 				  user_real_name:user_real_name,
 				  user_name:user_name,
+				  user_email_address:user_email_address,
 				  user_password:user_password,
 				  user_type:user_type,
-				  user_email_address:user_email_address,
 				  user_access:user_access,
 				  user_job_title:user_job_title,
 				  _token: "{{ csrf_token() }}"
@@ -134,20 +127,17 @@
 				 
 				  if(response) {
 
-					
 					$('#user_real_nameError').text('');				  
 					$('#user_nameError').text('');
 					$('#user_passwordError').text('');
 					$('#user_typeError').text('');		
 					$('#user_job_titleError').text('');
-					
 					$('#user_email_address_managementError').text('');
 					document.getElementById('user_email_address_management').className = "form-control";
 					
-					$('#switch_notice_on').show();
-					$('#sw_on').html(response.success);
-					setTimeout(function() { $('#switch_notice_on').fadeOut('fast'); },1000);
-					
+					$('.success_modal_bg').html(response.success);
+					$('#SuccessModal').modal('toggle');	
+				
 					document.getElementById("CreateUserform").reset();
 				
 					if(user_access=='BYSITE'){
@@ -156,7 +146,9 @@
 				
 					var table = $("#userList").DataTable();
 				    table.ajax.reload(null, false);
-				  
+					
+					document.getElementById('CreateUserform').className = "g-3 needs-validation";
+				
 				  }
 				},
 				error: function(error) {
@@ -190,7 +182,6 @@
 				
 				}
 				
-				
 				if(error.responseJSON.errors.user_name=="The user name has already been taken."){
 							  
 				  $('#user_nameError').html("<b>"+ user_name +"</b> has already been taken.");
@@ -213,16 +204,13 @@
 				  
 				  $('#user_job_titleError').text(error.responseJSON.errors.user_job_title);
 				  document.getElementById('user_job_titleError').className = "invalid-feedback";	
-				
-				  $('#switch_notice_off').show();
-				  $('#sw_off').html("Invalid Input");
-				  setTimeout(function() { $('#switch_notice_off').fadeOut('slow'); },1000);	
+				  
+				  $('#InvalidModal').modal('toggle');				
 				  
 				}
 			   });
-		
 	  });
-	  
+
 	function ResetFormUser(){
 			
 			event.preventDefault();
@@ -234,7 +222,7 @@
 
 			document.getElementById('CreateUserform').className = "g-3 needs-validation";
 			
-	}		  
+	}	
 
 	<!--Select Site For Update-->
 	$('body').on('click','#editUser',function(){
@@ -245,7 +233,7 @@
 			$('#update_user_passwordError').text('');
 			$('#update_user_typeError').text('');
 			$('#update_user_job_titleError').text('');
-			
+					
 			event.preventDefault();
 			let UserID = $(this).data('id');
 			
@@ -262,14 +250,21 @@
 					
 					document.getElementById("update-user").value = UserID;
 					document.getElementById("update-user").disabled = true;
-					
 					/*Set Switch Details*/
 					document.getElementById("update_user_real_name").value = response.user_real_name;
 					document.getElementById("update_user_name").value = response.user_name;
-					document.getElementById("update_user_type").value = response.user_type;
 					document.getElementById("update_user_email_address_management").value = response.user_email_address;
+					document.getElementById("update_user_type").value = response.user_type;
+					document.getElementById("update_user_access").value = response.user_access;
 					document.getElementById("update_user_job_title").value = response.user_job_title;
-					$('#UpdateUserModal').modal('toggle');					
+					
+					$('#update_user_email_address_managementError').html("");
+					document.getElementById('update_user_email_address_managementError').className = "valid-feedback";
+					document.getElementById('update_user_email_address_management').className = "form-control";
+
+						
+					$('#UpdateUserModal').modal('toggle');	
+					
 				  
 				  }
 				},
@@ -279,7 +274,7 @@
 				}
 			   });		
 	  });
-
+	  
 	document.getElementById("update_user_real_name").addEventListener('change', doThing_account_management);
 	document.getElementById("update_user_name").addEventListener('change', doThing_account_management);
 	document.getElementById("update_user_email_address_management").addEventListener('change', doThing_account_management);
@@ -315,30 +310,27 @@
 				  
 				  if(user_password!==''){
 						
-						 //alert('S1');
-						if(response.user_real_name===user_real_name && response.user_name===user_name && response.user_email_address===user_email_address && response.user_type===user_type && response.user_branch_access_type===user_access && response.user_job_title===user_job_title){
+						// alert('S1');
+						if(response.user_real_name===user_real_name && response.user_name===user_name && response.user_email_address===user_email_address && response.user_type===user_type && response.user_access===user_access && response.user_job_title===user_job_title){
 							
 							document.getElementById("update-user").disabled = false;
-							//alert('b');
 							
 						}else{
 							
 							document.getElementById("update-user").disabled = false;
-							//alert('c');
+							
 						}
 					
 				  }else{
 					  
 					  // alert('S2');
-					  if(response.user_real_name===user_real_name && response.user_name===user_name && response.user_email_address===user_email_address && response.user_type===user_type && response.user_branch_access_type===user_access && response.user_job_title===user_job_title){
+					  if(response.user_real_name===user_real_name && response.user_name===user_name && response.user_email_address===user_email_address && response.user_type===user_type && response.user_access===user_access && response.user_job_title===user_job_title){
 							
 							document.getElementById("update-user").disabled = true;
-							//alert('d')
 							
 						}else{
 							
 							document.getElementById("update-user").disabled = false;
-							//alert('e')
 							
 						}
 					  
@@ -354,7 +346,6 @@
 	   
     }
 	  
-
 	$("#update-user").click(function(event){
 			
 			event.preventDefault();
@@ -371,9 +362,9 @@
 
 			let user_real_name 		= $("input[name=update_user_real_name]").val();
 			let user_name 			= $("input[name=update_user_name]").val();
-			let user_password 		= $("input[name=update_user_password]").val();
-			let user_type 			= $("#update_user_type").val();		
 			let user_email_address 	= $("input[name=update_user_email_address_management]").val();
+			let user_password 		= $("input[name=update_user_password]").val();
+			let user_type 			= $("#update_user_type").val();	
 			let user_access 		= $("#update_user_access").val();
 			let user_job_title 		= $("input[name=update_user_job_title]").val();
 			
@@ -405,7 +396,14 @@
 					$('#sw_on').html(response.success);
 					setTimeout(function() { $('#switch_notice_on').fadeOut('fast'); },1000);
 					
+					$('.success_modal_bg').html(response.success);
+					$('#SuccessModal').modal('toggle');	
+					
 					$('#UpdateUserModal').modal('toggle');
+		
+					if(user_access=='BYSITE'){
+						UpdateUserAccess(userID);
+					}
 					
 					var table = $("#userList").DataTable();
 				    table.ajax.reload(null, false);
@@ -438,7 +436,7 @@
 				  
 				}else{
 					
-				  $('#update_user_nameError').text(error.responseJSON.errors.user_real_name);
+				  $('#update_user_nameError').text(error.responseJSON.errors.user_name);
 				  document.getElementById('update_user_nameError').className = "invalid-feedback";		
 				
 				}
@@ -467,13 +465,12 @@
 			      $('#update_user_job_titleError').text(error.responseJSON.errors.user_job_title);
 				  document.getElementById('update_user_job_titleError').className = "invalid-feedback";					  
 				
-				$('#switch_notice_off').show();
-				$('#sw_off').html("Invalid Input");
-				setTimeout(function() { $('#switch_notice_off').fadeOut('slow'); },1000);	
+				$('#InvalidModal').modal('toggle');
 				  
 				}
 			   });
 	  });
+	  
 	<!--Switch Deletion Confirmation-->
 	$('body').on('click','#deleteUser',function(){
 			
@@ -508,8 +505,8 @@
 			   });	
 	  });
 
-	  <!--User Confirmed For Deletion-->
-	  $('body').on('click','#deleteUserConfirmed',function(){
+	<!--User Confirmed For Deletion-->
+	$('body').on('click','#deleteUserConfirmed',function(){
 			
 			event.preventDefault();
 
@@ -526,10 +523,9 @@
 				  console.log(response);
 				  
 				  if(response) {
-					
-					$('#switch_notice_off').show();
-					$('#sw_off').html("User Account Deleted");
-					setTimeout(function() { $('#switch_notice_off').fadeOut('slow'); },1000);	
+					  
+					$('.success_modal_bg').html("Successfully deleted!");
+					$('#SuccessModal').modal('toggle');	
 
 					var table = $("#userList").DataTable();
 				    table.ajax.reload(null, false);
@@ -540,16 +536,13 @@
 				}
 			   });	
 		
-	  });
-	  
+	});
 
 	<!--Update User Site Access-->
 	function UpdateUserAccess(UserID){
-			
-			event.preventDefault();
-			
+					
 			  $.ajax({
-				url: "{{ route('getUserBranchAccess') }}",
+				url: "{{ route('getUserSiteAccess') }}",
 				type:"GET",
 				data:{
 				  UserID:UserID,
@@ -566,6 +559,8 @@
 					/*Get User Info*/
 					UserSiteInfo(UserID);
 					
+					document.getElementById("update-user-site-access").disabled = true;
+					
 					$('#SiteUserAccessModal').modal('toggle');					
 				  
 				  }
@@ -578,16 +573,6 @@
 	}
 
 	let LoadSiteList = $('#UserSiteAccessList').DataTable( {
-				"language": {
-						"lengthMenu":'<select class="form-select form-control form-control-sm">'+
-			             '<option value="10">10</option>'+
-			             '<option value="20">20</option>'+
-			             '<option value="30">30</option>'+
-			             '<option value="40">40</option>'+
-			             '<option value="50">50</option>'+
-			             '<option value="-1">All</option>'+
-			             '</select> '
-			    }, 
 				//processing: true,
 				//serverSide: true,
 				//stateSave: true,/*Remember Searches*/
@@ -596,14 +581,43 @@
 				searching: true,
 				info: true,
 				data: [],
+				scrollCollapse: true,
+				scrollY: '500px',
+				scrollX: '100%',
 				"columns": [
 					{data: 'action', name: 'action', orderable: false, searchable: false},   
-					{data: 'DT_RowIndex', name: 'DT_RowIndex' , orderable: false, searchable: false},
-					{data: 'branch_code'},
-					{data: 'branch_name'}
+					{data: 'DT_RowIndex', name: 'DT_RowIndex' , orderable: false, searchable: false, className: "text-right",},
+					{data: 'building_code', className: "text-left"},
+					{data: 'building_description', className: "text-left"}
 				]
 	} );
-  
+	
+		autoAdjustColumns_site_access(LoadSiteList);
+
+		 /*Adjust Table Column*/
+		 function autoAdjustColumns_site_access(table) {
+			 var container = table.table().container();
+			 var resizeObserver = new ResizeObserver(function () {
+				 table.columns.adjust();
+			 });
+			 resizeObserver.observe(container);
+		 }	
+	function enableUpdateUserAccess(){
+		
+			var site_checklist_item = [];		
+			$.each($("input[name='site_checklist']:checked"), function(){
+			site_checklist_item.push($(this).val());
+			});
+			
+			//if(site_checklist_item!=''){
+				document.getElementById("update-user-site-access").disabled = false;
+			//}
+			//else{
+			//	document.getElementById("update-user-site-access").disabled = true;
+			//}
+			
+	}
+	
 	$('body').on('click','#update-user-site-access',function(){
 			
 			event.preventDefault();
@@ -671,13 +685,5 @@
 				}
 			   });		
 	  };
-	  
-	function ResetFormUser(){
-			
-			event.preventDefault();
-			$('#CreateUserform')[0].reset();
-
-			document.getElementById('CreateUserform').className = "g-3 needs-validation";
-	}		  
 	  
 </script>

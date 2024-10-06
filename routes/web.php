@@ -1,26 +1,31 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserAuthController;
-use App\Http\Controllers\BillingTransactionController;
-use App\Http\Controllers\SOBillingTransactionController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ProductTankController;
-use App\Http\Controllers\ClientController;
-use App\Http\Controllers\BranchController;
-use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\ReportController;
+use App\Http\Controllers\CAMRUserAuthController;
+use App\Http\Controllers\CAMRSiteController;
+use App\Http\Controllers\CAMRGatewayController;
+use App\Http\Controllers\CAMRMeterController;
+use App\Http\Controllers\CAMRBuildingController;
+use App\Http\Controllers\CAMRMeterLocationController;
+use App\Http\Controllers\CAMRGatewayDeviceController;
+
+use App\Http\Controllers\ReportSettingsController;
+use App\Http\Controllers\SAPReportController;
+use App\Http\Controllers\RAWReportController;
+use App\Http\Controllers\SiteReportController;
+use App\Http\Controllers\SiteAsBuiltController;
+use App\Http\Controllers\OfflineReportController;
+
+use App\Http\Controllers\ConsumptionReportController;
+use App\Http\Controllers\DemandReportController;
+
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\ReceivablesController;
-use App\Http\Controllers\SalesOrderController;
-use App\Http\Controllers\SalesOrderDeliveryController;
-use App\Http\Controllers\PurchaseOrderController;
-use App\Http\Controllers\PurchaseOrderDeliveryController;
-use App\Http\Controllers\PurchaseOrderController_v2;
-use App\Http\Controllers\CashiersReportController;
-use App\Http\Controllers\CashiersReport_Dipstick_Inventory_Controller;
-use App\Http\Controllers\UserBranchAccessController;
-use App\Http\Controllers\SalesSummaryController;
+use App\Http\Controllers\UserSiteAccessController;
+use App\Http\Controllers\CAMRSampleExcel;
+
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\DivisionController;
+
 use App\Http\Controllers\EmailController;
 
 /*
@@ -34,128 +39,187 @@ use App\Http\Controllers\EmailController;
 |
 */
 
-/*SAMPLE EXCEL
-Route::get('/sample1', [CAMRSampleExcel::class,'sample1'])->name('site')->middleware('isLoggedIn');
-*/
+/*SAMPLE EXCEL*/
+#Route::get('/sample1', [CAMRSampleExcel::class,'sample1'])->name('site')->middleware('isLoggedIn');
 
 /*Login Page*/
-Route::get('/',[UserAuthController::class,'login'])->middleware('alreadyLoggedIn');
-Route::post('login-user', [UserAuthController::class,'loginUser'])->name('login-user');
-/*Logout*/
-Route::get('logout', [UserAuthController::class,'logout']);
+Route::get('/',[CAMRUserAuthController::class,'login'])->middleware('alreadyLoggedIn');
+Route::post('login-user', [CAMRUserAuthController::class,'loginUser'])->name('login-user');
 
 /*Reset Password - Unable to Login*/
-Route::get('/passwordreset',[UserAuthController::class,'passwordreset'])->name('passwordreset');
+Route::get('/passwordreset',[CAMRUserAuthController::class,'passwordreset'])->name('passwordreset');
 Route::post('/reset-password', [EmailController::class, 'sendTemporaryPasswordtoEmail'])->name('sendTemporaryPasswordtoEmail');
 
+/*Logout*/
+Route::get('logout', [CAMRUserAuthController::class,'logout']);
 
-/*Load Billing Transaction*/
-Route::get('/billing', [BillingTransactionController::class,'billing'])->name('billing')->middleware('isLoggedIn');
+/*Load Site*/
+Route::get('/site', [CAMRSiteController::class,'site'])->name('site')->middleware('isLoggedIn');
+Route::get('site/list', [CAMRSiteController::class, 'getSiteForAdmin'])->name('AdminSiteList')->middleware('isLoggedIn');
+Route::get('site/user/list', [CAMRSiteController::class, 'getSiteForUser'])->name('UserSiteList')->middleware('isLoggedIn');
 
-Route::get('billing/list', [BillingTransactionController::class, 'getBillingTransactionList'])->name('getBillingTransactionList')->middleware('isLoggedIn');
+/*Create Site*/
+Route::post('/create_site_post', [CAMRSiteController::class,'create_site_post'])->name('create_site_post')->middleware('isLoggedIn');
 
-/*Billed Item to MAnually Generated*/
-Route::get('billing/billed_list', [BillingTransactionController::class, 'getBillingTransactionList_Billed'])->name('getBillingTransactionList_Billed')->middleware('isLoggedIn');
+/*Update Site*/
+Route::post('/update_site_post', [CAMRSiteController::class,'update_site_post'])->name('update_site_post')->middleware('isLoggedIn');
 
-/*Create Bill*/
-Route::post('/create_bill_post', [BillingTransactionController::class,'create_bill_post'])->name('create_bill_post')->middleware('isLoggedIn');
-/*Update Bill*/
-Route::post('/update_bill_post', [BillingTransactionController::class,'update_bill_post'])->name('update_bill_post')->middleware('isLoggedIn');
-/*GET Bill Info*/
-Route::post('/bill_info', [BillingTransactionController::class, 'bill_info'])->name('bill_info')->middleware('isLoggedIn');
-/*Confirm Delete Bill*/
-Route::post('/delete_bill_confirmed', [BillingTransactionController::class, 'delete_bill_confirmed'])->name('delete_bill_confirmed')->middleware('isLoggedIn');
+/*GET Site Info*/
+Route::post('/site_info', [CAMRSiteController::class, 'site_info'])->name('site_info')->middleware('isLoggedIn');
 
-/*FOR SO Billing*/
-Route::get('/create_so_billing', [SOBillingTransactionController::class,'create_so_billing'])->name('create_so_billing')->middleware('isLoggedIn');
-/*Create SO*/
+/*Confirm Delete Site*/
+Route::post('/delete_site_confirmed', [CAMRSiteController::class, 'delete_site_confirmed'])->name('delete_site_confirmed')->middleware('isLoggedIn');
 
-Route::get('/so', [SOBillingTransactionController::class,'so'])->name('so')->middleware('isLoggedIn');
-Route::get('so/list', [SOBillingTransactionController::class, 'getSOBillingTransactionList'])->name('getSOBillingTransactionList')->middleware('isLoggedIn');
-Route::post('/so_info', [SOBillingTransactionController::class, 'so_info'])->name('so_info')->middleware('isLoggedIn');
-Route::post('/delete_so_confirmed', [SOBillingTransactionController::class, 'delete_so_confirmed'])->name('delete_so_confirmed')->middleware('isLoggedIn');
+/*Site Dashboard*/
+Route::get('/site_details/{siteID}', [CAMRSiteController::class,'site_details_2'])->name('site_details')->middleware('isLoggedIn');
+Route::get('/site_details_2/{siteID}', [CAMRSiteController::class,'site_details_2'])->name('site_details_2')->middleware('isLoggedIn');
 
-Route::post('/create_so_post', [SOBillingTransactionController::class,'create_so_post'])->name('CreateSOPost')->middleware('isLoggedIn');
-Route::get('/so_add_product/{id}', [SOBillingTransactionController::class, 'so_add_product'])->name('so_add_product')->middleware('isLoggedIn');
-Route::post('/update_so_post', [SOBillingTransactionController::class,'update_so_post'])->name('UpdateSOPost')->middleware('isLoggedIn');
-Route::post('/so_add_product_post', [SOBillingTransactionController::class,'so_add_product_post'])->name('SOAddProductPost')->middleware('isLoggedIn');
-Route::post('/get_so_product', [SOBillingTransactionController::class,'get_so_product'])->name('GetSoProduct')->middleware('isLoggedIn');
-Route::post('/so_update_product_post', [SOBillingTransactionController::class,'so_update_product_post'])->name('SOUpdateProductPost')->middleware('isLoggedIn');
+/*Save Site Current Tab*/
+Route::post('/save_site_tab', [CAMRSiteController::class, 'save_site_tab'])->name('save_site_tab')->middleware('isLoggedIn');
 
-/*Dev Date Nov 30 2022*/
-/*Load Product List*/
-Route::get('/product', [ProductController::class,'product'])->name('product')->middleware('isLoggedIn');
-Route::get('product/list', [ProductController::class, 'getProductList'])->name('getProductList')->middleware('isLoggedIn');
-/*Create Product*/
-Route::post('/create_product_post', [ProductController::class,'create_product_post'])->name('create_product_post')->middleware('isLoggedIn');
-/*GET Product Info*/
-Route::post('/product_info', [ProductController::class, 'product_info'])->name('product_info')->middleware('isLoggedIn');
-/*Update Product*/
-Route::post('/update_product_post', [ProductController::class,'update_product_post'])->name('update_product_post')->middleware('isLoggedIn');
-/*Confirm Delete Product*/
-Route::post('/delete_product_confirmed', [ProductController::class, 'delete_product_confirmed'])->name('delete_product_confirmed')->middleware('isLoggedIn');
-/*Load Product Pricing Per Branch 01-02-2023*/
-Route::post('/get_product_pricing_per_branch', [ProductController::class,'get_product_pricing_per_branch'])->name('ProductPricingPerBranch')->middleware('isLoggedIn');
-/*Save Product Pricing Per Branch 01-02-2023*/
-Route::post('/save_branches_product_pricing_post', [ProductController::class,'save_branches_product_pricing_post'])->name('save_branches_product_pricing_post')->middleware('isLoggedIn');
-/*Load Product Pricing Per Branch per Billing 01-09-2023*/
-Route::post('/get_product_list_pricing_per_branch', [ProductController::class,'get_product_list_pricing_per_branch'])->name('ProductListPricingPerBranch')->middleware('isLoggedIn');
-/**/
-Route::get('/update_product_information', [ProductController::class, 'update_product_information'])->name('update_product_information')->middleware('isLoggedIn');
-/*Product Tank*/
-Route::post('/get_product_tank', [ProductTankController::class,'get_product_tank'])->name('ProductTank')->middleware('isLoggedIn');
-/*Product Tank per Branch*/
-Route::post('/get_product_tank_per_branch', [ProductTankController::class,'get_product_tank_per_branch'])->name('ProductTankPerBranch')->middleware('isLoggedIn');
-/*Create Product Tank*/
-Route::post('/create_tank_post', [ProductTankController::class,'create_tank_post'])->name('create_tank_post')->middleware('isLoggedIn');
-/* Product Tank Info*/
-Route::post('/product_tank_info', [ProductTankController::class, 'product_tank_info'])->name('product_tank_info')->middleware('isLoggedIn');
-/*Update Product Tank*/
-Route::post('/update_tank_post', [ProductTankController::class,'update_tank_post'])->name('update_tank_post')->middleware('isLoggedIn');
-
-Route::post('/delete_product_tank_confirmed', [ProductTankController::class, 'delete_product_tank_confirmed'])->name('delete_product_tank_confirmed')->middleware('isLoggedIn');
-
-/*Dev Date Nov 30 2022*/
-/*Load Client List*/
-Route::get('/client', [ClientController::class,'client'])->name('client')->middleware('isLoggedIn');
-Route::get('client/list', [ClientController::class, 'getClientList'])->name('getClientList')->middleware('isLoggedIn');
-/*Create Product*/
-Route::post('/create_client_post', [ClientController::class,'create_client_post'])->name('create_client_post')->middleware('isLoggedIn');
-/*GET Product Info*/
-Route::post('/client_info', [ClientController::class, 'client_info'])->name('client_info')->middleware('isLoggedIn');
-/*Update Product*/
-Route::post('/update_client_post', [ClientController::class,'update_client_post'])->name('update_client_post')->middleware('isLoggedIn');
-/*Confirm Delete Product*/
-Route::post('/delete_client_confirmed', [ClientController::class, 'delete_client_confirmed'])->name('delete_client_confirmed')->middleware('isLoggedIn');
+/*Load Gateway List Persite*/
+Route::get('getGateway/', [CAMRGatewayController::class,'getGateway'])->name('getGateway')->middleware('isLoggedIn');
+/*Load Offline Gateway List Persite*/
+Route::get('getOfflineGateway/', [CAMRGatewayController::class,'getOfflineGateway'])->name('getOfflineGateway')->middleware('isLoggedIn');
 
 
-/*Load Billing Report History Interface*/
-Route::get('/billing_history', [ReportController::class,'billing_history'])->name('report')->middleware('isLoggedIn');
-/*Generate via Web Page View - For receivable*/
-Route::post('/generate_report_recievable', [ReportController::class,'generate_report_recievable'])->name('generate_report_recievable')->middleware('isLoggedIn');
-/*Generate via Web Page View - For receivable*/
-Route::post('/generate_report_recievable_after_saved', [ReportController::class,'generate_report_recievable_after_saved'])->name('generate_report_recievable_after_saved')->middleware('isLoggedIn');
+/*Load Gateway List BLD and EE ROOM*/
+Route::get('getGatewayPerBLGandEEROOM/', [CAMRGatewayController::class,'getGatewayPerBLGandEEROOM'])->name('getGatewayPerBLGandEEROOM')->middleware('isLoggedIn');
+Route::get('ReloadGatewayOption/', [CAMRGatewayController::class,'ReloadGatewayOption'])->name('ReloadGatewayOption')->middleware('isLoggedIn');
 
+/*Create Gateway*/
+Route::post('/create_gateway_post', [CAMRGatewayController::class,'create_gateway_post'])->name('create_gateway_post')->middleware('isLoggedIn');
 
-/*Load SOA Summary Report History Interface*/
-Route::get('/soa_summary_history', [ReportController::class,'soa_summary_history'])->name('soa_summary_history')->middleware('isLoggedIn');
-/*Generate via Web Page View - For receivable*/
-Route::post('/generate_soa_summary', [ReportController::class,'generate_soa_summary'])->name('generate_soa_summary')->middleware('isLoggedIn');
-/*Generate via Web Page View - For receivable*/
-Route::get('/generate_soa_summary_pdf', [ReportController::class,'generate_soa_summary_pdf'])->name('generate_soa_summary_pdf')->middleware('isLoggedIn');
-//Route::get('/generate_soa_summary_pdf', [ReportController::class,'generate_soa_summary_pdf'])->name('generate_receivable_soa_pdf')->middleware('isLoggedIn');
-//Route::post('/generate_report_recievable_after_saved', [ReportController::class,'generate_report_recievable_after_saved'])->name('generate_report_recievable_after_saved')->middleware('isLoggedIn');
+/*Update Gateway*/
+Route::post('/update_gateway_post', [CAMRGatewayController::class,'update_gateway_post'])->name('update_gateway_post')->middleware('isLoggedIn');
 
+/*GET Gateway Info*/
+Route::post('/gateway_info', [CAMRGatewayController::class, 'gateway_info'])->name('gateway_info')->middleware('isLoggedIn');
 
+/*Confirm Delete Gateway*/
+Route::post('/delete_gateway_confirmed', [CAMRGatewayController::class, 'delete_gateway_confirmed'])->name('delete_gateway_confirmed')->middleware('isLoggedIn');
+
+Route::post('/import_meters', [CAMRGatewayController::class, 'import_meters'])->name('import_meters')->middleware('isLoggedIn');
+
+/*Enable CSV Update*/
+Route::post('enablecsvUpdate/', [CAMRGatewayController::class,'enablecsvUpdate'])->name('enablecsvUpdate')->middleware('isLoggedIn');
+
+/*Disable CSV Update*/
+Route::post('disablecsvUpdate/', [CAMRGatewayController::class,'disablecsvUpdate'])->name('disablecsvUpdate')->middleware('isLoggedIn');
+
+/*Enable Site Code Update*/
+Route::post('enablesitecodeUpdate/', [CAMRGatewayController::class,'enablesitecodeUpdate'])->name('enablesitecodeUpdate')->middleware('isLoggedIn');
+
+/*Disable Site Code Update*/
+Route::post('disablesitecodeUpdate/', [CAMRGatewayController::class,'disablesitecodeUpdate'])->name('disablesitecodeUpdate')->middleware('isLoggedIn');
+
+/*Enable SSH*/
+Route::post('enableSSH/', [CAMRGatewayController::class,'enableSSH'])->name('enableSSH')->middleware('isLoggedIn');
+
+/*Disable SSH*/
+Route::post('disableSSH/', [CAMRGatewayController::class,'disableSSH'])->name('disableSSH')->middleware('isLoggedIn');
+
+/*Enable Force Load Profile*/
+Route::post('enableLP/', [CAMRGatewayController::class,'enableLP'])->name('enableLP')->middleware('isLoggedIn');
+
+/*Disable Force Load Profile*/
+Route::post('disableLP/', [CAMRGatewayController::class,'disableLP'])->name('disableLP')->middleware('isLoggedIn');
+
+/*Load Meter List Persite*/
+Route::get('getMeter/', [CAMRMeterController::class,'getMeter'])->name('getMeter')->middleware('isLoggedIn');
+/*Load Meter List Gateway*/
+Route::get('getMetersPerGateway/', [CAMRMeterController::class,'getMetersPerGateway'])->name('getMetersPerGateway')->middleware('isLoggedIn');
+/*Load Offline Meter List Gateway*/
+Route::get('getOfflineMeter/', [CAMRMeterController::class,'getOfflineMeter'])->name('getOfflineMeter')->middleware('isLoggedIn');
+
+/*Create Meter*/
+Route::post('/create_meter_post', [CAMRMeterController::class,'create_meter_post'])->name('CREATE_METER_INFO')->middleware('isLoggedIn');
+/*Update Meter*/
+Route::post('/update_meter_post', [CAMRMeterController::class,'update_meter_post'])->name('UPDATE_METER_INFO')->middleware('isLoggedIn');
+/*Meter Info*/
+Route::post('/meter_info', [CAMRMeterController::class,'meter_info'])->name('MeterInfo')->middleware('isLoggedIn');
+/*Delete Meter Info*/
+Route::post('/delete_meter_confirmed', [CAMRMeterController::class,'delete_meter_confirmed'])->name('DeleteMeterInfo')->middleware('isLoggedIn');
+
+/*Load Building List Persite*/
+Route::get('getBuilding/', [CAMRBuildingController::class,'get_Building'])->name('getBuilding')->middleware('isLoggedIn');
+/*Create Building*/
+Route::post('/create_building_post', [CAMRBuildingController::class,'create_building_post'])->name('CREATE_BUILDING_INFO')->middleware('isLoggedIn');
+/*Update Building*/
+Route::post('/update_building_post', [CAMRBuildingController::class,'update_building_post'])->name('UPDATE_BUILDING_INFO')->middleware('isLoggedIn');
+/*Meter Building*/
+Route::post('/building_info', [CAMRBuildingController::class,'building_info'])->name('BldgInfo')->middleware('isLoggedIn');
+/*Delete Building Info*/
+Route::post('/delete_building_confirmed', [CAMRBuildingController::class,'delete_building_confirmed'])->name('DeleteBuildingInfo')->middleware('isLoggedIn');
+
+Route::post('get_building_accordion/', [CAMRBuildingController::class,'get_building_accordion'])->name('get_building_accordion')->middleware('isLoggedIn');
+
+/*Load Meter Location List Persite*/
+Route::post('getMeterLocation/', [CAMRMeterLocationController::class,'get_MeterLocation'])->name('getMeterLocation')->middleware('isLoggedIn');
+/*Create Meter Location*/
+Route::post('/create_meter_location_post', [CAMRMeterLocationController::class,'create_meter_location_post'])->name('CREATE_METER_LOCATION_INFO')->middleware('isLoggedIn');
+/*Update Meter Location*/
+Route::post('/update_meter_location_post', [CAMRMeterLocationController::class,'update_meter_location_post'])->name('UPDATE_METER_LOCATION_INFO')->middleware('isLoggedIn');
+/*Meter Meter Location*/
+Route::post('/meter_location_info', [CAMRMeterLocationController::class,'meter_location_info'])->name('MeterLocationInfo')->middleware('isLoggedIn');
+/*Delete Meter Location Info*/
+Route::post('/delete_meter_location_confirmed', [CAMRMeterLocationController::class,'delete_meter_location_confirmed'])->name('DeleteMeterLocationInfo')->middleware('isLoggedIn');
+
+Route::post('/get_ee_room_location_accordion', [CAMRMeterLocationController::class,'get_ee_room_location_accordion'])->name('get_ee_room_location_accordion')->middleware('isLoggedIn');
+
+/*Get Building List*/
+Route::post('/generate_building_list', [ReportSettingsController::class,'generate_building_list'])->name('GetBuildingList')->middleware('isLoggedIn');
+/*Get Meter List*/
+Route::post('/generate_meter_list', [ReportSettingsController::class,'generate_meter_list'])->name('GetMeterList')->middleware('isLoggedIn');
+
+/*SAP Report Generation*/
+Route::get('/sap_report/', [SAPReportController::class,'sap_report'])->name('SAPReport')->middleware('isLoggedIn');
 /*Generate via Web Page View*/
-Route::post('/generate_report', [ReportController::class,'generate_report'])->name('generate_report')->middleware('isLoggedIn');
-/*Download Directly via Excel*/
-Route::get('/generate_report_excel', [ReportController::class,'generate_report_excel'])->name('generate_report_excel')->middleware('isLoggedIn');
-/*Download via PDF*/
-Route::get('/generate_report_pdf', [ReportController::class,'generate_report_pdf'])->name('generate_report_pdf')->middleware('isLoggedIn');
+Route::post('/generate_sap_report', [SAPReportController::class,'generate_sap_report'])->name('generate_sap_report')->middleware('isLoggedIn');
+/*Download SAP Directly via Excel*/
+Route::get('/generate_sap_report_excel', [SAPReportController::class,'generate_sap_report_excel'])->name('generate_sap_report_excel')->middleware('isLoggedIn');
 
-/*Download via PDF*/
-Route::get('/generate_receivable_covered_bill_pdf', [ReportController::class,'generate_receivable_covered_bill_pdf'])->name('generate_receivable_covered_bill_pdf')->middleware('isLoggedIn');
+/*Download Offline Gateway*/
+Route::get('/download_offline_gateway', [OfflineReportController::class,'download_offline_gateway'])->name('download_offline_gateway')->middleware('isLoggedIn');
+//downloadofflinemeter
+/*Download Offline Meter*/
+Route::get('/download_offline_meter', [OfflineReportController::class,'download_offline_meter'])->name('download_offline_meter')->middleware('isLoggedIn');
+
+/*RAW Report Generation*/
+Route::get('/raw_report/', [RAWReportController::class,'raw_report'])->name('RAWReport')->middleware('isLoggedIn');
+/*Generate via Web Page View*/
+Route::post('/generate_raw_report', [RAWReportController::class,'generate_raw_report'])->name('generate_raw_report')->middleware('isLoggedIn');
+/*Download SAP Directly via Excel*/
+Route::get('/generate_raw_report_excel', [RAWReportController::class,'generate_raw_report_excel'])->name('generate_raw_report_excel')->middleware('isLoggedIn');
+
+/*Site Report Generation*/
+Route::get('/site_report/', [SiteReportController::class,'site_report'])->name('SiteReport')->middleware('isLoggedIn');
+/*Generate via Web Page View*/
+Route::post('/generate_site_report', [SiteReportController::class,'generate_site_report'])->name('generate_site_report')->middleware('isLoggedIn');
+/*Download SAP Directly via Excel*/
+Route::get('/generate_site_report_excel', [SiteReportController::class,'generate_site_report_excel'])->name('generate_site_report_excel')->middleware('isLoggedIn');
+
+/*Download Meter List an Gateway*/
+Route::get('/generate_site_as_built_excel', [SiteAsBuiltController::class,'generate_site_as_built_excel'])->name('generate_site_as_built_excel')->middleware('isLoggedIn');
+
+
+/*Consumption Per Meter*/
+Route::get('/consumption_report/', [ConsumptionReportController::class,'consumption_report'])->name('ConsumptionReport')->middleware('isLoggedIn');
+/*Generate Meter Consumption Hourly*/
+Route::post('/generate_consumption_report/hourly', [ConsumptionReportController::class,'consumption_report_hourly'])->name('consumption_report_hourly')->middleware('isLoggedIn');
+/*Generate Meter Consumption Daily*/
+Route::post('/generate_consumption_report/daily', [ConsumptionReportController::class,'consumption_report_daily'])->name('consumption_report_daily')->middleware('isLoggedIn');
+/*Downlows Meter Consumption Hourly or Daily*/
+Route::get('/download_consumption_report', [ConsumptionReportController::class,'download_consumption_report'])->name('download_consumption_report')->middleware('isLoggedIn');
+
+/*Demand Per Meter*/
+Route::get('/demand_report/', [DemandReportController::class,'demand_report'])->name('DemandReport')->middleware('isLoggedIn');
+/*Generate Meter Demand Hourly*/
+Route::post('/generate_demand_report/hourly', [DemandReportController::class,'demand_report_hourly'])->name('demand_report_hourly')->middleware('isLoggedIn');
+/*Generate Meter Demand Daily*/
+Route::post('/generate_demand_report/fifteen', [DemandReportController::class,'demand_report_15'])->name('demand_report_15')->middleware('isLoggedIn');
+/*Downlows Meter Demand Hourly or Daily*/
+Route::get('/download_demand_report', [DemandReportController::class,'download_demand_report'])->name('download_demand_report')->middleware('isLoggedIn');
 
 /*Load User Account List for Admin Only*/
 Route::get('/user', [UserController::class,'user'])->name('user')->middleware('isLoggedIn');
@@ -163,6 +227,26 @@ Route::get('/user', [UserController::class,'user'])->name('user')->middleware('i
 Route::post('user_list', [UserController::class, 'getUserList'])->name('UserList')->middleware('isLoggedIn');
 /*Create User*/
 Route::post('/create_user_post', [UserController::class,'create_user_post'])->name('create_user_post')->middleware('isLoggedIn');
+/*View Site Access*/
+Route::get('user_site_access', [UserSiteAccessController::class, 'getUserSiteAccess'])->name('getUserSiteAccess')->middleware('isLoggedIn');
+/*Add Site Access*/
+Route::post('/add_user_access_post', [UserSiteAccessController::class,'add_user_access_post'])->name('add_user_access_post')->middleware('isLoggedIn');
+
+/*Company Info*/
+Route::get('/company', [CompanyController::class,'company'])->name('company')->middleware('isLoggedIn');
+Route::post('company_list', [CompanyController::class, 'getCompanyList'])->name('CompanyList')->middleware('isLoggedIn');
+Route::post('create_company_post', [CompanyController::class, 'create_company_post'])->name('create_company_post')->middleware('isLoggedIn');
+Route::post('/company_info', [CompanyController::class, 'company_info'])->name('company_info')->middleware('isLoggedIn');
+Route::post('update_company_post', [CompanyController::class, 'update_company_post'])->name('update_company_post')->middleware('isLoggedIn');
+Route::post('/delete_company_confirmed', [CompanyController::class, 'delete_company_confirmed'])->name('delete_company_confirmed')->middleware('isLoggedIn');
+
+/*Division Info*/
+Route::get('/division', [DivisionController::class,'division'])->name('division')->middleware('isLoggedIn');
+Route::post('division_list', [DivisionController::class, 'getDivisionList'])->name('DivisionList')->middleware('isLoggedIn');
+Route::post('create_division_post', [DivisionController::class, 'create_division_post'])->name('create_division_post')->middleware('isLoggedIn');
+Route::post('/division_info', [DivisionController::class, 'division_info'])->name('division_info')->middleware('isLoggedIn');
+Route::post('update_division_post', [DivisionController::class, 'update_division_post'])->name('update_division_post')->middleware('isLoggedIn');
+Route::post('/delete_division_confirmed', [DivisionController::class, 'delete_division_confirmed'])->name('delete_division_confirmed')->middleware('isLoggedIn');
 
 /*GET User Info*/
 Route::post('/user_info', [UserController::class, 'user_info'])->name('user_info')->middleware('isLoggedIn');
@@ -173,303 +257,26 @@ Route::post('/delete_user_confirmed', [UserController::class, 'delete_user_confi
 /*Update User Account*/
 Route::post('/user_account_post', [UserController::class,'user_account_post'])->name('user_account_post')->middleware('isLoggedIn');
 
+ 
+/*CHECK TIME*/
+Route::get('/check_time.php', [CAMRGatewayDeviceController::class,'check_time'])->name('check_time');
+/*Update CSV*/
+Route::get('/rtu/index.php/rtu/rtu_check_update/{mac}/get_update_csv', [CAMRGatewayDeviceController::class,'csv_update_status'])->name('csv_update_status');
+Route::get('/rtu/index.php/rtu/rtu_check_update/{mac}/get_content_csv', [CAMRGatewayDeviceController::class,'csv_download'])->name('csv_download');
+Route::get('/rtu/index.php/rtu/rtu_check_update/{mac}/reset_update_csv', [CAMRGatewayDeviceController::class,'csv_update_status_reset'])->name('csv_update_status_reset');
+/*Update Location*/
+Route::get('/rtu/index.php/rtu/rtu_check_update/{mac}/get_update_location', [CAMRGatewayDeviceController::class,'site_code_update_status'])->name('site_code_update_status');
+Route::get('/rtu/index.php/rtu/rtu_check_update/{mac}/get_content_location', [CAMRGatewayDeviceController::class,'site_code_download'])->name('site_code_download');
+Route::get('/rtu/index.php/rtu/rtu_check_update/{mac}/reset_update_location', [CAMRGatewayDeviceController::class,'site_code_update_status_reset'])->name('site_code_update_status_reset');
+/*Remote SSH*/
+Route::get('/rtu/index.php/rtu/rtu_check_update/{mac}/rtu_remote_ssh', [CAMRGatewayDeviceController::class,'gateway_ssh'])->name('gateway_ssh');
+/*Force Load Profile*/
+Route::get('/rtu/index.php/rtu/rtu_check_update/{mac}/force_lp', [CAMRGatewayDeviceController::class,'force_load_profile_status'])->name('force_load_profile_status');
+Route::get('/rtu/index.php/rtu/rtu_check_update/{mac}/reset_force_lp', [CAMRGatewayDeviceController::class,'force_load_profile_status_reset'])->name('force_load_profile_status_reset');
 
-/*Branch Access*/
-Route::get('user_branch_access', [UserBranchAccessController::class, 'getUserBranchAccess'])->name('getUserBranchAccess')->middleware('isLoggedIn');
-/*Add Site Access*/
-Route::post('/add_user_access_post', [UserBranchAccessController::class,'add_user_access_post'])->name('add_user_access_post')->middleware('isLoggedIn');
-
-/*Receivables*/
-/*December 17, 2022*/
-/*Load Create Receivable Interface June 18, 2023*/
-Route::get('/create_recievable', [ReceivablesController::class,'create_recievable'])->name('create_recievable')->middleware('isLoggedIn');
-/*Receivables List*/
-Route::get('/receivables', [ReceivablesController::class,'receivables'])->name('receivables')->middleware('isLoggedIn');
-Route::get('receivables/list_billing', [ReceivablesController::class, 'getReceivablesList_billing'])->name('getReceivablesList_billing')->middleware('isLoggedIn');
-Route::get('receivables/list_salesorder', [ReceivablesController::class, 'getReceivablesList_sales_order'])->name('getReceivablesList_sales_order')->middleware('isLoggedIn');
-/*GET receivables Info*/
-Route::post('/receivable_info', [ReceivablesController::class, 'receivable_info'])->name('receivable_info')->middleware('isLoggedIn');
-/*Confirm Delete receivables*/
-Route::post('/delete_receivable_confirmed', [ReceivablesController::class, 'delete_receivable_confirmed'])->name('delete_receivable_confirmed')->middleware('isLoggedIn');
-/*Create receivables*/
-Route::post('/create_receivables_post', [ReceivablesController::class,'create_receivables_post'])->name('create_receivables_post')->middleware('isLoggedIn');
-/*Create receivables*/
-Route::post('/update_receivables_post', [ReceivablesController::class,'update_receivables_post'])->name('update_receivables_post')->middleware('isLoggedIn');
-/*Get Receivables Payment*/
-Route::post('/get_receivable_payment_list', [ReceivablesController::class,'get_receivable_payment_list'])->name('get_receivable_payment_list')->middleware('isLoggedIn');
-/*Delete Receivables Payment*/
-Route::post('/delete_receivable_payment_item', [ReceivablesController::class,'delete_receivable_payment_item'])->name('delete_receivable_payment_item')->middleware('isLoggedIn');
-/*Save Receivables Payment*/
-Route::post('/save_receivable_payment_post', [ReceivablesController::class,'save_receivable_payment_post'])->name('save_receivable_payment_post')->middleware('isLoggedIn');
-/*Save Receivables Payment from Sales Order*/
-Route::post('/create_receivables_from_sale_order_post', [ReceivablesController::class,'create_receivables_from_sale_order_post'])->name('create_receivables_from_sale_order_post')->middleware('isLoggedIn');
-Route::post('/update_receivables_from_sale_order_post', [ReceivablesController::class,'update_receivables_from_sale_order_post'])->name('update_receivables_from_sale_order_post')->middleware('isLoggedIn');
+Route::post('/http_post_server', [CAMRGatewayDeviceController::class, 'http_post_server'])->name('http_post_server');
 
 
 
-Route::get('/receivable_from_billing_form', [ReceivablesController::class, 'receivable_from_billing_form'])->name('receivable_from_billing_form')->middleware('isLoggedIn');
-Route::post('/billing_to_receivable_product', [ReceivablesController::class,'billing_to_receivable_product'])->name('billing_to_receivable_product')->middleware('isLoggedIn');
-
-/*Sales Order*/
-/*January 04, 2023*/
-Route::get('/salesorder', [SalesOrderController::class,'salesorder'])->name('salesorder')->middleware('isLoggedIn');
-Route::get('salesorder/list', [SalesOrderController::class, 'getSalesOrderList'])->name('getSalesOrderList')->middleware('isLoggedIn');
-/*GET Sales Order Info*/
-Route::post('/sales_order_info', [SalesOrderController::class, 'sales_order_info'])->name('sales_order_info')->middleware('isLoggedIn');
-/*Confirm Delete Sales Order*/
-Route::post('/delete_sales_order_confirmed', [SalesOrderController::class, 'delete_sales_order_confirmed'])->name('delete_sales_order_confirmed')->middleware('isLoggedIn');
-/*Create Sales Order*/
-Route::post('/create_sales_order_post', [SalesOrderController::class,'create_sales_order_post'])->name('create_sales_order_post')->middleware('isLoggedIn');
-/*Update Sales Order*/
-Route::post('/update_sales_order_post', [SalesOrderController::class,'update_sales_order_post'])->name('update_sales_order_post')->middleware('isLoggedIn');
-/*Get Sales Order Product Item*/
-Route::post('/get_sales_order_product_list', [SalesOrderController::class,'get_sales_order_product_list'])->name('get_sales_order_product_list')->middleware('isLoggedIn');
-/*Delete Sales Order Product Item*/
-Route::post('/delete_sales_order_item', [SalesOrderController::class,'delete_sales_order_item'])->name('delete_sales_order_item')->middleware('isLoggedIn');
-/*Update Sales Order Status*/
-Route::post('/update_sales_status', [SalesOrderController::class,'update_sales_status'])->name('update_sales_status')->middleware('isLoggedIn');
-/*Update Sales Order Delivery Status*/
-Route::post('/update_sales_order_delivery_status', [SalesOrderController::class,'update_sales_order_delivery_status'])->name('update_sales_order_delivery_status')->middleware('isLoggedIn');
-/*Download Sales Order via PDF*/
-Route::get('/generate_sales_order_pdf', [ReportController::class,'generate_sales_order_pdf'])->name('generate_sales_order_pdf')->middleware('isLoggedIn');
-Route::get('/generate_sales_order_delivery_status_pdf', [ReportController::class,'generate_sales_order_delivery_status_pdf'])->name('generate_sales_order_delivery_status_pdf')->middleware('isLoggedIn');
-
-/*New Version for Sales Order*/
-Route::get('/sales_order_form', [SalesOrderController::class, 'sales_order_form'])->name('sales_order_form')->middleware('isLoggedIn');
-Route::post('/sales_order_component_info', [SalesOrderController::class,'sales_order_component_info'])->name('sales_order_component_info')->middleware('isLoggedIn');
-Route::post('/sales_order_component_compose', [SalesOrderController::class,'sales_order_component_compose'])->name('SalesOrderComponentCompose')->middleware('isLoggedIn');
-Route::post('/delete_sales_order_component_confirmed', [SalesOrderController::class,'delete_sales_order_component_confirmed'])->name('SalesOrderDeleteComponent')->middleware('isLoggedIn');
-
-/*Sales Order Delivery*/
-Route::post('/sales_order_component_delivery_compose', [SalesOrderDeliveryController::class,'sales_order_component_delivery_compose'])->name('SalesOrderDeliveryCompose')->middleware('isLoggedIn');
-Route::post('/get_sales_order_product_list_delivery', [SalesOrderDeliveryController::class,'get_sales_order_product_list_delivery'])->name('ProductListDelivery')->middleware('isLoggedIn');
-Route::post('/sales_order_component_delivery_info', [SalesOrderDeliveryController::class,'sales_order_component_delivery_info'])->name('SalesOrderDeliveryInfo')->middleware('isLoggedIn');
-Route::post('/delete_sales_order_product_delivery_confirmed', [SalesOrderDeliveryController::class,'delete_sales_order_product_delivery_confirmed'])->name('SalesOrderDeleteDelivery')->middleware('isLoggedIn');
 
 
-/*Get Receivable Payment Item*/
-Route::post('/receivable_payment_list', [ReceivablesController::class,'receivable_payment_list'])->name('receivable_payment_list')->middleware('isLoggedIn');
-/*Get Receivable Per Payment Item*/
-Route::post('/receivable_payment_info', [ReceivablesController::class,'receivable_payment_info'])->name('ReceivablePaymentInfo')->middleware('isLoggedIn');
-
-/* Sales Order to Receivable Payment Action */
-Route::post('/sales_order_receivable_payment',[ReceivablesController::class,'sales_order_receivable_payment'])->name('sales_order_receivable_payment')->middleware('isLoggedIn');
-/*Delete Sales Order Payment Item*/
-Route::post('/sales_order_receivable_delete_payment', [ReceivablesController::class,'sales_order_receivable_delete_payment'])->name('SalesOrderDeletePayment')->middleware('isLoggedIn');
-#Route::post('/get_sales_order_payment_list', [SalesOrderController::class,'get_sales_order_payment_list'])->name('get_sales_order_payment_list')->middleware('isLoggedIn');
-
-/*Billing to Receivable Payment Item*/
-Route::post('/billing_receivable_payment_post',[ReceivablesController::class,'billing_receivable_payment_post'])->name('billing_receivable_payment_post')->middleware('isLoggedIn');
-/*Delete Billing Payment Item*/
-Route::post('/billing_receivable_delete_payment', [ReceivablesController::class,'billing_receivable_delete_payment'])->name('BillingDeletePayment')->middleware('isLoggedIn');
-
-/*Delete Purchase Order Payment Item*/
-Route::post('/delete_purchase_order_payment_item', [PurchaseOrderController::class,'delete_purchase_order_payment_item'])->name('delete_purchase_order_payment_item')->middleware('isLoggedIn');
-/*Update Purchase Status*/
-Route::post('/update_purchase_status', [PurchaseOrderController::class,'update_purchase_status'])->name('update_purchase_status')->middleware('isLoggedIn');
-
-/*Purchase Order Version 2*/
-/*January 25, 2023*/
-Route::get('/purchaseorder_v2', [PurchaseOrderController_v2::class,'purchaseorder'])->name('purchaseorder_v2')->middleware('isLoggedIn');
-Route::get('purchaseorder_v2/list', [PurchaseOrderController_v2::class, 'getPurchaseOrderList_v2'])->name('getPurchaseOrderList_v2')->middleware('isLoggedIn');
-/*GET Purchase Order Info*/
-Route::post('/purchase_order_info', [PurchaseOrderController_v2::class, 'purchase_order_info'])->name('purchase_order_info')->middleware('isLoggedIn');
-/*Confirm Delete Purchase Order*/
-Route::post('/delete_purchase_order_confirmed', [PurchaseOrderController_v2::class, 'delete_purchase_order_confirmed'])->name('delete_purchase_order_confirmed')->middleware('isLoggedIn');
-/*Create Purchase Order*/
-Route::post('/create_purchase_order_post_v2', [PurchaseOrderController_v2::class,'create_purchase_order_post'])->name('SavePurchaseOrder')->middleware('isLoggedIn');
-/*Update Purchase Order*/
-Route::post('/update_purchase_order_post', [PurchaseOrderController_v2::class,'update_purchase_order_post'])->name('update_purchase_order_post')->middleware('isLoggedIn');
-/*Create Purchase Order Product Item*/
-Route::post('/create_purchase_order_product_item', [PurchaseOrderController_v2::class,'create_purchase_order_product_item'])->name('PurchaseOrderProduct')->middleware('isLoggedIn');
-/*Create Product for Purchase Order*/
-Route::post('/create_purchase_order_post_v2', [PurchaseOrderController_v2::class,'create_purchase_order_post'])->name('SavePurchaseOrder')->middleware('isLoggedIn');
-
-Route::post('/purchase_order_product_info', [PurchaseOrderController_v2::class,'purchase_order_product_info'])->name('purchase_order_product_info')->middleware('isLoggedIn');
-
-/*Get Purchase Order Product Item*/
-Route::post('/get_purchase_order_product_list', [PurchaseOrderController_v2::class,'get_purchase_order_product_list'])->name('get_purchase_order_product_list')->middleware('isLoggedIn');
-/*Delete Purchase Order Product Item*/
-Route::post('/delete_purchase_order_product', [PurchaseOrderController_v2::class,'delete_purchase_order_product'])->name('PurchaseOrderDeleteProduct')->middleware('isLoggedIn');
-/*Get Purchase Order Payment Item*/
-Route::post('/get_purchase_order_payment_list', [PurchaseOrderController_v2::class,'get_purchase_order_payment_list'])->name('get_purchase_order_payment_list')->middleware('isLoggedIn');
-/*Delete Purchase Order Payment Item*/
-Route::post('/delete_purchase_order_payment_item', [PurchaseOrderController_v2::class,'delete_purchase_order_payment_item'])->name('delete_purchase_order_payment_item')->middleware('isLoggedIn');
-/*Update Purchase Status*/
-Route::post('/update_purchase_status', [PurchaseOrderController_v2::class,'update_purchase_status'])->name('update_purchase_status')->middleware('isLoggedIn');
-
-Route::get('/purchase_order_form/{id}', [PurchaseOrderController_v2::class, 'purchase_order_form'])->name('purchase_order_forms')->middleware('isLoggedIn');
-
-/*Create Payment for Purchase Order*/
-Route::post('/create_purchase_order_payment_item', [PurchaseOrderController_v2::class,'create_purchase_order_payment_item'])->name('PurchaseOrderPayment')->middleware('isLoggedIn');
-Route::post('/purchase_order_payment_info', [PurchaseOrderController_v2::class,'purchase_order_payment_info'])->name('PaymentInfo')->middleware('isLoggedIn');
-Route::post('/purchase_order_delete_payment', [PurchaseOrderController_v2::class,'purchase_order_delete_payment'])->name('DeletePayment')->middleware('isLoggedIn');
-
-Route::post('/save_purchase_order_payment',[PurchaseOrderController_v2::class,'save_purchase_order_payment'])->name('save_purchase_order_payment')->middleware('isLoggedIn');
-
-Route::post('upload', [PurchaseOrderController_v2::class, 'store']);
-
-/*Purchase Order Delivery*/
-Route::post('/purchase_order_component_delivery_compose', [PurchaseOrderDeliveryController::class,'purchase_order_component_delivery_compose'])->name('PurchaseOrderDeliveryCompose')->middleware('isLoggedIn');
-Route::post('/get_purchase_order_product_list_delivery', [PurchaseOrderDeliveryController::class,'get_purchase_order_product_list_delivery'])->name('PurchaseOrderProductListDelivery')->middleware('isLoggedIn');
-Route::post('/purchase_order_component_delivery_info', [PurchaseOrderDeliveryController::class,'purchase_order_component_delivery_info'])->name('PurchaseOrderDeliveryInfo')->middleware('isLoggedIn');
-Route::post('/delete_purchase_order_product_delivery_confirmed', [PurchaseOrderDeliveryController::class,'delete_purchase_order_product_delivery_confirmed'])->name('PurchaseOrderDeleteDelivery')->middleware('isLoggedIn');
-
-
-/*Download Sales Order via PDF*/
-Route::get('/generate_sales_order_pdf', [ReportController::class,'generate_sales_order_pdf'])->name('generate_sales_order_pdf')->middleware('isLoggedIn');
-/*Download Purchase Order via PDF*/
-Route::get('/generate_purchase_order_pdf', [ReportController::class,'generate_purchase_order_pdf'])->name('generate_purchase_order_pdf')->middleware('isLoggedIn');
-Route::get('/generate_purchase_order_delivery_status_pdf', [ReportController::class,'generate_purchase_order_delivery_status_pdf'])->name('generate_purchase_order_delivery_status_pdf')->middleware('isLoggedIn');
-
-Route::get('/generate_purchase_order_payment_pdf', [ReportController::class,'generate_purchase_order_payment_pdf'])->name('generate_purchase_order_payment_pdf')->middleware('isLoggedIn');
-
-
-/*Download via PDF*/
-Route::get('/generate_receivable_pdf', [ReportController::class,'generate_receivable_pdf'])->name('generate_receivable_pdf')->middleware('isLoggedIn');
-Route::get('/generate_receivable_soa_pdf', [ReportController::class,'generate_receivable_soa_pdf'])->name('generate_receivable_soa_pdf')->middleware('isLoggedIn');
-Route::get('/generate_test_pdf', [ReportController::class,'generate_test_pdf'])->name('generate_test_pdf')->middleware('isLoggedIn');
-
-/*Dev Date Mar 27 2023*/
-/*Load Supplier List*/
-Route::get('/supplier', [SupplierController::class,'supplier'])->name('supplier')->middleware('isLoggedIn');
-Route::get('supplier/list', [SupplierController::class, 'getSupplierList'])->name('getSupplierList')->middleware('isLoggedIn');
-/*Create Product*/
-Route::post('/create_supplier_post', [SupplierController::class,'create_supplier_post'])->name('create_supplier_post')->middleware('isLoggedIn');
-/*GET Product Info*/
-Route::post('/supplier_info', [SupplierController::class, 'supplier_info'])->name('supplier_info')->middleware('isLoggedIn');
-/*Update Product*/
-Route::post('/update_supplier_post', [SupplierController::class,'update_supplier_post'])->name('update_supplier_post')->middleware('isLoggedIn');
-/*Confirm Delete Product*/
-Route::post('/delete_supplier_confirmed', [SupplierController::class, 'delete_supplier_confirmed'])->name('delete_supplier_confirmed')->middleware('isLoggedIn');
-
-/*Load Cashier's Report List*/
-/*Dev Date May 10, 2023*/
-Route::get('/cashier_report', [CashiersReportController::class,'cashierReport'])->name('cashierReport')->middleware('isLoggedIn');
-Route::get('cashier_report/list', [CashiersReportController::class, 'getCashierReport'])->name('getCashierReport')->middleware('isLoggedIn');
-/*Create Cashier's Report Primary Information*/
-Route::post('/create_cashier_report_post', [CashiersReportController::class,'create_cashier_report_post'])->name('create_cashier_report_post')->middleware('isLoggedIn');
-/*Update Cashier's Report Primary Information*/
-Route::post('/update_cashier_report_post', [CashiersReportController::class,'update_cashier_report_post'])->name('update_cashier_report_post')->middleware('isLoggedIn');
-/*GET Cashier's Report Primary Information*/
-Route::post('/cashiers_report_info', [CashiersReportController::class, 'cashiers_report_info'])->name('cashiers_report_info')->middleware('isLoggedIn');
-/**/
-Route::post('/delete_cashiers_report_info', [CashiersReportController::class, 'delete_cashiers_report_info'])->name('delete_cashiers_report_info')->middleware('isLoggedIn');
-
-/*Cashiers Report Part 1*/
-Route::get('/cashiers_report_form/{id}', [CashiersReportController::class, 'cashiers_report_form'])->name('cashiers_report_form')->middleware('isLoggedIn');
-/*Save Cashier's Report Product*/
-Route::post('/save_product_cashiers_report_p1', [CashiersReportController::class,'save_product_cashiers_report_p1'])->name('SAVE_CHR_PH1')->middleware('isLoggedIn');
-/* Load Product P1 */
-Route::post('/get_cashiers_report_product_p1', [CashiersReportController::class,'get_cashiers_report_product_p1'])->name('GetCashiersProductP1')->middleware('isLoggedIn');
-/* Delete Product P1 */
-Route::post('/delete_cashiers_report_product_p1', [CashiersReportController::class,'delete_cashiers_report_product_p1'])->name('DeleteCashiersProductP1')->middleware('isLoggedIn');
-/*GET Cashiers report product P1*/
-Route::post('/cashiers_report_p1_info', [CashiersReportController::class, 'cashiers_report_p1_info'])->name('CRP1_info')->middleware('isLoggedIn');
-
-/*Cashiers Report Part 2*/
-Route::post('/save_product_cashiers_report_PH2', [CashiersReportController::class,'save_product_cashiers_report_PH2'])->name('SAVE_CHR_PH2')->middleware('isLoggedIn');
-/* Load Product P2 */
-Route::post('/get_cashiers_report_product_p2', [CashiersReportController::class,'get_cashiers_report_product_p2'])->name('GetCashiersProductP2')->middleware('isLoggedIn');
-/* Delete Product P2 */
-Route::post('/delete_cashiers_report_product_p2', [CashiersReportController::class,'delete_cashiers_report_product_p2'])->name('DeleteCashiersProductP2')->middleware('isLoggedIn');
-/*GET Cashiers report product P2*/
-Route::post('/cashiers_report_p2_info', [CashiersReportController::class, 'cashiers_report_p2_info'])->name('CRP2_info')->middleware('isLoggedIn');
-
-/*Cashiers Report Part 3*/
-Route::post('/save_product_cashiers_report_PH3', [CashiersReportController::class,'save_product_cashiers_report_PH3'])->name('SAVE_CHR_PH3')->middleware('isLoggedIn');
-/* Load Product P3 */
-Route::post('/get_cashiers_report_product_p3_DISCOUNTS', [CashiersReportController::class,'get_cashiers_report_product_p3_DISCOUNTS'])->name('GetCashiersProductP3_DISCOUNTS')->middleware('isLoggedIn');
-/* Delete Product P3 */
-Route::post('/delete_cashiers_report_product_p3', [CashiersReportController::class,'delete_cashiers_report_product_p3'])->name('DeleteCashiersProductP3')->middleware('isLoggedIn');
-/*GET Cashiers report product P3*/
-Route::post('/cashiers_report_p3_info_SALES_CREDIT', [CashiersReportController::class, 'cashiers_report_p3_info_SALES_CREDIT'])->name('CRP3_info_SALES_CREDIT')->middleware('isLoggedIn');
-/*GET Cashiers report product P3*/
-Route::post('/cashiers_report_p3_info_OTHERS', [CashiersReportController::class, 'cashiers_report_p3_info_OTHERS'])->name('CRP3_info_OTHERS')->middleware('isLoggedIn');
-/*GET Cashiers report product P3*/
-Route::post('/cashiers_report_p3_info_DISCOUNT', [CashiersReportController::class, 'cashiers_report_p3_info_DISCOUNT'])->name('CRP3_info_DISCOUNT')->middleware('isLoggedIn');
-
-/*Cashiers Report Part 3.1
-Route::post('/save_product_cashiers_report_PH3_1', [CashiersReportController::class,'save_product_cashiers_report_PH3_1'])->name('SAVE_CHR_PH3_1')->middleware('isLoggedIn');
-*//* Load Product P3 */
-Route::post('/get_cashiers_report_product_p3_SALES_CREDIT', [CashiersReportController::class,'get_cashiers_report_product_p3_SALES_CREDIT'])->name('GetCashiersProductP3_SALES_CREDIT')->middleware('isLoggedIn');
-Route::post('/get_cashiers_report_product_p3_OTHERS', [CashiersReportController::class,'get_cashiers_report_product_p3_OTHERS'])->name('GetCashiersProductP3_OTHERS')->middleware('isLoggedIn');
-
-/* Delete Product P3
-Route::post('/delete_cashiers_report_product_p3_1', [CashiersReportController::class,'delete_cashiers_report_product_p3_1'])->name('DeleteCashiersProductP3_1')->middleware('isLoggedIn');
- *//*GET Cashiers report product P3
-Route::post('/cashiers_report_p3_info_1', [CashiersReportController::class, 'cashiers_report_p3_info_1'])->name('CRP3_info_1')->middleware('isLoggedIn');
-*/
-/*Cashiers Report Part 4*/
-/*Save or Update*/
-Route::post('/save_cashiers_report_PH4', [CashiersReportController::class,'save_cashiers_report_PH4'])->name('SAVE_CHR_PH4')->middleware('isLoggedIn');
-/* Load P4 */
-Route::post('/get_cashiers_report_p4', [CashiersReportController::class,'get_cashiers_report_p4'])->name('GetCashiersP4')->middleware('isLoggedIn');
-/* Delete P4 */
-Route::post('/delete_cashiers_report_p4', [CashiersReportController::class,'delete_cashiers_report_p4'])->name('DeleteCashiersP4')->middleware('isLoggedIn');
-/*GET Cashiers report P4*/
-Route::post('/cashiers_report_p4_info', [CashiersReportController::class, 'cashiers_report_p4_info'])->name('CRP4_info')->middleware('isLoggedIn');
-
-/*Cashiers Report Part 5*/
-/*Save or Update*/
-Route::post('/save_cashiers_report_PH5', [CashiersReportController::class,'save_cashiers_report_PH5'])->name('SAVE_CHR_PH5')->middleware('isLoggedIn');
-/*GET Cashiers report P5*/
-Route::post('/cashiers_report_p5_info', [CashiersReportController::class, 'cashiers_report_p5_info'])->name('CRP5_info')->middleware('isLoggedIn');
-
-/*GET Cashiers Summary Report*/
-Route::post('/cashiers_report_summary_info', [CashiersReportController::class, 'cashiers_report_summary_info'])->name('CashiersReportSummary')->middleware('isLoggedIn');
-
-
-
-/*Cashiers Report Part 6*/
-Route::post('/save_product_cashiers_report_p6', [CashiersReportController::class,'save_product_cashiers_report_p6'])->name('SAVE_CHR_PH6')->middleware('isLoggedIn');
-/* Load P6 */
-Route::post('/get_product_inventory_list', [CashiersReportController::class,'get_product_inventory_list'])->name('GetCashiersP6')->middleware('isLoggedIn');
-/*Delete*/
-Route::post('/delete_cashiers_report_p6', [CashiersReportController::class,'delete_cashiers_report_p6'])->name('DeleteCashiersProductP6')->middleware('isLoggedIn');
-
-Route::post('/cashiers_report_p6_info', [CashiersReportController::class, 'cashiers_report_p6_info'])->name('CRP6_info')->middleware('isLoggedIn');
-/*Load Cashiers Report */
-Route::get('/generate_cashier_report_pdf', [CashiersReportController::class,'generate_cashier_report_pdf'])->name('generate_cashier_report_pdf')->middleware('isLoggedIn');
-
-/*Cahiers's Report Dipstick Inventory*/
-Route::post('/save_product_cashiers_report_p7', [CashiersReport_Dipstick_Inventory_Controller::class,'save_product_cashiers_report_p7'])->name('SAVE_CHR_PH7')->middleware('isLoggedIn');
-/* Load P6 */
-Route::post('/get_product_dipstick_inventory_list', [CashiersReport_Dipstick_Inventory_Controller::class,'get_product_dipstick_inventory_list'])->name('GetCashiersP7')->middleware('isLoggedIn');
-/*Delete*/
-Route::post('/delete_cashiers_report_p7', [CashiersReport_Dipstick_Inventory_Controller::class,'delete_cashiers_report_p7'])->name('DeleteCashiersProductP7')->middleware('isLoggedIn');
-
-Route::post('/cashiers_report_p7_info', [CashiersReport_Dipstick_Inventory_Controller::class, 'cashiers_report_p7_info'])->name('CRP7_info')->middleware('isLoggedIn');
-
-/*Load Cashiers Report VIA PDF */
-//Route::get('/generate_cashier_report_pdf', [CashiersReport::class,'generate_cashier_report_pdf'])->name('generate_cashier_report_pdf')->middleware('isLoggedIn');
-
-
-/*Dev Date Nov 30 2022*/
-/*Load Branch List*/
-Route::get('/branch', [BranchController::class,'branch'])->name('branch')->middleware('isLoggedIn');
-Route::get('branch/list', [BranchController::class, 'getBranchList'])->name('getBranchList')->middleware('isLoggedIn');
-/*Create Product*/
-Route::post('/create_branch_post', [BranchController::class,'create_branch_post'])->name('CreateBranch')->middleware('isLoggedIn');
-/*GET Product Info*/
-Route::post('/branch_info', [BranchController::class, 'branch_info'])->name('BranchInfo')->middleware('isLoggedIn');
-/*Update Product*/
-Route::post('/update_branch_post', [BranchController::class,'update_branch_post'])->name('UpdateBranch')->middleware('isLoggedIn');
-/*Confirm Delete Product*/
-Route::post('/delete_branch_confirmed', [BranchController::class, 'delete_branch_confirmed'])->name('DeleteBranch')->middleware('isLoggedIn');
-
-
-
-/* Sales Summary */
-Route::get('/monthly_sales', [SalesSummaryController::class,'MonthlySalesSummary'])->name('MonthlySalesSummary')->middleware('isLoggedIn');
-Route::get('/monthly-chart-line-ajax', [SalesSummaryController::class,'MonthlySaleschartLineAjax'])->name('MonthlySaleschartLineAjax')->middleware('isLoggedIn');
-Route::post('/reload_monthly_sales_per_year', [SalesSummaryController::class,'ReloadMonthlySales'])->name('ReloadMonthlySales')->middleware('isLoggedIn');
-
-Route::get('monthly-chart-line-ajax', 'SalesSummaryController@MonthlySaleschartLineAjax');
-
-/*CHARTS TEST
-
-Route::get('chart-line', 'ChartController@chartLine');
-Route::get('chart-line-ajax', 'ChartController@chartLineAjax');
-
-*/

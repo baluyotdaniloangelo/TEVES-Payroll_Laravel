@@ -5,8 +5,8 @@
 	<p>Hi {{ $name }},</p>
 	<p>{{ $body }}</p>
 	
-	<div align='center'>
-			<table width='70%' style="background-color:#fff9f9;color:black;">
+	<div align='left'>
+			<table width='70%' style="color:black;">
 			<tr>
 				<td width="10%">Username:</td>
 				<td>{{ $user_name }}</td>
@@ -18,6 +18,6 @@
 			</table>
 	</div>
 	
-	<p>Thank You</p>
+	<p>Thank You!</p>
 </body>
 </html>
