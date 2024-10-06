@@ -1,0 +1,8 @@
+/*Supliers Table Changes*/
+
+ALTER TABLE `teves_supplier_table`
+	ADD COLUMN `default_less_percentage` DOUBLE NULL DEFAULT NULL AFTER `supplier_tin`,
+	ADD COLUMN `default_net_percentage` DOUBLE NULL DEFAULT NULL AFTER `default_less_percentage`,
+	ADD COLUMN `default_vat_percentage` DOUBLE NULL DEFAULT NULL AFTER `default_net_percentage`,
+	ADD COLUMN `default_withholding_tax_percentage` DOUBLE NULL DEFAULT NULL AFTER `default_vat_percentage`,
+	ADD COLUMN `default_payment_terms` DOUBLE NULL DEFAULT NULL AFTER `default_withholding_tax_percentage`;

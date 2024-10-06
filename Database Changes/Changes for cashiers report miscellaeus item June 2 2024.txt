@@ -1,0 +1,2 @@
+ALTER TABLE `teves_cashiers_report_p3`
+	ADD COLUMN `client_idx` INT(11) NULL DEFAULT NULL AFTER `cashiers_report_id`;

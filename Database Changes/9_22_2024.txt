@@ -1,0 +1,8 @@
+ALTER TABLE `teves_sales_order_table`
+	CHANGE COLUMN `sales_order_less_percentage` `sales_order_withholding_tax` DOUBLE NULL DEFAULT NULL COMMENT 'Withholding Tax' AFTER `sales_order_net_amount`;
+
+
+
+ALTER TABLE `teves_sales_order_table`
+	ADD COLUMN `created_by_user_id` INT NULL DEFAULT NULL AFTER `created_at`,
+	ADD COLUMN `updated_by_user_id` INT NULL DEFAULT NULL AFTER `updated_at`;

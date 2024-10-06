@@ -1,0 +1,166 @@
+/*Custom Appearance of Web Page including Navbar,Header Logo*/
+@font-face {
+		font-family: Nunito;
+		src: url('fonts/Nunito/Nunito-VariableFont_wght.ttf');
+}
+
+.sidebar-brand {
+  height: 6.375rem !important;
+}
+
+.bg-gradient-primary {
+    background-color: #1c3789 !important;
+    background-image: none !important; 
+    /* background-size: cover;*/
+}
+
+
+.sidebar_li_a{
+	/*color: #0030ff !important; */
+    margin-bottom: 0px;
+    background-color: #c3d6f7;
+    border-radius: 0px !important;
+    padding: 10px 0 10px 10px !important;
+}
+
+/*
+.sidebar_li_a_icon{
+	font-size: 16px !important;
+    color: yellow;
+}
+*/
+.logo img{
+	max-height: none;
+	width:60px;
+    /*background-color: #fff;
+    border-radius: 50px !important;
+    margin-right: none;
+    padding: 5px;*/
+}
+
+.header{    
+	height: 75px;
+}
+
+.footer .copyright {
+    text-align: center;
+    color: #000000;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.logo{
+	width: inherit;
+}
+
+.header .toggle-sidebar-btn{
+	padding-right: 20px;
+}
+
+.bg-sm {
+    background-color: #1c3789!important;
+}
+
+.side_navar_icon{
+	color:#000 !important;
+	background-color: yellow;
+}
+
+.sidebar_bg{
+	/*box-shadow: none !important;*/
+    background-color: #f1f3ff !important;
+	top: 75px !important;
+	width: 160px !important;
+	padding-top: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.card {
+    box-shadow: none !important;
+	border-radius: 0px !important;
+}
+
+.card-title {
+    padding: 10px 0 10px 0px !important;
+	font-family: "Nunito", sans-serif;
+	font-weight: bold;
+}
+.sidebar-nav{
+	border-left: #abb513 solid 1px;
+}
+
+.sidebar-nav .nav-link {
+	font-size:13px !important;
+}
+
+.sidebar-nav .nav-link:hover {
+    color: #4154f1;
+    background: #e1e8f5 !important;
+}
+
+.sidebar-nav .nav-content a{
+	font-size:13px !important;
+}
+
+.sidebar-nav .nav-content {
+	padding-top: 0px !important;
+    border-left: #ff4700 4px solid !important;
+}
+.navbar_bg{
+	color: #000 !important;
+}
+
+.navbar_icon{
+	color: #006e47 !important;
+	font-size: 16px !important;
+}
+
+.navbar_header_bg{
+	/*transition: none !important;
+    box-shadow: none !important;*/
+	box-shadow: 0px 1px 5px rgb(1 41 112 / 10%) !important;
+    background-color: #fff !important;
+}
+
+.navbar_header_title{
+	color: #016136 !important;
+	font-size: 17px !important;
+}
+
+.toggle_sidebar{
+	color: #e15810 !important;
+}
+
+.top_navbar_text{
+	color :#000 !important;
+}
+
+.nav_user_logo{
+	 color: #000 !important; 
+	 font-size: 10px;
+}
+
+.th_style{
+	background-color: #207b52;
+    color: yellow;
+    text-align: center;
+    border-bottom: 0px solid #C8DBBE !important;
+}
+
+.table thead th{
+	background-color: #207b52;
+    color: yellow;
+    border-bottom: 0px solid #C8DBBE !important;
+}
+.table tfoot th{
+	background-color:#207b52;
+	color:yellow;
+}
+.text-right{
+text-align:right;
+}
+
+.form_button_icon{
+    color: #fffc6c !important;
+}

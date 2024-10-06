@@ -1,0 +1,6 @@
+ALTER TABLE `teves_branch_table`
+	ADD COLUMN `created_by_user_idx` INT NULL DEFAULT NULL AFTER `created_at`,
+	ADD COLUMN `modified_by_user_idx` INT NULL DEFAULT NULL AFTER `updated_at`;
+
+ALTER TABLE `teves_branch_table`
+	ADD COLUMN `image_reference` LONGBLOB NULL AFTER `branch_logo`;

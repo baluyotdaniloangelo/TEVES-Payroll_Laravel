@@ -1,0 +1,11 @@
+ALTER TABLE `teves_sales_order_table`
+	CHANGE COLUMN `sales_order_status` `sales_order_payment_status` VARCHAR(50) NULL DEFAULT 'Pending' COLLATE 'utf8mb4_general_ci' AFTER `sales_order_payment_amount`,
+	ADD COLUMN `sales_order_delivery_status` VARCHAR(50) NULL DEFAULT 'Pending' AFTER `sales_order_payment_status`;
+
+ALTER TABLE `teves_cashiers_report_p1`
+	CHANGE COLUMN `beginning_reading` `beginning_reading` DOUBLE NULL DEFAULT '0' AFTER `product_idx`,
+	CHANGE COLUMN `closing_reading` `closing_reading` DOUBLE NULL DEFAULT '0' AFTER `beginning_reading`,
+	CHANGE COLUMN `calibration` `calibration` DOUBLE NULL DEFAULT '0' AFTER `closing_reading`,
+	CHANGE COLUMN `order_quantity` `order_quantity` DOUBLE NULL DEFAULT '0' AFTER `calibration`,
+	CHANGE COLUMN `product_price` `product_price` DOUBLE NULL DEFAULT '0' AFTER `order_quantity`,
+	CHANGE COLUMN `order_total_amount` `order_total_amount` DOUBLE NULL DEFAULT '0' AFTER `product_price`;

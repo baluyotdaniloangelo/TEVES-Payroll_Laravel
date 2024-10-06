@@ -1,0 +1,109 @@
+/*Custom Appearance of Web Page including Navbar,Header Logo*/
+@font-face {
+		font-family: Nunito;
+		src: url('fonts/Nunito/Nunito-VariableFont_wght.ttf');
+}
+
+.sidebar-brand {
+  height: 6.375rem !important;
+}
+
+.bg-gradient-primary {
+    background-color: #1c3789!important;
+    background-image: none !important; 
+    /* background-size: cover;*/
+}
+/*
+#main{
+	 padding: 0px !important;    
+	 margin-top: 70px !important;
+}
+*/
+.logo img{
+	max-height: none;
+    background-color: #FFFFFF;
+    border-radius: 5px !important;
+    margin-right: none;
+    padding: 0px;
+}
+
+.search_control{
+	font-size:12px;
+}
+
+.header{    
+	height: 70px;
+}
+
+.logo{
+	width: inherit;
+}
+
+.header .toggle-sidebar-btn{
+	padding-right: 20px;
+}
+
+.bg-sm {
+    background-color: #1c3789!important;
+}
+
+.side_navar_icon{
+	color:#000 !important;
+	background-color: yellow;
+}
+
+
+.sidebar_bg{
+	/*box-shadow: none !important;*/
+    background-color: #f1f3ff !important;
+	top: 70px !important;
+	width: 170px !important;
+	padding-top: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.navbar_bg{
+	color: #000 !important;
+    background: #fff !important;
+	border-radius: 0px !important;	
+}
+
+.sidebar-nav{
+	border-left: #abb513 solid 1px;
+}
+
+.sidebar-nav .nav-link:hover {
+    color: #4154f1;
+    background: #e1e8f5 !important;
+}
+
+.sidebar-nav .nav-content {
+	padding-top: 0px !important;
+    border-left: #ff4700 4px solid !important;
+}
+
+.navbar_icon{
+	color: #006e47 !important;
+}
+
+.form_button_icon{
+    color: #fffc6c !important;
+}
+
+.sidebar-nav .nav-content a i{
+	font-size: 16px !important;
+}
+.navbar_header_bg{
+	/*transition: none !important;
+    box-shadow: none !important;
+    background-color: #2b2a2a !important;*/
+}
+
+.navbar_header_title{
+	/*color: #fff !important;*/
+}
+
+.toggle_sidebar{
+	color: #c0ff00 !important;
+}

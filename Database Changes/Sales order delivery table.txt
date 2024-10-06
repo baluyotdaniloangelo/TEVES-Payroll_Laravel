@@ -1,0 +1,2 @@
+ALTER TABLE `teves_sales_order_delivery_details`
+	CHANGE COLUMN `sales_order_delivery_ship_to_account` `sales_order_delivery_remarks` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci' AFTER `sales_order_delivery_hauler_details`;
