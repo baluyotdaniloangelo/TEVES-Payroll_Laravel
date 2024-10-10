@@ -8,7 +8,7 @@ use Hash;
 use Session;
 use Validator;
 
-class CAMRUserAuthController extends Controller
+class UserAuthController extends Controller
 {
     public function login(){
 		$title = 'Login';

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CAMRUserAuthController;
+use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\CAMRSiteController;
 use App\Http\Controllers\CAMRGatewayController;
 use App\Http\Controllers\CAMRMeterController;
@@ -43,15 +43,15 @@ use App\Http\Controllers\EmailController;
 #Route::get('/sample1', [CAMRSampleExcel::class,'sample1'])->name('site')->middleware('isLoggedIn');
 
 /*Login Page*/
-Route::get('/',[CAMRUserAuthController::class,'login'])->middleware('alreadyLoggedIn');
-Route::post('login-user', [CAMRUserAuthController::class,'loginUser'])->name('login-user');
+Route::get('/',[UserAuthController::class,'login'])->middleware('alreadyLoggedIn');
+Route::post('login-user', [UserAuthController::class,'loginUser'])->name('login-user');
 
 /*Reset Password - Unable to Login*/
-Route::get('/passwordreset',[CAMRUserAuthController::class,'passwordreset'])->name('passwordreset');
+Route::get('/passwordreset',[UserAuthController::class,'passwordreset'])->name('passwordreset');
 Route::post('/reset-password', [EmailController::class, 'sendTemporaryPasswordtoEmail'])->name('sendTemporaryPasswordtoEmail');
 
 /*Logout*/
-Route::get('logout', [CAMRUserAuthController::class,'logout']);
+Route::get('logout', [UserAuthController::class,'logout']);
 
 /*Load Site*/
 Route::get('/site', [CAMRSiteController::class,'site'])->name('site')->middleware('isLoggedIn');

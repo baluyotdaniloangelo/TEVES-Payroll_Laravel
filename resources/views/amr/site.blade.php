@@ -1,284 +1,72 @@
 @extends('layouts.layout')  
 @section('content')  
+	
 
-	<!-- Site Delete Modal-->
-    <div class="modal fade" id="SiteDeleteModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header header_modal_bg">
-                    <h5 class="modal-title" id="exampleModalLabel"></h5>
- 					<div class="btn-sm btn-warning btn-circle bi bi-exclamation-circle btn_icon_modal"></div>
-                </div>
-                <div class="modal-body warning_modal_bg" id="modal-body">
-				Are you sure you want to delete?
-				</div>
-				
-				<div style="margin:10px;">
-				
-				<table width="100%">
-				
-				<tr>
-				<th width="40%">Building Code:</th>
-				<td width="60%"><span id="building_code_delete_info"></span></td>
-				</tr>
-				
-				<tr>
-				<th width="40%">Building Description:</th>
-				<td width="60%"><span id="building_description_delete_info"></span></td>
-				</tr>
-				
-				</table>
-				
-				</div>
-				
-                <div class="modal-footer footer_modal_bg">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"><i class="bi bi-x-circle navbar_icon"></i> Cancel</button>
-					<button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="deleteSiteConfirmed" value=""><i class="bi bi-trash3 navbar_icon"></i> Delete</button>
-                  
-                </div>
-            </div>
-        </div>
-    </div>	
 
-	<!-- Site Comfirm Delete Modal-->
-    <div class="modal fade" id="SiteDeleteModalConfirmed" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header header_modal_bg">
-                    <h5 class="modal-title" id="exampleModalLabel"></h5>
- 					<div class="btn-sm btn-warning btn-circle bi bi-exclamation-circle btn_icon_modal"></div>
-                </div>
-                <div class="modal-body warning_modal_bg" id="modal-body">
-				Successfully deleted!
-				</div>
-				<div style="margin:10px;">
+			
+			<!-- Page Wrapper -->
+            <div class="page-wrapper">
+			
+				<!-- Page Content -->
+                <div class="content container-fluid">
 				
-				
-				<table width="100%">
-				
-				<tr>
-				<th width="40%">Building Code:</th>
-				<td width="60%"><span id="building_code_delete_confirmed_info"></span></td>
-				</tr>
-				
-				<tr>
-				<th width="40%">Building Description:</th>
-				<td width="60%"><span id="building_description_delete_confirmed_info"></span></td>
-				</tr>
-				
-				</table>
-				
-				</div>
-                <div class="modal-footer footer_modal_bg">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"><i class="bi bi-x-circle navbar_icon"></i> Close</button>
-					     
-                </div>
-            </div>
-        </div>
-    </div>			
-			<!--Create Building-->
-
-			  
-<div class="modal fade " id="CreateSiteModal" aria-modal="true" role="dialog" style="display: none;">
-                <div class="modal-dialog modal-dialog-scrollable">
-                  <div class="modal-content">
-                    <div class="modal-header modal-header_form">
-                      <h5 class="modal-title">Create Building</h5>
-                      <button type="button" class="btn btn-danger bi bi-x-circle navbar_icon" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-					 <form class=" g-2 needs-validation" id="siteform">
-							<div class="form-floating mb-1">
-							  <input type="text" class="form-control " name="building_code" id="building_code" value="" required placeholder="Building Code">		
-							  <label for="building_code" class="col-sm-3 col-form-label">Building Code</label>
-							  <span class="valid-feedback" id="building_codeError"></span>
-							</div>	
-					
-							<div class="form-floating mb-1">
-							  <input type="text" class="form-control " name="building_description" id="building_description" value="" required placeholder="Building Description">		
-							  <label for="building_description" class="col-sm-3 col-form-label">Building Description</label>
-							  <span class="valid-feedback" id="building_descriptionError"></span>
+					<!-- Page Header -->
+					<div class="page-header">
+						<div class="row align-items-center">
+							<div class="col">
+								<h3 class="page-title">Employee</h3>
+								<ul class="breadcrumb">
+									<li class="breadcrumb-item"><a href="admin-dashboard.html">Dashboard</a></li>
+									<li class="breadcrumb-item active">Employee</li>
+								</ul>
 							</div>
-							
-							<div class="form-floating mb-1">
-							  <input class="form-control" list="division_list" name="division_id" id="division_id"  autocomplete="off" value="" placeholder="Division" required>
-									<datalist id="division_list">
-										@foreach ($division_data as $division_data_cols)
-											<option label="Code : {{$division_data_cols->division_code}} | Name : {{$division_data_cols->division_name}}" data-id="{{$division_data_cols->division_id}}" value="{{$division_data_cols->division_code}} - {{$division_data_cols->division_name}}">
-										@endforeach
-									</datalist>
-							  <label for="division_id" class="col-sm-3 col-form-label">Division</label>
-							  <span class="valid-feedback" id="division_idError"></span>
-							 </div>	
-						
-							<div class="form-floating mb-1">
-							  <input class="form-control" list="company_list" name="company_id" id="company_id"  autocomplete="off" value="" placeholder="Company" required>
-									<datalist id="company_list">
-										@foreach ($company_data as $company_data_cols)
-											<option label="Name : {{$company_data_cols->company_name}}" data-id="{{$company_data_cols->company_id}}" value="{{$company_data_cols->company_name}}">
-										@endforeach
-									</datalist>
-							  <label for="company_id" class="col-sm-3 col-form-label">Company</label>
-							  <span class="valid-feedback" id="company_idError"></span>
-							</div>	
-							
-							<!--
-							<div class="form-floating mb-3">
-							  <input class="form-control" name="site_cut_off" id="site_cut_off" required autocomplete="off" value="" placeholder="Cut Off">		
-							  <label for="site_cut_off" class="col-sm-3 col-form-label">Cut Off</label>
-							  <span class="valid-feedback" id="site_cut_offError"></span>
-							</div>	
-							-->
-							<div class="form-floating mb-1">
-							  <input class="form-control" name="device_ip_range" id="device_ip_range"  autocomplete="off" value="" placeholder="IP Address Range">		
-							  <label for="device_ip_range" class="col-sm-3 col-form-label">IP Address Range</label>
-							  <span class="valid-feedback" id="device_ip_rangeError"></span>
+							<div class="col-auto float-end ms-auto">
+								<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#add_employee"><i class="fa-solid fa-plus"></i> Add Employee</a>
+								<div class="view-icons">
+									<a href="employees.html" class="grid-view btn btn-link"><i class="fa fa-th"></i></a>
+									<a href="employees-list.html" class="list-view btn btn-link active"><i class="fa-solid fa-bars"></i></a>
+								</div>
 							</div>
-							
-							<div class="form-floating mb-1">
-							  <input class="form-control" name="ip_netmask" id="ip_netmask"  autocomplete="off" value="" placeholder="Netmask">		
-							  <label for="ip_netmask" class="col-sm-3 col-form-label">Netmask</label>
-							  <span class="valid-feedback" id="ip_netmaskError"></span>
-							</div>
-							
-							<div class="form-floating mb-1">
-							  <input class="form-control" name="ip_network" id="ip_network"  autocomplete="off" value="" placeholder="Network">		
-							  <label for="ip_network" class="col-sm-3 col-form-label">Network</label>
-							  <span class="valid-feedback" id="ip_networkError"></span>
-							</div>
-							
-							<div class="form-floating mb-1">
-							  <input class="form-control" name="ip_gateway" id="ip_gateway"  autocomplete="off" value="" placeholder="Gateway">		
-							  <label for="ip_gateway" class="col-sm-3 col-form-label">Gateway</label>
-							  <span class="valid-feedback" id="ip_gatewayError"></span>
-							</div>
-							</form>
-                    </div>
-                    <div class="modal-footer modal-footer_form">
-						<button type="submit" class="btn btn-success bi bi-save-fill navbar_icon btn-sm" id="save-site"> Submit</button>
-						<button type="submit" class="btn btn-primary bi bi-backspace-fill navbar_icon btn-sm" id="clear-site" onclick="ResetFormSite()"> Reset</button>
-                    </div>
-                  </div>
-                </div>
-              </div>			  
-			  
-			  
-			  
-
-			<!--Create Building-->
-			<div class="modal fade" id="UpdateSiteModal" tabindex="-1" aria-modal="true" role="dialog" style="display: none;">
-                <div class="modal-dialog modal-dialog-scrollable">
-                  <div class="modal-content">
-				  
-                    <div class="modal-header modal-header_form">
-                      <h5 class="modal-title">Update Building</h5>
-                      <button type="button" class="btn btn-danger bi bi-x-circle navbar_icon" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                    <form class=" g-2 needs-validation" id="updatesiteform">
-						<input type="hidden" name="update_building_id" id="update_building_id"></input>
-					   		<div class="form-floating mb-1">
-							  <input type="text" class="form-control " name="update_building_code" id="update_building_code" value="" required placeholder="Building Code">		
-							  <label for="update_building_code" class="col-sm-3 col-form-label">Building Code</label>
-							  <span class="valid-feedback" id="update_building_codeError"></span>
-							</div>	
-					
-							<div class="form-floating mb-1">
-							  <input type="text" class="form-control " name="update_building_description" id="update_building_description" value="" required placeholder="Building Description">		
-							  <label for="update_building_description" class="col-sm-3 col-form-label">Building Description</label>
-							  <span class="valid-feedback" id="update_building_descriptionError"></span>
-							</div>
-							
-							<div class="form-floating mb-1">
-							  <input class="form-control" list="update_division_list" name="update_division_id" id="update_division_id"  autocomplete="off" value="" placeholder="Division" required>
-									<datalist id="update_division_list">
-										@foreach ($division_data as $division_data_cols)
-											<option label="Code : {{$division_data_cols->division_code}} | Name : {{$division_data_cols->division_name}}" data-id="{{$division_data_cols->division_id}}" value="{{$division_data_cols->division_code}} - {{$division_data_cols->division_name}}">
-										@endforeach
-									</datalist>
-							  <label for="update_division_id" class="col-sm-3 col-form-label">Division</label>
-							  <span class="valid-feedback" id="update_division_idError"></span>
-							 </div>	
-						
-							<div class="form-floating mb-1">
-							  <input class="form-control" list="update_company_list" name="update_company_id" id="update_company_id"  autocomplete="off" value="" placeholder="Company" required>
-									<datalist id="update_company_list">
-										@foreach ($company_data as $company_data_cols)
-											<option label="Name : {{$company_data_cols->company_name}}" data-id="{{$company_data_cols->company_id}}" value="{{$company_data_cols->company_name}}">
-										@endforeach
-									</datalist>
-							  <label for="update_company_id" class="col-sm-3 col-form-label">Company</label>
-							  <span class="valid-feedback" id="update_company_idError"></span>
-							</div>	
-							<!--
-							<div class="form-floating mb-3">
-							  <input class="form-control" name="update_site_cut_off" id="update_site_cut_off" required autocomplete="off" value="" placeholder="Cut Off">		
-							  <label for="update_site_cut_off" class="col-sm-3 col-form-label">Cut Off</label>
-							  <span class="valid-feedback" id="update_site_cut_offError"></span>
-							</div>	
-							-->
-							<div class="form-floating mb-1">
-							  <input class="form-control" name="update_device_ip_range" id="update_device_ip_range"  autocomplete="off" value="" placeholder="IP Address Range">		
-							  <label for="update_device_ip_range" class="col-sm-3 col-form-label">IP Address Range</label>
-							  <span class="valid-feedback" id="update_device_ip_rangeError"></span>
-							</div>
-							
-							<div class="form-floating mb-1">
-							  <input class="form-control" name="update_ip_netmask" id="update_ip_netmask"  autocomplete="off" value="" placeholder="Netmask">		
-							  <label for="update_ip_netmask" class="col-sm-3 col-form-label">Netmask</label>
-							  <span class="valid-feedback" id="update_ip_netmaskError"></span>
-							</div>
-							
-							<div class="form-floating mb-1">
-							  <input class="form-control" name="update_ip_network" id="update_ip_network"  autocomplete="off" value="" placeholder="Network">		
-							  <label for="update_ip_network" class="col-sm-3 col-form-label">Network</label>
-							  <span class="valid-feedback" id="update_ip_networkError"></span>
-							</div>
-							
-							<div class="form-floating mb-1">
-							  <input class="form-control" name="update_ip_gateway" id="update_ip_gateway"  autocomplete="off" value="" placeholder="Gateway">		
-							  <label for="ip_gateway" class="col-sm-3 col-form-label">Gateway</label>
-							  <span class="valid-feedback" id="update_ip_gatewayError"></span>
-							</div>
-</form>
-					</div>
-                    <div class="modal-footer modal-footer_form">
-							<div id="loading_data" style="display:none;">
-									<button class="btn btn-light btn-sm" type="button" disabled="">
-									<span class="spinner-grow spinner-grow-sm text-danger" role="status" aria-hidden="true"></span>
-									Checking for changes...
-									</button>
-							</div>
-							<button type="submit" class="btn btn-success bi bi-save-fill navbar_icon btn-sm" id="update-site"> Submit</button>
-							<!--<button type="reset" class="btn btn-primary bi bi-backspace-fill navbar_icon btn-sm" id="update-clear-site"> Reset</button>-->
-                    </div>
-                  </div>
-                </div>
-              </div>
-			  
-<main id="main" class="main">	
-    <section class="section">	  
-          <div class="card">
-		  
-			  <div class="card card-12-btm">
-			  
-				<div class="card-header " style="text-align:center;">
-				  <h5 class="card-title bi bi-building">&nbsp;Building Management</h5>
-						<div class="d-flex justify-content-end">
-						<div class="btn-group" role="group" aria-label="Basic outlined example" style="margin-top: -50px;position: absolute;">
-							<?php if($data->user_type=="Admin"){ ?>
-							<button type="button" class="btn btn-success new_item bi bi-plus-circle" data-bs-toggle="modal" data-bs-target="#CreateSiteModal" onclick="ResetFormSite()"> Building</button>
-							<?php } ?>
 						</div>
-						</div>				  
-				  </div>
-				</div>			  
-		 
-            <div class="card-body">
-				<div class="row">
-				<div class="p-1" align="">
-									<div class="table-responsive">
-										<table class="table dataTable display nowrap cell-border"" id="siteList" width="100%" cellspacing="0">
+					</div>
+					<!-- /Page Header -->
+					
+					<!-- Search Filter -->
+					<div class="row filter-row">
+						<div class="col-sm-6 col-md-3">  
+							<div class="input-block mb-3 form-focus">
+								<input type="text" class="form-control floating">
+								<label class="focus-label">Employee ID</label>
+							</div>
+						</div>
+						<div class="col-sm-6 col-md-3">  
+							<div class="input-block mb-3 form-focus">
+								<input type="text" class="form-control floating">
+								<label class="focus-label">Employee Name</label>
+							</div>
+						</div>
+						<div class="col-sm-6 col-md-3"> 
+							<div class="input-block mb-3 form-focus select-focus">
+								<select class="select floating"> 
+									<option>Select Designation</option>
+									<option>Web Developer</option>
+									<option>Web Designer</option>
+									<option>Android Developer</option>
+									<option>Ios Developer</option>
+								</select>
+								<label class="focus-label">Designation</label>
+							</div>
+						</div>
+						<div class="col-sm-6 col-md-3">  
+							<a href="#" class="btn btn-success w-100"> Search </a>  
+						</div>     
+                    </div>
+					<!-- /Search Filter -->
+					
+					<div class="row">
+						<div class="col-md-12">
+							<div class="table-responsive">
+								<table class="table dataTable display nowrap cell-border"" id="siteList" width="100%" cellspacing="0">
 											<thead>
 												<tr>
 													<th class="all">#</th>
@@ -298,16 +86,917 @@
 											
 											
 										</table>
-									</div>		
-				</div>									
-                </div>   
+							</div>
+						</div>
+					</div>
+                </div>
+				<!-- /Page Content -->
+				
+				<!-- Add Employee Modal -->
+				<div id="add_employee" class="modal custom-modal fade" role="dialog">
+					<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">Add Employee</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<form>
+									<div class="row">
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">First Name <span class="text-danger">*</span></label>
+												<input class="form-control" type="text">
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Last Name</label>
+												<input class="form-control" type="text">
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Username <span class="text-danger">*</span></label>
+												<input class="form-control" type="text">
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Email <span class="text-danger">*</span></label>
+												<input class="form-control" type="email">
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Password</label>
+												<input class="form-control" type="password">
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Confirm Password</label>
+												<input class="form-control" type="password">
+											</div>
+										</div>
+										<div class="col-sm-6">  
+											<div class="input-block mb-3">
+												<label class="col-form-label">Employee ID <span class="text-danger">*</span></label>
+												<input type="text" class="form-control">
+											</div>
+										</div>
+										<div class="col-sm-6">  
+											<div class="input-block mb-3">
+												<label class="col-form-label">Joining Date <span class="text-danger">*</span></label>
+												<div class="cal-icon"><input class="form-control datetimepicker" type="text"></div>
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Phone </label>
+												<input class="form-control" type="text">
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Company</label>
+												<select class="select">
+													<option value="">Global Technologies</option>
+													<option value="1">Delta Infotech</option>
+												</select>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Department <span class="text-danger">*</span></label>
+												<select class="select">
+													<option>Select Department</option>
+													<option>Web Development</option>
+													<option>IT Management</option>
+													<option>Marketing</option>
+												</select>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Designation <span class="text-danger">*</span></label>
+												<select class="select">
+													<option>Select Designation</option>
+													<option>Web Designer</option>
+													<option>Web Developer</option>
+													<option>Android Developer</option>
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="table-responsive m-t-15">
+										<table class="table table-striped custom-table">
+											<thead>
+												<tr>
+													<th>Module Permission</th>
+													<th class="text-center">Read</th>
+													<th class="text-center">Write</th>
+													<th class="text-center">Create</th>
+													<th class="text-center">Delete</th>
+													<th class="text-center">Import</th>
+													<th class="text-center">Export</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td>Holidays</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+												</tr>
+												<tr>
+													<td>Leaves</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+												</tr>
+												<tr>
+													<td>Clients</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+												</tr>
+												<tr>
+													<td>Projects</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+												</tr>
+												<tr>
+													<td>Tasks</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+												</tr>
+												<tr>
+													<td>Chats</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+												</tr>
+												<tr>
+													<td>Assets</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+												</tr>
+												<tr>
+													<td>Timing Sheets</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+									<div class="submit-section">
+										<button class="btn btn-primary submit-btn">Submit</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /Add Employee Modal -->
+				
+				<!-- Edit Employee Modal -->
+				<div id="edit_employee" class="modal custom-modal fade" role="dialog">
+					<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">Edit Employee</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<form>
+									<div class="row">
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">First Name <span class="text-danger">*</span></label>
+												<input class="form-control" value="John" type="text">
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Last Name</label>
+												<input class="form-control" value="Doe" type="text">
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Username <span class="text-danger">*</span></label>
+												<input class="form-control" value="johndoe" type="text">
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Email <span class="text-danger">*</span></label>
+												<input class="form-control" value="johndoe@example.com" type="email">
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Password</label>
+												<input class="form-control" value="johndoe" type="password">
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Confirm Password</label>
+												<input class="form-control" value="johndoe" type="password">
+											</div>
+										</div>
+										<div class="col-sm-6">  
+											<div class="input-block mb-3">
+												<label class="col-form-label">Employee ID <span class="text-danger">*</span></label>
+												<input type="text" value="FT-0001" readonly class="form-control floating">
+											</div>
+										</div>
+										<div class="col-sm-6">  
+											<div class="input-block mb-3">
+												<label class="col-form-label">Joining Date <span class="text-danger">*</span></label>
+												<div class="cal-icon"><input class="form-control datetimepicker" type="text"></div>
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Phone </label>
+												<input class="form-control" value="9876543210" type="text">
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Company</label>
+												<select class="select">
+													<option>Global Technologies</option>
+													<option>Delta Infotech</option>
+													<option selected>International Software Inc</option>
+												</select>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Department <span class="text-danger">*</span></label>
+												<select class="select">
+													<option>Select Department</option>
+													<option>Web Development</option>
+													<option>IT Management</option>
+													<option>Marketing</option>
+												</select>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Designation <span class="text-danger">*</span></label>
+												<select class="select">
+													<option>Select Designation</option>
+													<option>Web Designer</option>
+													<option>Web Developer</option>
+													<option>Android Developer</option>
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="table-responsive m-t-15">
+										<table class="table table-striped custom-table">
+											<thead>
+												<tr>
+													<th>Module Permission</th>
+													<th class="text-center">Read</th>
+													<th class="text-center">Write</th>
+													<th class="text-center">Create</th>
+													<th class="text-center">Delete</th>
+													<th class="text-center">Import</th>
+													<th class="text-center">Export</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td>Holidays</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+												</tr>
+												<tr>
+													<td>Leaves</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+												</tr>
+												<tr>
+													<td>Clients</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+												</tr>
+												<tr>
+													<td>Projects</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+												</tr>
+												<tr>
+													<td>Tasks</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+												</tr>
+												<tr>
+													<td>Chats</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+												</tr>
+												<tr>
+													<td>Assets</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+												</tr>
+												<tr>
+													<td>Timing Sheets</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" checked>													
+															<span class="checkmark"></span>
+													</label>																			
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+													<td class="text-center">
+														<label class="custom_check">
+															<input type="checkbox" name="rememberme" class="rememberme">
+															<span class="checkmark"></span>
+														</label>
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+									<div class="submit-section">
+										<button class="btn btn-primary submit-btn">Save</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /Edit Employee Modal -->
+				
+				<!-- Delete Employee Modal -->
+				<div class="modal custom-modal fade" id="delete_employee" role="dialog">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content">
+							<div class="modal-body">
+								<div class="form-header">
+									<h3>Delete Employee</h3>
+									<p>Are you sure want to delete?</p>
+								</div>
+								<div class="modal-btn delete-action">
+									<div class="row">
+										<div class="col-6">
+											<a href="javascript:void(0);" class="btn btn-primary continue-btn">Delete</a>
+										</div>
+										<div class="col-6">
+											<a href="javascript:void(0);" data-bs-dismiss="modal" class="btn btn-primary cancel-btn">Cancel</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /Delete Employee Modal -->
+				
             </div>
-          </div>
-	
-    </section>
-</main>
-
+			<!-- /Page Wrapper -->
+			
 
 
 @endsection
-

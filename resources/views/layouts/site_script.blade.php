@@ -1,6 +1,6 @@
 
    <!-- Page level plugins -->
-   <script src="{{asset('Datatables/2.0.8/js/dataTables.js')}}"></script>
+  <script src="{{asset('Datatables/2.0.8/js/dataTables.js')}}"></script>
    <script src="{{asset('Datatables/responsive/3.0.2/js/dataTables.responsive.js')}}"></script>
    <script type="text/javascript">
    // $(window).resize(function(){location.reload();});
@@ -282,7 +282,7 @@ autoAdjustColumns(siteTable);
 			   });
 				  
 	  });
-
+/*
 	document.getElementById("update_building_code").addEventListener('change', doThing_site_management);
 	document.getElementById("update_building_description").addEventListener('change', doThing_site_management);
 	document.getElementById("update_division_id").addEventListener('change', doThing_site_management);
@@ -292,7 +292,7 @@ autoAdjustColumns(siteTable);
 	document.getElementById("update_ip_netmask").addEventListener('change', doThing_site_management);
 	document.getElementById("update_ip_network").addEventListener('change', doThing_site_management);
 	document.getElementById("update_ip_gateway").addEventListener('change', doThing_site_management);
-	
+*/	
 	function doThing_site_management(){
 
 			let siteID = document.getElementById("update-site").value;

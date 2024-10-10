@@ -1,46 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark"  data-sidebar-size="lg" data-sidebar-image="none">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Smarthr - Bootstrap Admin Template">
+		<meta name="keywords" content="admin, estimates, bootstrap, business, corporate, creative, management, minimal, modern, accounts, invoice, html5, responsive, CRM, Projects">
+        <meta name="author" content="Dreamstechnologies - Bootstrap Admin Template">
+        <title>{{ $title }}</title>
+		
 
-<head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+		<!-- Favicon -->
+        <link rel="shortcut icon" type="image/x-icon" href="{{asset('assets/img/favicon.png')}}">
+		
+		<!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="{{asset('assets/css/bootstrap.min.css')}}">
 
-  <title>{{ $title }}</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
+		<!-- Fontawesome CSS -->
+        <link rel="stylesheet" href="{{asset('assets/plugins/fontawesome/css/fontawesome.min.css')}}">
+    	<link rel="stylesheet" href="{{asset('assets/plugins/fontawesome/css/all.min.css')}}">
 
-  <!-- Favicons -->
-  <link href="{{asset('client_logo/logo.png')}}" rel="icon">
- 
-  <!-- Google Fonts -->
-  <link href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
- 
-  <!-- Vendor CSS Files -->
-  <link href="{{asset('template/assets/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
-  <link href="{{asset('template/assets/vendor/bootstrap-icons/bootstrap-icons.css')}}" rel="stylesheet">
-  <link href="{{asset('template/assets/vendor/boxicons/css/boxicons.min.css')}}" rel="stylesheet">
-  <link href="{{asset('template/assets/vendor/quill/quill.snow.css')}}" rel="stylesheet">
-  <link href="{{asset('template/assets/vendor/quill/quill.bubble.css')}}" rel="stylesheet">
-
-
-  <!-- Template Main CSS File -->
-  <link href="{{asset('template/assets/css/style.css')}}" rel="stylesheet">
-  
-  
-  <!-- Custom styles for this page -->
+		<!-- Lineawesome CSS -->
+        <link rel="stylesheet" href="{{asset('assets/css/line-awesome.min.css')}}">
+		<link rel="stylesheet" href="{{asset('assets/css/material.css')}}">
+		
+		<!-- Datatable CSS
+		<link rel="stylesheet" href="{{asset('assets/css/dataTables.bootstrap4.min.css')}}"> -->
+		  <!-- Custom styles for this page -->
   <link href="{{asset('Datatables/2.0.8/css/dataTables.dataTables.css')}}" rel="stylesheet">
   <!--Responsive Datatable Plugin-->
   <link href="{{asset('Datatables/responsive/3.0.2/css/responsive.dataTables.css')}}" rel="stylesheet">
- 
-  <link href="{{asset('style/custom_style_common.css')}}" rel="stylesheet">
-  <link href="{{asset('style/custom_style_robinsons.css')}}" rel="stylesheet">
-
-  <!-- =======================================================
-  * Template Name: template - v2.3.1
-  * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+		
+		<!-- Select2 CSS -->
+		<link rel="stylesheet" href="{{asset('assets/css/select2.min.css')}}">
+		
+		<!-- Datetimepicker CSS -->
+		<link rel="stylesheet" href="{{asset('assets/css/bootstrap-datetimepicker.min.css')}}">
+		
+		<!-- Main CSS -->
+        <link rel="stylesheet" href="{{asset('assets/css/style.css')}}">
+    </head>  
   
-@include('layouts.navigation')                                                                                                                                                                                     
+  
+  
+  
