@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Session;
 
-class DivisionModel extends Model
+class DepartmentModel extends Model
 {
 	use LogsActivity;
 	
@@ -15,26 +15,24 @@ class DivisionModel extends Model
     $activity->causer_id = Session::get('loginID');
 	}
 	
-	protected $table = 'meter_division_table';
+	protected $table = 'teves_department_table';
 	
 	protected $fillable = [
-        'division_code',
-		'division_name',
+        'department_name',
 		'created_at',
 		'created_by_user_idx',
 		'updated_at',
 		'modified_by_user_idx'
     ];
     
-	protected $primaryKey = 'division_id';
+	protected $primaryKey = 'department_id';
 	
-	protected static $logName = 'Division Details';
+	protected static $logName = 'Department Details';
 	
 	protected static $logOnlyDirty = true;
 	
 	protected static $logAttributes = [
-		'division_code',
-		'division_name',
+		'department_name',
 		'created_at',
 		'created_by_user_idx',
 		'updated_at',

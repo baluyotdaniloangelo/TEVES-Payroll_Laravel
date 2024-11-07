@@ -20,10 +20,15 @@ class EmployeeModel extends Model
 	
 	protected $fillable = [
         'employee_number',
-        'employee_name',
+        'employee_last_name',
+        'employee_first_name',
+        'employee_middle_name',
+        'employee_extension_name',
         'employee_birthday',
 		'employee_position',
 		'employee_picture',
+		'employee_phone',
+		'employee_email',
 		'branch_idx',
 		'department_idx',
 		'time_in',
@@ -50,10 +55,15 @@ class EmployeeModel extends Model
 	
 	protected static $logAttributes = [
 		'employee_number',
-        'employee_name',
+        'employee_last_name',
+        'employee_first_name',
+        'employee_middle_name',
+        'employee_extension_name',
         'employee_birthday',
 		'employee_position',
 		'employee_picture',
+		'employee_phone',
+		'employee_email',
 		'branch_idx',
 		'department_idx',
 		'time_in',

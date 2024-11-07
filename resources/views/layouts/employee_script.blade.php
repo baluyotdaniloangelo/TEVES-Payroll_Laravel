@@ -3,17 +3,11 @@
   <script src="{{asset('Datatables/2.0.8/js/dataTables.js')}}"></script>
    <script src="{{asset('Datatables/responsive/3.0.2/js/dataTables.responsive.js')}}"></script>
    <script type="text/javascript">
-   // $(window).resize(function(){location.reload();});
 
-	<?php 
-			
-	if($data->user_type=="Admin"){ 
-		$route_ctr = 'AdminSiteList'; 
-		?>
 			<!--Load Table-->
 			$(function () {
 			
-				var siteTable = $('#siteList').DataTable({
+				var EmployeeList = $('#EmployeeListDatatable').DataTable({
 					processing: true,
 					responsive: true,
 					serverSide: true,
@@ -21,76 +15,35 @@
 					scrollCollapse: true,
 					scrollY: '500px',
 					//scrollX: '100%',
-					ajax: "{{ route('AdminSiteList') }}",
+					ajax: "{{ route('getEmployeeList') }}",
 					columns: [
 							{data: 'DT_RowIndex', name: 'DT_RowIndex' , orderable: false, searchable: false, className: "text-right"},       
-							{data: 'building_code', className: "text-left"},
-							{data: 'building_description', className: "text-left"},
-							{data: 'company_name', className: "text-left"},
-							{data: 'division_code', className: "text-left"},
-							{data: 'cut_off', className: "text-center"},
-							{data: 'status', name: 'status', orderable: true, searchable: true, className: "text-center"},
+							{data: 'employee_number', className: "text-left"},
+							{data: 'employee_last_name', className: "text-left"},
+							{data: 'employee_first_name', className: "text-left"},
+							{data: 'employee_middle_name', className: "text-left"},
+							{data: 'employee_extension_name', className: "text-left"},
+							{data: 'branch_name', className: "text-left"},
+							{data: 'department_name', className: "text-left"},
+							{data: 'employee_position', className: "text-left"},
+							{data: 'employee_status', className: "text-left"},
 							{data: 'action', name: 'action', orderable: false, searchable: false, className: "text-center"},
 					]
 				});
 
 
-		autoAdjustColumns(siteTable);
+		//autoAdjustColumns(EmployeeList);
 
-		 /*Adjust Table Column*/
+		 /*Adjust Table Column
 		 function autoAdjustColumns(table) {
 			 var container = table.table().container();
 			 var resizeObserver = new ResizeObserver(function () {
 				 table.columns.adjust();
 			 });
 			 resizeObserver.observe(container);
-		 }	
-			});	
-		<?php
-	} 
-	else{
-		$route_ctr = 'UserSiteList';
-		?>
-			<!--Load Table-->
-			$(function () {
-			
-				var siteTable = $('#siteList').DataTable({
-					processing: true,
-					responsive: true,
-					serverSide: true,
-					stateSave: true,/*Remember Searches*/
-					scrollCollapse: true,
-					scrollY: '500px',
-					//scrollX: '100%',
-					ajax: "{{ route('UserSiteList') }}",
-					columns: [
-							{data: 'DT_RowIndex', name: 'DT_RowIndex' , orderable: false, searchable: false, className: "text-right"},       
-							{data: 'building_code', className: "text-left"},
-							{data: 'building_description', className: "text-left"},
-							{data: 'company_name', className: "text-left"},
-							{data: 'division_code', className: "text-left"},
-							{data: 'cut_off', className: "text-center"},
-							{data: 'status', name: 'status', orderable: true, searchable: true, className: "text-center"},
-							{data: 'action', name: 'action', orderable: false, searchable: false, className: "text-center"},
-					]
-				});
-				
-autoAdjustColumns(siteTable);
-
-		 /*Adjust Table Column*/
-		 function autoAdjustColumns(table) {
-			 var container = table.table().container();
-			 var resizeObserver = new ResizeObserver(function () {
-				 table.columns.adjust();
-			 });
-			 resizeObserver.observe(container);
-		 }	
+		 }	*/
 
 			});	
-		<?php
-	} 
-			
-	?>
 
 		
 

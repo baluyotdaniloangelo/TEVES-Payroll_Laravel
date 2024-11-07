@@ -15,10 +15,10 @@
 @include('layouts.footer')
 <?php
 
-if (Request::is('site')){
+if (Request::is('employee')){
 
 ?>
-@include('layouts.site_script')
+@include('layouts.employee_script')
 <?php
 
 }

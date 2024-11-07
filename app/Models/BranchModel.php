@@ -1,12 +1,12 @@
 <?php
 namespace App\Models;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\Contracts\Activity;
-use Illuminate\Database\Eloquent\Model;
 
 use Session;
 
-class CompanyModel extends Model
+class BranchModel extends Model
 {
 	use LogsActivity;
 	
@@ -14,30 +14,42 @@ class CompanyModel extends Model
 	{
     $activity->causer_id = Session::get('loginID');
 	}
-	
-	protected $table = 'meter_company_table';
+
+	protected $table = 'teves_branch_table';
 	
 	protected $fillable = [
-        'company_code',
-		'company_name',
+        'branch_code',
+		'branch_name',
+		'branch_initial',
+		'branch_tin',
+		'branch_address',
+		'branch_contact_number',
+		'branch_owner',
+		'branch_owner_title',
 		'created_at',
 		'created_by_user_idx',
 		'updated_at',
 		'modified_by_user_idx'
     ];
-    
-	protected $primaryKey = 'company_id';
 	
-	protected static $logName = 'Company Details';
+	protected $primaryKey = 'branch_id';
+    
+	protected static $logName = 'Branch Information';
 	
 	protected static $logOnlyDirty = true;
 	
 	protected static $logAttributes = [
-		'company_code',
-		'company_name',
+		'branch_code',
+		'branch_name',
+		'branch_initial',
+		'branch_tin',
+		'branch_address',
+		'branch_contact_number',
+		'branch_owner',
+		'branch_owner_title',
 		'created_at',
 		'created_by_user_idx',
 		'updated_at',
 		'modified_by_user_idx'
-    ];	
+    ];
 }

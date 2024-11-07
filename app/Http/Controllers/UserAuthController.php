@@ -31,7 +31,7 @@ class UserAuthController extends Controller
 		if ($user){
 			if(Hash::check($request->InputPassword,$user->user_password)){
 				$request->session()->put('loginID', $user->user_id);
-				return redirect('site');
+				return redirect('employee');
 			}else{
 				return back()->with('fail', 'Incorrect Password');
 			}
@@ -43,7 +43,7 @@ class UserAuthController extends Controller
     public function logout(){
 		if(Session::has('loginID')){
 			Session::pull('loginID');
-			Session::pull('site_current_tab');
+			//Session::pull('site_current_tab');
 			return redirect('/');
 		}
     }

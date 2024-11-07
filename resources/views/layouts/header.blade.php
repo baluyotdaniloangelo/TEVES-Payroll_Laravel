@@ -23,6 +23,8 @@
         <link rel="stylesheet" href="{{asset('assets/css/line-awesome.min.css')}}">
 		<link rel="stylesheet" href="{{asset('assets/css/material.css')}}">
 		
+		<link rel="stylesheet" href="{{asset('assets/plugins/simpleline/simple-line-icons.css')}}">
+		
 		<!-- Datatable CSS
 		<link rel="stylesheet" href="{{asset('assets/css/dataTables.bootstrap4.min.css')}}"> -->
 		  <!-- Custom styles for this page -->
