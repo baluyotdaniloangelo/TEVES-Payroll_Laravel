@@ -66,6 +66,10 @@
 					.dt-scroll-body{
 						min-height:400px !important;
 					}
+					.invalid-tooltip {
+						
+						top: 80px !important;
+					}
 					</style>
 					<div class="row">
 						<div class="col-md-12">
@@ -110,7 +114,8 @@
 								</button>
 							</div>
 							<div class="modal-body">
-								 <form class="g-2 needs-validation" id="CreateCompanyform">
+								 <form class="g-2 needs-validation" id="Employeeform">
+								 
 								<!--
 								'employee_number',
 								'employee_last_name',
@@ -141,35 +146,40 @@
 											<div class="input-block mb-3">
 												<label class="col-form-label">Last Name <span class="text-danger">*</span></label>
 												<input class="form-control" type="text" id="employee_last_name" name="employee_last_name" required>
+												<span class="valid-feedback" id="employee_last_nameError" title="Required"></span>
 											</div>
 										</div>
 										<div class="col-sm-3">
 											<div class="input-block mb-3">
 												<label class="col-form-label">First Name</label>
 												<input class="form-control" type="text" id="employee_first_name" name="employee_first_name" required>
+												<span class="valid-feedback" id="employee_first_nameError" title="Required"></span>
 											</div>
 										</div>
 										<div class="col-sm-3">
 											<div class="input-block mb-3">
 												<label class="col-form-label">Middle Name</label>
 												<input class="form-control" type="text" id="employee_middle_name" name="employee_middle_name">
+												<span class="valid-feedback" id="employee_middle_nameError" title="Required"></span>
 											</div>
 										</div>
 										<div class="col-sm-3">
 											<div class="input-block mb-3">
 												<label class="col-form-label">Name Extention</label>
 												<input class="form-control" type="text" id="employee_extension_name" name="employee_extension_name">
+												<span class="valid-feedback" id="employee_middle_nameError" title="Required"></span>
 											</div>
 										</div>
 										<div class="col-sm-4">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Birth Date <span class="text-danger">*</span></label>
 												<div class="cal-icon"><input class="form-control datetimepicker" type="text" id="employee_birthday" name="employee_birthday" required></div>
+												<span class="valid-feedback" id="employee_birthdayError" title="Required"></span>
 											</div>
 										</div>
 										<div class="col-sm-4">
 											<div class="input-block mb-3">
-												<label class="col-form-label">Email <span class="text-danger">*</span></label>
+												<label class="col-form-label">Email <span class="text-danger"></span></label>
 												<input class="form-control" type="email" id="" name="" id="employee_email" name="employee_email">
 											</div>
 										</div>
@@ -182,13 +192,14 @@
 										<div class="col-sm-6">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Employee ID <span class="text-danger">*</span></label>
-												<input type="text" class="form-control" id="employee_number" name="employee_number">
+												<input type="text" class="form-control" id="employee_number" name="employee_number" required>
+												<span class="valid-feedback" id="employee_numberError" title="Required"></span>
 											</div>
 										</div>
 										
 										<div class="col-sm-6">  
 											<div class="input-block mb-3">
-												<label class="col-form-label">Position <span class="text-danger">*</span></label>
+												<label class="col-form-label">Position <span class="text-danger"></span></label>
 												<input type="text" class="form-control" id="employee_position" name="employee_position">
 											</div>
 										</div>
@@ -203,7 +214,7 @@
 										</div>
 										<div class="col-md-6">
 											<div class="input-block mb-3">
-												<label class="col-form-label">Department <span class="text-danger">*</span></label>
+												<label class="col-form-label">Department <span class="text-danger"></span></label>
 												<select class="select" id="department_idx" name="department_idx">
 													<option>Select Department</option>
 													<option>Web Development</option>
@@ -216,19 +227,22 @@
 										<div class="col-sm-4">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Time In <span class="text-danger">*</span></label>
-												<div class="cal-icon"><input class="form-control timepicker" type="text" id="time_in" name="time_in" required></div>
+												<div class="cal-icon"><input class="form-control timepicker" type="text" id="time_in" name="time_in" required value="08:00"></div>
+												<span class="valid-feedback" id="time_inError" title="Required"></span>
 											</div>
 										</div>
 										<div class="col-sm-4">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Breaktime <span class="text-danger">*</span></label>
-												<div class="cal-icon"><input class="form-control timepicker" type="text" id="break_time" name="break_time" required></div>
+												<div class="cal-icon"><input class="form-control timepicker" type="text" id="break_time" name="break_time" required value="12:00"></div>
+												<span class="valid-feedback" id="break_timeError" title="Required"></span>
 											</div>
 										</div>
 										<div class="col-sm-4">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Time Out <span class="text-danger">*</span></label>
-												<div class="cal-icon"><input class="form-control timepicker" type="text" id="time_out" name="time_out" required></div>
+												<div class="cal-icon"><input class="form-control timepicker" type="text" id="time_out" name="time_out" required value="17:00"></div>
+												<span class="valid-feedback" id="time_outError" title="Required"></span>
 											</div>
 										</div>
 									</div>
@@ -251,43 +265,43 @@
 													<td>Restday</td>
 													<td class="text-center">
 														<label class="custom_check">
-															<input type="checkbox" checked>													
+															<input type="checkbox" checked name="restday_sunday" class="restday_sunday">													
 															<span class="checkmark"></span>
 													</label>																			
 													</td>
 													<td class="text-center">
 														<label class="custom_check">
-															<input type="checkbox" name="rememberme" class="rememberme">
+															<input type="checkbox" name="restday_monday" class="restday_monday">
 															<span class="checkmark"></span>
 														</label>
 													</td>
 													<td class="text-center">
 														<label class="custom_check">
-															<input type="checkbox" name="rememberme" class="rememberme">
+															<input type="checkbox" name="restday_tuesday" class="restday_tuesday">
 															<span class="checkmark"></span>
 														</label>
 													</td>
 													<td class="text-center">
 														<label class="custom_check">
-															<input type="checkbox" name="rememberme" class="rememberme">
+															<input type="checkbox" name="restday_wednesday" class="restday_wednesday">
 															<span class="checkmark"></span>
 														</label>
 													</td>
 													<td class="text-center">
 														<label class="custom_check">
-															<input type="checkbox" name="rememberme" class="rememberme">
+															<input type="checkbox" name="restday_thursday" class="restday_thursday">
 															<span class="checkmark"></span>
 														</label>
 													</td>
 													<td class="text-center">
 														<label class="custom_check">
-															<input type="checkbox" name="rememberme" class="rememberme">
+															<input type="checkbox" name="restday_friday" class="restday_friday">
 															<span class="checkmark"></span>
 														</label>
 													</td>
 													<td class="text-center">
 														<label class="custom_check">
-															<input type="checkbox" checked>													
+															<input type="checkbox" checked name="restday_saturday" class="restday_saturday">													
 															<span class="checkmark"></span>
 													</label>																			
 													</td>
@@ -296,7 +310,7 @@
 										</table>
 									</div>
 									<div class="submit-section">
-										<button class="btn btn-primary submit-btn">Submit</button>
+										<button class="btn btn-primary submit-btn" id="submit_employee_details" value="0">Submit</button>
 									</div>
 								</form>
 							</div>

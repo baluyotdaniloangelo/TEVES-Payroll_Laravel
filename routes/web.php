@@ -58,11 +58,11 @@ Route::get('/employee', [EmployeeManagementController::class,'employee'])->name(
 Route::get('employee/list', [EmployeeManagementController::class, 'getEmployeeList'])->name('getEmployeeList')->middleware('isLoggedIn');
 //Route::get('site/user/list', [EmployeeManagementController::class, 'getSiteForUser'])->name('UserSiteList')->middleware('isLoggedIn');
 
-/*Create Site*/
-Route::post('/create_site_post', [EmployeeManagementController::class,'create_site_post'])->name('create_site_post')->middleware('isLoggedIn');
+/*Create/Update Employee*/
+Route::post('/submit_employee_information', [EmployeeManagementController::class,'submit_employee_information'])->name('submit_employee_information')->middleware('isLoggedIn');
 
 /*Update Site*/
-Route::post('/update_site_post', [EmployeeManagementController::class,'update_site_post'])->name('update_site_post')->middleware('isLoggedIn');
+//Route::post('/update_site_post', [EmployeeManagementController::class,'update_site_post'])->name('update_site_post')->middleware('isLoggedIn');
 
 /*GET Site Info*/
 Route::post('/site_info', [EmployeeManagementController::class, 'site_info'])->name('site_info')->middleware('isLoggedIn');

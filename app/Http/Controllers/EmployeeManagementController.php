@@ -100,8 +100,8 @@ class EmployeeManagementController extends Controller
               		->get([
 					'teves_employee_table.employee_id',
 					'teves_employee_table.last_log_update',
-					'teves_employee_table.building_code',
-					'teves_employee_table.building_description',
+					'teves_employee_table.employee_number',
+					'teves_employee_table.employee_last_name',
 					'teves_branch_table.branch_name',
 					'teves_department_table.division_code',
 					'teves_employee_table.device_ip_range',
@@ -120,8 +120,8 @@ class EmployeeManagementController extends Controller
               		->get([
 					'teves_employee_table.employee_id',
 					'teves_employee_table.last_log_update',
-					'teves_employee_table.building_code',
-					'teves_employee_table.building_description',
+					'teves_employee_table.employee_number',
+					'teves_employee_table.employee_last_name',
 					'teves_branch_table.branch_name',
 					'teves_department_table.division_code',
 					'teves_employee_table.device_ip_range',
@@ -305,8 +305,8 @@ class EmployeeManagementController extends Controller
               		->get([
 					'teves_employee_table.employee_id',
 					'teves_employee_table.building_id',
-					'teves_employee_table.building_code',
-					'teves_employee_table.building_description',
+					'teves_employee_table.employee_number',
+					'teves_employee_table.employee_last_name',
 					'teves_branch_table.branch_name',
 					'teves_department_table.division_code',
 					'teves_department_table.department_name',
@@ -322,137 +322,6 @@ class EmployeeManagementController extends Controller
 		
 	}
 
-	/*Site Dashboard*/
-	public function site_details($siteID){
-
-		$title = 'Site Details';
-		/*Get User Information*/
-		if(Session::has('loginID')){
-			$data = User::where('user_id', '=', Session::get('loginID'))
-			->first();
-			
-			/*Get List of Configuration File*/
-			$configuration_file_data = ConfigurationFileModel::orderby('config_file')->get();
-
-		$site_current_tab = Session::get('site_current_tab');
-		
-		if($site_current_tab == 'status' || $site_current_tab == ''){
-			
-			$status_tab = " active show";
-			$gateway_tab = "";
-			$meter_tab = "";
-			$building_tab = "";
-			$meterlocation_tab = "";
-			
-			$status_aria_selected = "true";
-			$gateway_aria_selected = "false";
-			$meter_aria_selected = "false";
-			$building_aria_selected = "false";
-			$meterlocation_aria_selected = "false";
-			
-		}else if($site_current_tab == 'meter'){
-			
-			$status_tab = "";
-			$gateway_tab = "";
-			$meter_tab = " active show";
-			$building_tab = "";
-			$meterlocation_tab = "";
-			
-			$status_aria_selected = "false";
-			$gateway_aria_selected = "false";
-			$meter_aria_selected = "true";
-			$building_aria_selected = "false";
-			$meterlocation_aria_selected = "false";	
-			
-		}else if($site_current_tab == 'building'){
-			
-			$status_tab = "";
-			$gateway_tab = "";
-			$meter_tab = "";
-			$building_tab = " active show";
-			$meterlocation_tab = "";
-			
-			$status_aria_selected = "false";
-			$gateway_aria_selected = "false";
-			$meter_aria_selected = "false";
-			$building_aria_selected = "true";
-			$meterlocation_aria_selected = "false";
-			
-		}else if($site_current_tab == 'meterlocation'){
-			
-			$status_tab = "";
-			$gateway_tab = "";
-			$meter_tab = "";
-			$building_tab = "";
-			$meterlocation_tab = " active show";
-			
-			$status_aria_selected = "false";
-			$gateway_aria_selected = "false";
-			$meter_aria_selected = "false";
-			$building_aria_selected = "false";
-			$meterlocation_aria_selected = "true";
-			
-		}else{
-			
-			$status_tab = "";
-			$gateway_tab = " active show";
-			$meter_tab = "";
-			$building_tab = "";
-			$meterlocation_tab = "";
-			
-			$status_aria_selected = "false";
-			$gateway_aria_selected = "true";
-			$meter_aria_selected = "false";
-			$building_aria_selected = "false";
-			$meterlocation_aria_selected = "false";
-	
-		}
-		
-		$raw_query_offline = "SELECT 
-				(
-				SELECT COUNT(*) from `meter_rtu` where `employee_id` = ?
-				) AS `total_gateway`,
-				(
-				SELECT COUNT(*) from `meter_rtu` where `employee_id` = ? and DATEDIFF(NOW(), meter_rtu.last_log_update) < 0
-				) AS `online_gateway`,
-				(
-				SELECT COUNT(*) from `meter_rtu` where `employee_id` = ? and DATEDIFF(NOW(), meter_rtu.last_log_update) >= 1 OR (meter_rtu.last_log_update = '0000-00-00 00:00:00' AND `employee_id` = ?)
-				) AS `offline_gateway`,
-				(
-				SELECT COUNT(*) from `meter_details` where `employee_id` = ?
-				) AS `total_meter`,
-				(
-				SELECT COUNT(*) from `meter_details` where `employee_id` = ? and DATEDIFF(NOW(), meter_details.last_log_update) < 0
-				) AS `online_meter`,
-				(
-				SELECT COUNT(*) from `meter_details` where `employee_id` = ? and DATEDIFF(NOW(), meter_details.last_log_update) >= 1 OR (meter_details.last_log_update = '0000-00-00 00:00:00' AND `employee_id` = ?)
-				) AS `offline_meter`";	
-					   
-		$offline_data = DB::select("$raw_query_offline", [$siteID,$siteID,$siteID,$siteID,$siteID,$siteID,$siteID,$siteID]);
-		
-		$SiteData = EmployeeModel::join('teves_employee_table', 'teves_employee_table.employee_id', '=', 'teves_employee_table.employee_id')
-					->join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
-					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
-					->where('teves_employee_table.employee_id', $siteID)
-              		->get([
-					'teves_employee_table.employee_id',
-					'teves_employee_table.building_id',
-					'teves_employee_table.building_code',
-					'teves_employee_table.building_description',
-					'teves_branch_table.branch_name',
-					'teves_department_table.division_code',
-					'teves_department_table.department_name',
-					'teves_employee_table.device_ip_range',
-					'teves_employee_table.ip_network',
-					'teves_employee_table.ip_netmask',
-					'teves_employee_table.ip_gateway',
-					'teves_employee_table.cut_off']);
-		
-		return view("amr.site_main",  compact('data','SiteData','title','status_tab','gateway_tab','meter_tab','meterlocation_tab','building_tab','status_aria_selected','gateway_aria_selected','meter_aria_selected','building_aria_selected','meterlocation_aria_selected','site_current_tab','configuration_file_data','offline_data'));
-		
-		}
-		
-	}
 
 	/*Fetch Site Information*/
 	public function site_info(Request $request){
@@ -465,8 +334,8 @@ class EmployeeManagementController extends Controller
 					->where('teves_employee_table.employee_id', $siteID)
               		->get([
 					'teves_employee_table.building_id',
-					'teves_employee_table.building_code',
-					'teves_employee_table.building_description',
+					'teves_employee_table.employee_number',
+					'teves_employee_table.employee_last_name',
 					'teves_branch_table.branch_id',
 					'teves_branch_table.branch_name',
 					'teves_department_table.department_id',
@@ -497,20 +366,46 @@ class EmployeeManagementController extends Controller
 		
 	} 
 
-	public function create_site_post(Request $request){
+	public function submit_employee_information(Request $request){
+
+
+/*'employee_number',
+								'employee_last_name',
+								'employee_first_name',
+								'employee_middle_name',
+								'employee_extension_name',
+								'employee_birthday',
+								'employee_position',
+								'employee_picture',
+								'employee_phone',
+								'employee_email',
+								'branch_idx',
+								'department_idx',
+								'time_in',
+								'break_time',
+								'time_out',
+								'restday_monday',
+								'restday_tuesday',
+								'restday_wednesday',
+								'restday_thursday',
+								'restday_friday',
+								'restday_saturday',
+								'restday_sunday',
+								*/
+
 
 		$request->validate([
-          'building_code'      		=> 'required|unique:teves_employee_table,building_code',
-		  'building_description'    => 'required|unique:teves_employee_table,building_description',
-		  'department_id'    			=> 'required',
-		  'branch_id' 				=> 'required'
+          'employee_number'      		=> 'required|unique:teves_employee_table,employee_number',
+		  'employee_last_name'    		=> 'required',
+		  'employee_first_name'    		=> 'required',
+		  'employee_birthday'    		=> 'required',
+		  'branch_idx'    				=> 'required',
+		  'department_idx' 				=> 'required',
+		  'time_in'    					=> 'required',
+		  'break_time'    				=> 'required',
+		  'time_out'    				=> 'required',
         ], 
-        [
-			'building_code.required' 		=> 'Building Code is Required',
-			'building_description.required' => 'Building Description is Required',
-			'department_id.required' 			=> 'Division is Required',
-			'branch_id.required' 			=> 'Company is Required',
-        ]
+       
 		);
 
 			// $data = $request->all();
@@ -518,7 +413,7 @@ class EmployeeManagementController extends Controller
 			$site = new EmployeeModel();
 			$site->department_idx 		= $request->department_id;
 			$site->branch_idx 			= $request->branch_id;
-			$site->site_code 			= $request->building_code;
+			$site->site_code 			= $request->employee_number;
 			$site->created_by_user_idx 	= Session::get('loginID');
 			$result = $site->save();
 	
@@ -527,8 +422,8 @@ class EmployeeManagementController extends Controller
 			/*Save to Building Details*/
 			$Bldg = new BuildingModel();
 			$Bldg->employee_id 			= $employee_id;
-			$Bldg->building_code 		= $request->building_code;
-			$Bldg->building_description = $request->building_description;
+			$Bldg->employee_number 		= $request->employee_number;
+			$Bldg->employee_last_name = $request->employee_last_name;
 			$Bldg->device_ip_range 		= $request->device_ip_range;
 			$Bldg->ip_network 			= $request->ip_network;
 			$Bldg->ip_netmask 			= $request->ip_netmask;
@@ -547,22 +442,22 @@ class EmployeeManagementController extends Controller
 	public function update_site_post(Request $request){
 		
 		$request->validate([
-          'building_code'      		=> ['required',Rule::unique('teves_employee_table')->where( 
+          'employee_number'      		=> ['required',Rule::unique('teves_employee_table')->where( 
 										fn ($query) =>$query
-											->where('building_code', $request->building_code)
+											->where('employee_number', $request->employee_number)
 											->where('building_id', '<>',  $request->building_id )											
 										)],
-		  'building_description'    => ['required',Rule::unique('teves_employee_table')->where( 
+		  'employee_last_name'    => ['required',Rule::unique('teves_employee_table')->where( 
 										fn ($query) =>$query
-											->where('building_description', $request->building_description)
+											->where('employee_last_name', $request->employee_last_name)
 											->where('building_id', '<>',  $request->building_id )
 										)],
 		  'department_id'    			=> 'required',
 		  'branch_id' 				=> 'required'
         ], 
         [
-			'building_code.required' 		=> 'Building Code is Required',
-			'building_description.required' => 'Building Description is Required',
+			'employee_number.required' 		=> 'Building Code is Required',
+			'employee_last_name.required' => 'Building Description is Required',
 			'department_id.required' 			=> 'Division is Required',
 			'branch_id.required' 			=> 'Company is Required',
         ]
@@ -575,7 +470,7 @@ class EmployeeManagementController extends Controller
 			$site = EmployeeModel::find($request->SiteID);
 			$site->department_idx 		= $request->department_id;
 			$site->branch_idx 			= $request->branch_id;
-			$site->site_code 			= $request->building_code;
+			$site->site_code 			= $request->employee_number;
 			$site->modified_by_user_idx = Session::get('loginID');
 			
 			$result = $site->update();
@@ -584,8 +479,8 @@ class EmployeeManagementController extends Controller
 			$Bldg = BuildingModel::where('employee_id', $request->SiteID)
 				->firstOrFail()
 				->update([
-					'building_code' 		=> $request->building_code,
-					'building_description' 	=> $request->building_description,
+					'employee_number' 		=> $request->employee_number,
+					'employee_last_name' 	=> $request->employee_last_name,
 					'device_ip_range' 		=> $request->device_ip_range,
 					'ip_network' 			=> $request->ip_network,
 					'ip_netmask' 			=> $request->ip_netmask,
@@ -596,13 +491,13 @@ class EmployeeManagementController extends Controller
 			/*Update Meter Site Code*/
 			$meter_update = MeterModel::where('employee_id', $request->SiteID)
 				->update([
-					'site_code' => $request->building_code
+					'site_code' => $request->employee_number
 				]);
 			
 			/*Update Gateway Site Code*/
 			$gateway_update = GatewayModel::where('employee_id', $request->SiteID)
 				->update([
-					'site_code' => $request->building_code,
+					'site_code' => $request->employee_number,
 					'update_rtu_location' => 1
 				]);
 				
