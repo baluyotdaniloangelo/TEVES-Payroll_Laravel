@@ -178,32 +178,46 @@
 				/*Required Item Show Status*/
 				
 				
-				
 				if(error.responseJSON.errors.employee_last_name=="validation.required"){
 							  
 				  $('#employee_last_nameError').html("Last Name is Required");
-				  document.getElementById('employee_last_nameError').className = "invalid-tooltip";
+				  document.getElementById('employee_last_nameError').className = "invalid-feedback";
 				  
 				}
 				
 				if(error.responseJSON.errors.employee_first_name=="validation.required"){
 							  
 				  $('#employee_first_nameError').html("First Name is Required");
-				  document.getElementById('employee_first_nameError').className = "invalid-tooltip";
+				  document.getElementById('employee_first_nameError').className = "invalid-feedback";
+				  
+				}
+				
+				if(error.responseJSON.errors.employee_number=="validation.required"){
+							  
+				  $('#employee_numberError').html("Employee ID is Required");
+				  document.getElementById('employee_numberError').className = "invalid-feedback";
 				  
 				}
 				
 				if(error.responseJSON.errors.time_in=="validation.required"){
 							  
 				  $('#time_inError').html("Time In is Required");
-				  document.getElementById('time_inError').className = "invalid-tooltip";
+				  document.getElementById('time_inError').className = "invalid-feedback";
 				  
 				}
 				
-				if(error.responseJSON.errors.break_time=="validation.required"){
+				
+				if(error.responseJSON.errors.time_in=="validation.required"){
 							  
 				  $('#break_timeError').html("Break Time is Required");
-				  document.getElementById('break_timeError').className = "invalid-tooltip";
+				  document.getElementById('break_timeError').className = "invalid-feedback";
+				  
+				}
+				
+				if(error.responseJSON.errors.time_out=="validation.required"){
+							  
+				  $('#time_outError').html("Time Out is Required");
+				  document.getElementById('time_outError').className = "invalid-feedback";
 				  
 				}
 				/*
