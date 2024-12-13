@@ -64,288 +64,57 @@ class EmployeeManagementController extends Controller
 					$actionBtn = '
 					
 					<div class="dropdown dropdown-action">
-													<a href="#" class="action-icon dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="true"><i class="si si-options-vertical" data-bs-toggle="tooltip" aria-label="si-options-vertical" data-bs-original-title="si-options-vertical"></i></a>
-													<div class="dropdown-menu dropdown-menu-right " data-popper-placement="bottom-end" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);">
-														<a class="dropdown-item" href="' . url('site_details/'.$row->employee_id) .'" data-bs-toggle="modal" data-bs-target="#edit_employee"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
-														<a class="dropdown-item" href="' . url('site_details/'.$row->employee_id) .'" data-bs-toggle="modal" data-bs-target="#delete_employee"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>
-													</div>
-												</div>
+						<a href="#" class="action-icon dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="true"><i class="si si-options-vertical" data-bs-toggle="tooltip" aria-label="si-options-vertical" data-bs-original-title="si-options-vertical"></i></a>
+							<div class="dropdown-menu dropdown-menu-right " data-popper-placement="bottom-end" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);">
+								<a class="dropdown-item" href="#" data-id="'.$row->employee_id.'" id="edit_employee"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
+								<a class="dropdown-item" href="#" data-id="'.$row->employee_id.'" id="delete_employee"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>
+							</div>
+					</div>';
 					
-					';
                     return $actionBtn;
 					
                 })
 					
-										
-				
-				
 				->rawColumns(['action'])
                 ->make(true);
 		}
     }
 
-	/*Fetch Site List using Datatable*/
-	public function getSiteForUser(Request $request)
-    {
-
-		if ($request->ajax()) {
-		
-		$user_data = User::where('user_id', '=', Session::get('loginID'))->first();
-		
-		if($user_data->user_access=='ALL'){
-			
-			$employee_list_data = EmployeeModel::join('teves_employee_table', 'teves_employee_table.employee_id', '=', 'teves_employee_table.employee_id')
-					->join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
-					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
-              		->get([
-					'teves_employee_table.employee_id',
-					'teves_employee_table.last_log_update',
-					'teves_employee_table.employee_number',
-					'teves_employee_table.employee_last_name',
-					'teves_branch_table.branch_name',
-					'teves_department_table.division_code',
-					'teves_employee_table.device_ip_range',
-					'teves_employee_table.ip_network',
-					'teves_employee_table.ip_netmask',
-					'teves_employee_table.ip_gateway',
-					'teves_employee_table.cut_off']);
-			
-		}else{
-			
-			$employee_list_data = EmployeeModel::join('teves_employee_table', 'teves_employee_table.employee_id', '=', 'teves_employee_table.employee_id')
-					->join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
-					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
-					->join('user_access_group', 'user_access_group.employee_id', '=', 'teves_employee_table.employee_id')
-					->where('user_idx', $user_data->user_id)
-              		->get([
-					'teves_employee_table.employee_id',
-					'teves_employee_table.last_log_update',
-					'teves_employee_table.employee_number',
-					'teves_employee_table.employee_last_name',
-					'teves_branch_table.branch_name',
-					'teves_department_table.division_code',
-					'teves_employee_table.device_ip_range',
-					'teves_employee_table.ip_network',
-					'teves_employee_table.ip_netmask',
-					'teves_employee_table.ip_gateway',
-					'teves_employee_table.cut_off']);
-			
-		}
-		
-		return DataTables::of($employee_list_data)
-				->addIndexColumn()
-                ->addColumn('action', function($row){
-                    
-					$last_log_update = $row->last_log_update;
-					
-						/*FROM LOGS*/
-						$_date_format = strtotime($last_log_update);
-						$date_format = date('Y-m-d H:i:s',$_date_format);		
-										
-					$actionBtn = '
-					<div align="center" class="action_table_menu_site">
-					<a href="' . url('site_details/'.$row->employee_id) .'" class="btn-info btn-circle btn-sm bi bi-eye-fill btn_icon_table btn_icon_table_view"></a>
-					</div>';
-                    return $actionBtn;
-                })
-				
-				->addColumn('status', function($row){
-                    
-					$last_log_update = $row->last_log_update;
-					
-						/*FROM LOGS*/
-						$_date_format = strtotime($last_log_update);
-						$date_format = date('Y-m-d H:i:s',$_date_format);
-						
-						/*SERVER DATETIME*/
-						$_server_time=date('Y-m-d H:i:s');
-						$server_time_current = strtotime($_server_time);
-						
-						$date1=date_create("$_server_time");
-						$date2=date_create("$date_format");
-								
-						$diff					= date_diff($date1,$date2);
-						$days_last_active 		= $diff->format("%a");
-						
-						if($last_log_update == "0000/00/00 00:00"){
-							$statusBtn = '<div style="color:black; font-weight:bold; text-align:center;" title="No Meter Connected on the Gateway/Spare">No Data</div>';
-						}
-						else if($diff->format("%a")<=0){
-							$statusBtn = '<a href="#" class="btn-circle btn-sm bi bi-cloud-check-fill btn_icon_table btn_icon_table_status_online" title="Last Status Update : '.$last_log_update.'"></a>';
-						}else{
-							$statusBtn = '<a href="#" class="btn-circle btn-sm bi bi-cloud-slash-fill btn_icon_table btn_icon_table_status_offline" title="Offline Since : '.$last_log_update.'"></a>';
-						}		
-										
-					$actionBtn = '
-					<div align="center" class="row_status_table_site">
-					'.$statusBtn.'
-					</div>';
-                    return $actionBtn;
-                })
-				
-				->rawColumns(['status','action'])
-                ->make(true);
-		
-		}
-		
-    }
-
-	/*Site Dashboard*/
-	public function site_details_2($siteID){
-
-		$title = 'Site Details';
-		/*Get User Information*/
-		if(Session::has('loginID')){
-			$data = User::where('user_id', '=', Session::get('loginID'))
-			->first();
-			
-			/*Get List of Configuration File*/
-			$configuration_file_data = ConfigurationFileModel::orderby('config_file')->get();
-
-		$site_current_tab = Session::get('site_current_tab');
-		
-		if($site_current_tab == 'status' || $site_current_tab == ''){
-			
-			$status_tab = " active show";
-			$gateway_tab = "";
-			$meter_tab = "";
-			$building_tab = "";
-			$meterlocation_tab = "";
-			
-			$status_aria_selected = "true";
-			$gateway_aria_selected = "false";
-			$meter_aria_selected = "false";
-			$building_aria_selected = "false";
-			$meterlocation_aria_selected = "false";
-			
-		}else if($site_current_tab == 'meter'){
-			
-			$status_tab = "";
-			$gateway_tab = "";
-			$meter_tab = " active show";
-			$building_tab = "";
-			$meterlocation_tab = "";
-			
-			$status_aria_selected = "false";
-			$gateway_aria_selected = "false";
-			$meter_aria_selected = "true";
-			$building_aria_selected = "false";
-			$meterlocation_aria_selected = "false";	
-			
-		}else if($site_current_tab == 'building'){
-			
-			$status_tab = "";
-			$gateway_tab = "";
-			$meter_tab = "";
-			$building_tab = " active show";
-			$meterlocation_tab = "";
-			
-			$status_aria_selected = "false";
-			$gateway_aria_selected = "false";
-			$meter_aria_selected = "false";
-			$building_aria_selected = "true";
-			$meterlocation_aria_selected = "false";
-			
-		}else if($site_current_tab == 'meterlocation'){
-			
-			$status_tab = "";
-			$gateway_tab = "";
-			$meter_tab = "";
-			$building_tab = "";
-			$meterlocation_tab = " active show";
-			
-			$status_aria_selected = "false";
-			$gateway_aria_selected = "false";
-			$meter_aria_selected = "false";
-			$building_aria_selected = "false";
-			$meterlocation_aria_selected = "true";
-			
-		}else{
-			
-			$status_tab = "";
-			$gateway_tab = " active show";
-			$meter_tab = "";
-			$building_tab = "";
-			$meterlocation_tab = "";
-			
-			$status_aria_selected = "false";
-			$gateway_aria_selected = "true";
-			$meter_aria_selected = "false";
-			$building_aria_selected = "false";
-			$meterlocation_aria_selected = "false";
-	
-		}
-		
-		$raw_query_offline = "SELECT 
-				(
-				SELECT COUNT(*) from `meter_rtu` where `employee_id` = ?
-				) AS `total_gateway`,
-				(
-				SELECT COUNT(*) from `meter_rtu` where `employee_id` = ? and DATEDIFF(NOW(), meter_rtu.last_log_update) < 0
-				) AS `online_gateway`,
-				(
-				SELECT COUNT(*) from `meter_rtu` where `employee_id` = ? and DATEDIFF(NOW(), meter_rtu.last_log_update) >= 1 OR (meter_rtu.last_log_update = '0000-00-00 00:00:00' AND `employee_id` = ?)
-				) AS `offline_gateway`,
-				(
-				SELECT COUNT(*) from `meter_details` where `employee_id` = ?
-				) AS `total_meter`,
-				(
-				SELECT COUNT(*) from `meter_details` where `employee_id` = ? and DATEDIFF(NOW(), meter_details.last_log_update) < 0
-				) AS `online_meter`,
-				(
-				SELECT COUNT(*) from `meter_details` where `employee_id` = ? and DATEDIFF(NOW(), meter_details.last_log_update) >= 1 OR (meter_details.last_log_update = '0000-00-00 00:00:00' AND `employee_id` = ?)
-				) AS `offline_meter`";	
-					   
-		$offline_data = DB::select("$raw_query_offline", [$siteID,$siteID,$siteID,$siteID,$siteID,$siteID,$siteID,$siteID]);
-		
-		$SiteData = EmployeeModel::join('teves_employee_table', 'teves_employee_table.employee_id', '=', 'teves_employee_table.employee_id')
-					->join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
-					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
-					->where('teves_employee_table.employee_id', $siteID)
-              		->get([
-					'teves_employee_table.employee_id',
-					'teves_employee_table.building_id',
-					'teves_employee_table.employee_number',
-					'teves_employee_table.employee_last_name',
-					'teves_branch_table.branch_name',
-					'teves_department_table.division_code',
-					'teves_department_table.department_name',
-					'teves_employee_table.device_ip_range',
-					'teves_employee_table.ip_network',
-					'teves_employee_table.ip_netmask',
-					'teves_employee_table.ip_gateway',
-					'teves_employee_table.cut_off']);
-		
-		return view("amr.site_main_2",  compact('data','SiteData','title','status_tab','gateway_tab','meter_tab','meterlocation_tab','building_tab','status_aria_selected','gateway_aria_selected','meter_aria_selected','building_aria_selected','meterlocation_aria_selected','site_current_tab','configuration_file_data','offline_data'));
-		
-		}
-		
-	}
-
-
 	/*Fetch Site Information*/
-	public function site_info(Request $request){
+	public function employee_info(Request $request){
 
-		$siteID = $request->siteID;
+		$employeeID = $request->employeeID;
 		
-		$data = EmployeeModel::join('teves_employee_table', 'teves_employee_table.employee_id', '=', 'teves_employee_table.employee_id')
-					->join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
+		$data = EmployeeModel::join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
 					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
-					->where('teves_employee_table.employee_id', $siteID)
+					->where('teves_employee_table.employee_id', $employeeID)
               		->get([
-					'teves_employee_table.building_id',
 					'teves_employee_table.employee_number',
 					'teves_employee_table.employee_last_name',
+					'teves_employee_table.employee_first_name',
+					'teves_employee_table.employee_middle_name',
+					'teves_employee_table.employee_extension_name',
+					'teves_employee_table.employee_birthday',
+					'teves_employee_table.employee_position',
+					'teves_employee_table.employee_picture',
+					'teves_employee_table.employee_phone',
+					'teves_employee_table.employee_email',
 					'teves_branch_table.branch_id',
 					'teves_branch_table.branch_name',
 					'teves_department_table.department_id',
-					'teves_department_table.division_code',
 					'teves_department_table.department_name',
-					'teves_employee_table.device_ip_range',
-					'teves_employee_table.ip_network',
-					'teves_employee_table.ip_netmask',
-					'teves_employee_table.ip_gateway',
-					'teves_employee_table.cut_off']);
+					'teves_employee_table.employee_status',
+					'teves_employee_table.time_in',
+					'teves_employee_table.break_time',
+					'teves_employee_table.time_out',
+					'teves_employee_table.restday_monday',
+					'teves_employee_table.restday_tuesday',
+					'teves_employee_table.restday_wednesday',
+					'teves_employee_table.restday_thursday',
+					'teves_employee_table.restday_friday',
+					'teves_employee_table.restday_saturday',
+					'teves_employee_table.restday_sunday',
+					]);
 		
 		return response()->json($data);
 		

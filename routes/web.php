@@ -65,7 +65,7 @@ Route::post('/submit_employee_information', [EmployeeManagementController::class
 //Route::post('/update_site_post', [EmployeeManagementController::class,'update_site_post'])->name('update_site_post')->middleware('isLoggedIn');
 
 /*GET Site Info*/
-Route::post('/site_info', [EmployeeManagementController::class, 'site_info'])->name('site_info')->middleware('isLoggedIn');
+Route::post('/employee_info', [EmployeeManagementController::class, 'employee_info'])->name('employee_info')->middleware('isLoggedIn');
 
 /*Confirm Delete Site*/
 Route::post('/delete_site_confirmed', [EmployeeManagementController::class, 'delete_site_confirmed'])->name('delete_site_confirmed')->middleware('isLoggedIn');

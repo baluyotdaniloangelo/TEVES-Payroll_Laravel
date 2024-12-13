@@ -75,10 +75,10 @@
 												<tr>
 													<th class="all">#</th>
 										 			<th class="all" title="Employee Number">Employee Number</th>
-													<th class="all" title="Employee Name">Employee Name</th>
-													<th class="all" title="Employee Name">Employee Name</th>
-													<th class="all" title="Employee Name">Employee Name</th>
-													<th class="all" title="Employee Name">Employee Name</th>
+													<th class="all" title="Employee Name">Last Name</th>
+													<th class="all" title="Employee Name">First Name</th>
+													<th class="all" title="Employee Name">Middle Name</th>
+													<th class="all" title="Employee Name">Extension Name</th>
 													<th>Branch</th>
 													<th>Department</th>			
 													<th>Position</th>				
@@ -315,10 +315,8 @@
 				</div>
 				<!-- /Add Employee Modal -->
 				
-				
-				
 				<!-- Delete Employee Modal -->
-				<div class="modal custom-modal fade" id="delete_employee" role="dialog">
+				<div class="modal custom-modal fade" id="EmployeeDeleteModal" role="dialog">
 					<div class="modal-dialog modal-dialog-centered">
 						<div class="modal-content">
 							<div class="modal-body">
@@ -328,8 +326,22 @@
 								</div>
 								<div class="modal-btn delete-action">
 									<div class="row">
+									<div class="card text-center">
+								<div class="card-header border-bottom-0 pb-0">
+									<span class="ms-auto shadow-lg fs-17"></span>
+								</div>
+								<div class="card-body pt-1">
+									<span class="avatar avatar-xl avatar-rounded me-2 mb-2">
+										<img src="assets/img/avatar/avatar-7.jpg" alt="img">
+									</span>
+									<div class="fw-semibold fs-16"><span id="delete_employee_complete_name"></span></div>
+									<p class="mb-4 text-muted fs-11" id="delete_employee_position">Web Developer</p>
+								</div>
+							</div>
+									</div>
+									<div class="row">
 										<div class="col-6">
-											<a href="javascript:void(0);" class="btn btn-primary continue-btn">Delete</a>
+											<a href="javascript:void(0);" class="btn btn-primary continue-btn" id="deleteEmployeeConfirmed" data-id="">Delete</a>
 										</div>
 										<div class="col-6">
 											<a href="javascript:void(0);" data-bs-dismiss="modal" class="btn btn-primary cancel-btn">Cancel</a>
@@ -340,6 +352,51 @@
 						</div>
 					</div>
 				</div>
+				
+	<!-- Meter Delete Modal-->
+    <div class="modal fade" id="" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header header_modal_bg">
+                    <h5 class="modal-title" id="exampleModalLabel"></h5>
+ 					<div class="btn-sm btn-warning btn-circle bi bi-exclamation-circle btn_icon_modal"></div>
+                </div>
+                <div class="modal-body warning_modal_bg" id="modal-body">
+				Are you sure you want to delete?
+				</div>
+				
+				<div style="margin:10px;">	
+				<table width="100%">
+				<tr>
+				<th width="30%">Meter Description:</th>
+				<td width="70%"><span id="meter_name_delete"></span></td>
+				</tr>
+				<tr>
+				<th width="30%">Name/Tagging:</th>
+				<td width="70%"><span id="customer_name_delete"></span></td>
+				</tr>
+				<tr>
+				<th width="30%">Status:</th>
+				<td width="70%"><span id="meter_status_delete"></span></td>
+				</tr>
+				<tr>
+				<th width="30%">Location:</th>
+				<td width="70%"><span id="meter_location_delete"></span></td>
+				</tr>
+				</table>
+				</div>
+				
+                <div class="modal-footer footer_modal_bg">
+                   
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="deleteMeterConfirmed" value=""><i class="bi bi-trash3 navbar_icon"></i> Delete</button>
+					 <button type="button" class="btn btn-primary" data-bs-dismiss="modal"><i class="bi bi-x-circle navbar_icon"></i> Cancel</button>
+                  
+                </div>
+            </div>
+        </div>
+    </div>					
+				
+				
 				<!-- /Delete Employee Modal -->
 				
             </div>

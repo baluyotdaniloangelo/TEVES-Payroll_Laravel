@@ -108,14 +108,14 @@
 			/*#13*/let break_time 						= $("input[name=break_time]").val();
 			/*#14*/let time_out 						= $("input[name=time_out]").val();
 			
-			/*#15*/let restday_monday 					= $("input[name=restday_monday]").val();
-			/*#16*/let restday_tuesday 					= $("input[name=restday_tuesday]").val();
-			/*#17*/let restday_wednesday 				= $("input[name=restday_wednesday]").val();
-			/*#18*/let restday_thursday 				= $("input[name=restday_thursday]").val();
-			/*#19*/let restday_friday 					= $("input[name=restday_friday]").val();
-			/*#20*/let restday_saturday 				= $("input[name=restday_saturday]").val();
-			/*#21*/let restday_sunday 					= $("input[name=restday_sunday]").val();
-			  alert(restday_friday);
+			 /*#15*/var restday_monday 					= $('.restday_monday:checked').val() || 'off';
+			 /*#16*/var restday_tuesday 				= $('.restday_tuesday:checked').val() || 'off';
+			 /*#17*/var restday_wednesday 				= $('.restday_wednesday:checked').val() || 'off';
+			 /*#18*/var restday_thursday 				= $('.restday_thursday:checked').val() || 'off';
+			 /*#19*/var restday_friday 					= $('.restday_friday:checked').val() || 'off';
+			 /*#20*/var restday_saturday 				= $('.restday_saturday:checked').val() || 'off';
+			 /*#21*/var restday_sunday 					= $('.restday_sunday:checked').val() || 'off';
+			
 			  $.ajax({
 				url: "/submit_employee_information",
 				type:"POST",
@@ -525,31 +525,28 @@
 	  });
 	  
 	<!--Site Deletion Confirmation-->
-	$('body').on('click','#deleteSite',function(){
+	$('body').on('click','#delete_employee',function(){
 			
 			event.preventDefault();
-			let siteID = $(this).data('id');
+			let employeeID = $(this).data('id');
 			
 			  $.ajax({
-				url: "/site_info",
+				url: "/employee_info",
 				type:"POST",
 				data:{
-				  siteID:siteID,
+				  employeeID:employeeID,
 				  _token: "{{ csrf_token() }}"
 				},
 				success:function(response){
 				  console.log(response);
 				  if(response) {
 					
-					document.getElementById("deleteSiteConfirmed").value = siteID;
+					$('#deleteEmployeeConfirmed').attr('data-id', employeeID);
 					
-					$('#employee_last_name_delete_info').html(response[0].employee_last_name);
-					$('#employee_first_name_delete_info').html(response[0].employee_first_name);
+					$('#delete_employee_position').html(response[0].employee_position);
+					$('#delete_employee_complete_name').html(response[0].employee_last_name+", "+response[0].employee_first_name+" "+response[0].employee_middle_name+" "+response[0].employee_extension_name);
 					
-					$('#employee_last_name_delete_confirmed_info').html(response[0].employee_first_name);
-					$('#employee_first_name_delete_confirmed_info').html(response[0].employee_last_name);
-					
-					$('#SiteDeleteModal').modal('toggle');					
+					$('#EmployeeDeleteModal').modal('toggle');					
 				  
 				  }
 				},
