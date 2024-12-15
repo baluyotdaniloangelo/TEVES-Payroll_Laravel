@@ -51,7 +51,7 @@ Route::get('/passwordreset',[UserAuthController::class,'passwordreset'])->name('
 Route::post('/reset-password', [EmailController::class, 'sendTemporaryPasswordtoEmail'])->name('sendTemporaryPasswordtoEmail');
 
 /*Logout*/
-Route::get('logout', [UserAuthController::class,'logout']);
+Route::get('logout', [UserAuthController::class,'logout'])->name('logout-user');
 
 /*Load Site*/
 Route::get('/employee', [EmployeeManagementController::class,'employee'])->name('employee')->middleware('isLoggedIn');
@@ -61,21 +61,11 @@ Route::get('employee/list', [EmployeeManagementController::class, 'getEmployeeLi
 /*Create/Update Employee*/
 Route::post('/submit_employee_information', [EmployeeManagementController::class,'submit_employee_information'])->name('submit_employee_information')->middleware('isLoggedIn');
 
-/*Update Site*/
-//Route::post('/update_site_post', [EmployeeManagementController::class,'update_site_post'])->name('update_site_post')->middleware('isLoggedIn');
-
 /*GET Site Info*/
-Route::post('/employee_info', [EmployeeManagementController::class, 'employee_info'])->name('employee_info')->middleware('isLoggedIn');
+Route::post('/employee_info', [EmployeeManagementController::class, 'employee_info'])->name('EmployeeInformation')->middleware('isLoggedIn');
 
 /*Confirm Delete Site*/
-Route::post('/delete_site_confirmed', [EmployeeManagementController::class, 'delete_site_confirmed'])->name('delete_site_confirmed')->middleware('isLoggedIn');
-
-/*Site Dashboard*/
-Route::get('/site_details/{siteID}', [EmployeeManagementController::class,'site_details_2'])->name('site_details')->middleware('isLoggedIn');
-Route::get('/site_details_2/{siteID}', [EmployeeManagementController::class,'site_details_2'])->name('site_details_2')->middleware('isLoggedIn');
-
-/*Save Site Current Tab*/
-Route::post('/save_site_tab', [EmployeeManagementController::class, 'save_site_tab'])->name('save_site_tab')->middleware('isLoggedIn');
+Route::post('/delete_employee_confirmed', [EmployeeManagementController::class, 'delete_employee_confirmed'])->name('DeleteEmployee')->middleware('isLoggedIn');
 
 
 

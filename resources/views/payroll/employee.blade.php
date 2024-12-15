@@ -17,7 +17,7 @@
 								</ul>
 							</div>
 							<div class="col-auto float-end ms-auto">
-								<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#add_employee"><i class="fa-solid fa-plus"></i> Add Employee</a>
+								<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#add_employee" onclick="ResetEmployeeForm()"><i class="fa-solid fa-plus"></i> Add Employee</a>
 								<!--<div class="view-icons">
 									<a href="employees.html" class="grid-view btn btn-link"><i class="fa fa-th"></i></a>
 									<a href="employees-list.html" class="list-view btn btn-link active"><i class="fa-solid fa-bars"></i></a>
@@ -111,31 +111,6 @@
 							</div>
 							<div class="modal-body">
 								 <form class="g-2 needs-validation" id="Employeeform">
-								 
-								<!--
-								'employee_number',
-								'employee_last_name',
-								'employee_first_name',
-								'employee_middle_name',
-								'employee_extension_name',
-								'employee_birthday',
-								'employee_position',
-								'employee_picture',
-								'employee_phone',
-								'employee_email',
-								'branch_idx',
-								'department_idx',
-								'time_in',
-								'break_time',
-								'time_out',
-								'restday_monday',
-								'restday_tuesday',
-								'restday_wednesday',
-								'restday_thursday',
-								'restday_friday',
-								'restday_saturday',
-								'restday_sunday',
-								-->
 								
 									<div class="row">
 										<div class="col-sm-3">
@@ -169,14 +144,14 @@
 										<div class="col-sm-4">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Birth Date <span class="text-danger">*</span></label>
-												<div class="cal-icon"><input class="form-control datetimepicker" type="text" id="employee_birthday" name="employee_birthday" required></div>
+												<input class="form-control datetimepicker" type="text" id="employee_birthday" name="employee_birthday" required>
 												<span class="valid-feedback" id="employee_birthdayError" title="Required"></span>
 											</div>
 										</div>
 										<div class="col-sm-4">
 											<div class="input-block mb-3">
 												<label class="col-form-label">Email <span class="text-danger"></span></label>
-												<input class="form-control" type="email" id="" name="" id="employee_email" name="employee_email">
+												<input class="form-control" type="email" name="employee_email" id="employee_email" name="employee_email">
 											</div>
 										</div>
 										<div class="col-sm-4">
@@ -185,7 +160,8 @@
 												<input class="form-control" type="text" id="employee_phone" name="employee_phone">
 											</div>
 										</div>
-										<div class="col-sm-6">  
+										
+										<div class="col-sm-4">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Employee ID <span class="text-danger">*</span></label>
 												<input type="text" class="form-control" id="employee_number" name="employee_number" required>
@@ -193,29 +169,44 @@
 											</div>
 										</div>
 										
-										<div class="col-sm-6">  
+										<div class="col-sm-4">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Position <span class="text-danger"></span></label>
 												<input type="text" class="form-control" id="employee_position" name="employee_position">
 											</div>
 										</div>
+										
+										<div class="col-sm-4">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Status</label>
+												<select class="form-select form-control" name="employee_status" id="employee_status">
+													<option value="Active">Active</option>
+													<option value="Inactive">Inactive</option>
+												</select>
+											</div>
+										</div>
+										
 										<div class="col-sm-6">
 											<div class="input-block mb-3">
-												<label class="col-form-label">Company/Branch</label>
-												<select class="select" id="branch_idx" name="branch_idx">
-													<option value="">Global Technologies</option>
-													<option value="1">Delta Infotech</option>
+												<label class="col-form-label">Branch</label>
+												<select class="form-select form-control" required="" name="branch_idx" id="branch_idx">
+													@foreach ($branch_data as $branch_data_cols)
+													<option value="{{$branch_data_cols->branch_id}}">
+														{{$branch_data_cols->branch_code}}
+													</option>
+													@endforeach
 												</select>
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="input-block mb-3">
-												<label class="col-form-label">Department <span class="text-danger"></span></label>
+												<label class="col-form-label">Department</label>
 												<select class="select" id="department_idx" name="department_idx">
-													<option>Select Department</option>
-													<option>Web Development</option>
-													<option>IT Management</option>
-													<option>Marketing</option>
+													@foreach ($department_data as $department_data_cols)
+													<option value="{{$department_data_cols->department_id}}">
+														{{$department_data_cols->department_name}}
+													</option>
+													@endforeach
 												</select>
 											</div>
 										</div>
@@ -261,13 +252,13 @@
 													<td>Restday</td>
 													<td class="text-center">
 														<label class="custom_check">
-															<input type="checkbox" checked name="restday_sunday" class="restday_sunday">													
+															<input type="checkbox" name="restday_sunday" class="restday_sunday">													
 															<span class="checkmark"></span>
 													</label>																			
 													</td>
 													<td class="text-center">
 														<label class="custom_check">
-															<input type="checkbox" name="restday_monday" class="restday_monday">
+															<input type="checkbox" id="restday_monday" name="restday_monday" class="restday_monday">
 															<span class="checkmark"></span>
 														</label>
 													</td>
@@ -297,7 +288,7 @@
 													</td>
 													<td class="text-center">
 														<label class="custom_check">
-															<input type="checkbox" checked name="restday_saturday" class="restday_saturday">													
+															<input type="checkbox" name="restday_saturday" class="restday_saturday">													
 															<span class="checkmark"></span>
 													</label>																			
 													</td>
@@ -316,6 +307,7 @@
 				<!-- /Add Employee Modal -->
 				
 				<!-- Delete Employee Modal -->
+				<!-- <div class="modal custom-modal fade" id="EmployeeDeleteModal" role="dialog" tabindex="-1" role="dialog">-->
 				<div class="modal custom-modal fade" id="EmployeeDeleteModal" role="dialog">
 					<div class="modal-dialog modal-dialog-centered">
 						<div class="modal-content">
@@ -339,10 +331,9 @@
 								</div>
 							</div>
 									</div>
+									
 									<div class="row">
-										<div class="col-6">
-											<a href="javascript:void(0);" class="btn btn-primary continue-btn" id="deleteEmployeeConfirmed" data-id="">Delete</a>
-										</div>
+										<button type="submit" class="col-6 btn btn-primary continue-btn" id="deleteEmployeeConfirmed">Delete</button>
 										<div class="col-6">
 											<a href="javascript:void(0);" data-bs-dismiss="modal" class="btn btn-primary cancel-btn">Cancel</a>
 										</div>
@@ -353,53 +344,30 @@
 					</div>
 				</div>
 				
-	<!-- Meter Delete Modal-->
-    <div class="modal fade" id="" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header header_modal_bg">
-                    <h5 class="modal-title" id="exampleModalLabel"></h5>
- 					<div class="btn-sm btn-warning btn-circle bi bi-exclamation-circle btn_icon_modal"></div>
-                </div>
-                <div class="modal-body warning_modal_bg" id="modal-body">
-				Are you sure you want to delete?
-				</div>
-				
-				<div style="margin:10px;">	
-				<table width="100%">
-				<tr>
-				<th width="30%">Meter Description:</th>
-				<td width="70%"><span id="meter_name_delete"></span></td>
-				</tr>
-				<tr>
-				<th width="30%">Name/Tagging:</th>
-				<td width="70%"><span id="customer_name_delete"></span></td>
-				</tr>
-				<tr>
-				<th width="30%">Status:</th>
-				<td width="70%"><span id="meter_status_delete"></span></td>
-				</tr>
-				<tr>
-				<th width="30%">Location:</th>
-				<td width="70%"><span id="meter_location_delete"></span></td>
-				</tr>
-				</table>
-				</div>
-				
-                <div class="modal-footer footer_modal_bg">
-                   
-					<button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="deleteMeterConfirmed" value=""><i class="bi bi-trash3 navbar_icon"></i> Delete</button>
-					 <button type="button" class="btn btn-primary" data-bs-dismiss="modal"><i class="bi bi-x-circle navbar_icon"></i> Cancel</button>
-                  
-                </div>
-            </div>
-        </div>
-    </div>					
-				
-				
 				<!-- /Delete Employee Modal -->
 				
-            </div>
+				<!-- Successful Action -->
+				<div id="success-alert-modal" class="modal fade" tabindex="-1" role="dialog">
+					<div class="modal-dialog modal-sm">
+						<div class="modal-content modal-filled bg-success">
+							<div class="modal-body p-4">
+								<div class="text-center">
+									<i class="dripicons-checkmark h1 text-white"></i>
+										<h4 class="mt-2 text-white" id="modal_success_details">Well Done!</h4>
+											<!--<p class="mt-3 text-white">Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac facilisis in, egestas eget quam.</p>-->
+											<button type="button" class="btn btn-light my-2" data-bs-dismiss="modal">Continue</button>
+									</div>
+								</div>
+								</div><!-- /.modal-content -->
+					</div><!-- /.modal-dialog -->
+				</div>
+				
+				<!-- Succeful Action End -->
+				
+				</div>
+				
+				
+				
 			<!-- /Page Wrapper -->
 			
 
