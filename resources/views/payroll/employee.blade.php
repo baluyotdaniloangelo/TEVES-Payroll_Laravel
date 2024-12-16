@@ -17,46 +17,12 @@
 								</ul>
 							</div>
 							<div class="col-auto float-end ms-auto">
-								<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#add_employee" onclick="ResetEmployeeForm()"><i class="fa-solid fa-plus"></i> Add Employee</a>
-								<!--<div class="view-icons">
-									<a href="employees.html" class="grid-view btn btn-link"><i class="fa fa-th"></i></a>
-									<a href="employees-list.html" class="list-view btn btn-link active"><i class="fa-solid fa-bars"></i></a>
-								</div>-->
+								<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#employee_details_modal" onclick="ResetEmployeeForm()"><i class="fa-solid fa-plus"></i> Add Employee</a>
+								
 							</div>
 						</div>
 					</div>
-					<!-- /Page Header -->
 					
-					<!-- Search Filter
-					<div class="row filter-row">
-						<div class="col-sm-6 col-md-3">  
-							<div class="input-block mb-3 form-focus">
-								<input type="text" class="form-control floating">
-								<label class="focus-label">Employee ID</label>
-							</div>
-						</div>
-						<div class="col-sm-6 col-md-3">  
-							<div class="input-block mb-3 form-focus">
-								<input type="text" class="form-control floating">
-								<label class="focus-label">Employee Name</label>
-							</div>
-						</div>
-						<div class="col-sm-6 col-md-3"> 
-							<div class="input-block mb-3 form-focus select-focus">
-								<select class="select floating"> 
-									<option>Select Designation</option>
-									<option>Web Developer</option>
-									<option>Web Designer</option>
-									<option>Android Developer</option>
-									<option>Ios Developer</option>
-								</select>
-								<label class="focus-label">Designation</label>
-							</div>
-						</div>
-						<div class="col-sm-6 col-md-3">  
-							<a href="#" class="btn btn-success w-100"> Search </a>  
-						</div>     
-                    </div> -->
 					<!-- /Search Filter -->
 					<style>
 					.dt-scroll-body{
@@ -100,11 +66,11 @@
 				<!-- /Page Content -->
 				
 				<!-- Add Employee Modal -->
-				<div id="add_employee" class="modal custom-modal fade" role="dialog">
+				<div id="employee_details_modal" class="modal custom-modal fade" data-bs-backdrop="static" role="dialog">
 					<div class="modal-dialog modal-dialog-centered modal-xl" role="document">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title">Add Employee</h5>
+								<h5 class="modal-title" id="modal_title_action_employee">Add Employee</h5>
 								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
 									<span aria-hidden="true">&times;</span>
 								</button>
@@ -327,7 +293,7 @@
 										<img src="assets/img/avatar/avatar-7.jpg" alt="img">
 									</span>
 									<div class="fw-semibold fs-16"><span id="delete_employee_complete_name"></span></div>
-									<p class="mb-4 text-muted fs-11" id="delete_employee_position">Web Developer</p>
+									<p class="mb-4 text-muted fs-11" id="delete_employee_position"></p>
 								</div>
 							</div>
 									</div>
@@ -348,12 +314,12 @@
 				
 				<!-- Successful Action -->
 				<div id="success-alert-modal" class="modal fade" tabindex="-1" role="dialog">
-					<div class="modal-dialog modal-sm">
+					<div class="modal-dialog modal-lg">
 						<div class="modal-content modal-filled bg-success">
 							<div class="modal-body p-4">
 								<div class="text-center">
 									<i class="dripicons-checkmark h1 text-white"></i>
-										<h4 class="mt-2 text-white" id="modal_success_details">Well Done!</h4>
+										<h4 class="mt-2 text-white" id="modal_success_details"></h4>
 											<!--<p class="mt-3 text-white">Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac facilisis in, egestas eget quam.</p>-->
 											<button type="button" class="btn btn-light my-2" data-bs-dismiss="modal">Continue</button>
 									</div>

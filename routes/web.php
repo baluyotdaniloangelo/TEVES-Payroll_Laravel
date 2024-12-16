@@ -21,6 +21,7 @@ use App\Http\Controllers\EmployeeManagementController;
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserSiteAccessController;
+use App\Http\Controllers\BranchController;
 // use App\Http\Controllers\CAMRSampleExcel;
 
 // use App\Http\Controllers\CompanyController;
@@ -53,20 +54,28 @@ Route::post('/reset-password', [EmailController::class, 'sendTemporaryPasswordto
 /*Logout*/
 Route::get('logout', [UserAuthController::class,'logout'])->name('logout-user');
 
-/*Load Site*/
+/*Start Employee Routes*/
 Route::get('/employee', [EmployeeManagementController::class,'employee'])->name('employee')->middleware('isLoggedIn');
 Route::get('employee/list', [EmployeeManagementController::class, 'getEmployeeList'])->name('getEmployeeList')->middleware('isLoggedIn');
-//Route::get('site/user/list', [EmployeeManagementController::class, 'getSiteForUser'])->name('UserSiteList')->middleware('isLoggedIn');
-
 /*Create/Update Employee*/
 Route::post('/submit_employee_information', [EmployeeManagementController::class,'submit_employee_information'])->name('submit_employee_information')->middleware('isLoggedIn');
-
-/*GET Site Info*/
+/*GET Employee Info*/
 Route::post('/employee_info', [EmployeeManagementController::class, 'employee_info'])->name('EmployeeInformation')->middleware('isLoggedIn');
-
-/*Confirm Delete Site*/
+/*Confirm Delete Employee*/
 Route::post('/delete_employee_confirmed', [EmployeeManagementController::class, 'delete_employee_confirmed'])->name('DeleteEmployee')->middleware('isLoggedIn');
+/*End Employee Routes*/
 
+/*Load Branch List*/
+Route::get('/branch', [BranchController::class,'branch'])->name('branch')->middleware('isLoggedIn');
+Route::get('branch/list', [BranchController::class, 'getBranchList'])->name('getBranchList')->middleware('isLoggedIn');
+/*Create Product*/
+Route::post('/sumbit_branch_post', [BranchController::class,'sumbit_branch_post'])->name('SubmitBranch')->middleware('isLoggedIn');
+/*GET Product Info*/
+Route::post('/branch_info', [BranchController::class, 'branch_info'])->name('BranchInfo')->middleware('isLoggedIn');
+/*Update Product*/
+//Route::post('/update_branch_post', [BranchController::class,'update_branch_post'])->name('UpdateBranch')->middleware('isLoggedIn');
+/*Confirm Delete Product*/
+Route::post('/delete_branch_confirmed', [BranchController::class, 'delete_branch_confirmed'])->name('DeleteBranch')->middleware('isLoggedIn');
 
 
 /*Load User Account List for Admin Only*/

@@ -142,7 +142,7 @@
 					var table = $("#EmployeeListDatatable").DataTable();
 				    table.ajax.reload(null, false);					
 					
-					$('#modal_success_details').html("Employee Information successfully Created");
+					$('#modal_success_details').html("Employee Information successfully "+response.success);
 					$('#success-alert-modal').modal('show');
 					
 					ResetEmployeeForm();
@@ -179,9 +179,14 @@
 				
 				if(error.responseJSON.errors.employee_number=="validation.required"){
 							  
-				  $('#employee_numberError').html("Employee ID is Required");
-				  document.getElementById('employee_numberError').className = "invalid-feedback";
+					$('#employee_numberError').html("Employee ID is Required");
+					document.getElementById('employee_numberError').className = "invalid-feedback";
 				  
+				}else if(error.responseJSON.errors.employee_number=="validation.unique"){
+				
+					$('#employee_numberError').html("Employee ID already Exist");
+					document.getElementById('employee_numberError').className = "invalid-feedback";
+				
 				}
 				
 				if(error.responseJSON.errors.time_in=="validation.required"){
@@ -258,7 +263,6 @@
 				  if(response) {
 					
 					document.getElementById("submit_employee_details").value = employeeID;
-					//document.getElementById("update-site").disabled = true;
 
 					/*Set Details*/
 					document.getElementById("employee_number").value 			= response[0].employee_number;
@@ -320,7 +324,8 @@
 						$( ".restday_sunday" ).prop( "checked", false );
 					}
 					
-					$('#add_employee').modal('toggle');					
+					$('#modal_title_action_employee').html('Edit Employee');
+					$('#employee_details_modal').modal('toggle');					
 				  
 				  }
 				},
@@ -550,18 +555,13 @@
 			event.preventDefault();
 			$('#Employeeform')[0].reset();
 			
+			$('#modal_title_action_employee').html('Add Employee');
+			
 			document.getElementById('Employeeform').className = "g-3 needs-validation";
 			
 			document.getElementById("submit_employee_details").value = 0;
-			/*Hide the Clear Button*/
 			
-		//	$('#branch_idxError').text('');
-		//	document.getElementById('branch_idxError').className = "valid-feedback";	
-		//	document.getElementById('branch_idx').className = "form-control";
-					
-		//	$('#department_idxError').text('');
-		//	document.getElementById('department_idxError').className = "valid-feedback";	
-		//	document.getElementById('department_idx').className = "form-control";
+			/*Hide the Clear Button*/
 			
 			$('#employee_last_nameError').text('');
 			document.getElementById('employee_last_nameError').className = "valid-feedback";

@@ -22,6 +22,13 @@ if (Request::is('employee')){
 <?php
 
 }
+if (Request::is('branch')){
+
+?>
+@include('layouts.branch_script')
+<?php
+
+}
 
 
 ?>

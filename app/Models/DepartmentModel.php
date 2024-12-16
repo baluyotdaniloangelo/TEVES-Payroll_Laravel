@@ -22,7 +22,7 @@ class DepartmentModel extends Model
 		'created_at',
 		'created_by_user_idx',
 		'updated_at',
-		'modified_by_user_idx'
+		'updated_by_user_idx'
     ];
     
 	protected $primaryKey = 'department_id';
@@ -36,6 +36,6 @@ class DepartmentModel extends Model
 		'created_at',
 		'created_by_user_idx',
 		'updated_at',
-		'modified_by_user_idx'
+		'updated_by_user_idx'
     ];	
 }

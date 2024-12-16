@@ -63,7 +63,6 @@ class EmployeeManagementController extends Controller
                 ->addColumn('action', function($row){
 										
 					$actionBtn = '
-					
 					<div class="dropdown dropdown-action">
 						<a href="#" class="action-icon dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="true"><i class="si si-options-vertical" data-bs-toggle="tooltip" aria-label="si-options-vertical" data-bs-original-title="si-options-vertical"></i></a>
 							<div class="dropdown-menu dropdown-menu-right " data-popper-placement="bottom-end" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);">
@@ -133,7 +132,7 @@ class EmployeeManagementController extends Controller
 	} 
 
 	public function submit_employee_information(Request $request){
-			//'employee_number'      		=> 'required|unique:teves_employee_table,employee_number',
+		
 			$employee_id = $request->employee_id;
 			$request->validate([
 			  'employee_number'      		=> ['required',Rule::unique('teves_employee_table')->where( 
@@ -150,8 +149,6 @@ class EmployeeManagementController extends Controller
 			  'break_time'    				=> 'required',
 			  'time_out'    				=> 'required',
 			]);
-			
-			
 			
 			if($employee_id==0){
 			
@@ -191,7 +188,7 @@ class EmployeeManagementController extends Controller
 				$result = $EmployeeDetails->save();
 				
 				if($result){
-					return response()->json(['success'=>'Employee Information Successfully Created!']);
+					return response()->json(['success'=>'Created']);
 				}
 				else{
 					return response()->json(['success'=>'Error on Insert Employee Information']);
@@ -237,10 +234,10 @@ class EmployeeManagementController extends Controller
 				$result = $EmployeeDetails->update();
 				
 				if($result){
-					return response()->json(['success'=>'Employee Information Successfully Created!']);
+					return response()->json(['success'=>'Updated']);
 				}
 				else{
-					return response()->json(['success'=>'Error on Insert Employee Information']);
+					return response()->json(['success'=>'Error on Update Employee Information']);
 				}
 			
 			}
