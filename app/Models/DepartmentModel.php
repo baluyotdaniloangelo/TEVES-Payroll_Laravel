@@ -19,6 +19,7 @@ class DepartmentModel extends Model
 	
 	protected $fillable = [
         'department_name',
+		'branch_idx',
 		'created_at',
 		'created_by_user_idx',
 		'updated_at',
@@ -33,6 +34,7 @@ class DepartmentModel extends Model
 	
 	protected static $logAttributes = [
 		'department_name',
+		'branch_idx',
 		'created_at',
 		'created_by_user_idx',
 		'updated_at',

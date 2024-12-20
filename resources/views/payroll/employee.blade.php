@@ -23,16 +23,7 @@
 						</div>
 					</div>
 					
-					<!-- /Search Filter -->
-					<style>
-					.dt-scroll-body{
-						min-height:400px !important;
-					}
-					.invalid-tooltip {
-						
-						top: none !important;
-					}
-					</style>
+					<!-- /Search Filter >-->
 					<div class="row">
 						<div class="col-md-12">
 							<div class="table-responsive">

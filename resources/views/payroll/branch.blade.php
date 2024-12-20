@@ -23,14 +23,10 @@
 						</div>
 					</div>
 					
-					<style>
+					<!--<style>
 					.dt-scroll-body{
 						min-height:400px !important;
-					}
-					.invalid-tooltip {
-						
-						top: none !important;
-					}
+					}-->
 					</style>
 					<div class="row">
 						<div class="col-md-12">
@@ -179,24 +175,41 @@
 										
 										<div class="col-sm-8">
 										
-											<div class="row">
-											<div class="col-sm-12">
-												<div class="input-block mb-2">
-													<label class="col-form-label">Deparment Name <span class="text-danger">*</span></label>
-													<input class="form-control" type="text" id="department_name" name="department_name" required>
-													<span class="valid-feedback" id="department_nameError" title="Required"></span>
-												</div>
+											<div class="input-block mb-3">
+												<label class="col-form-label">Department</label>
+												<input type="text" class="form-control">
+											</div>
+											<div class="text-end mb-3">
+											<button type="submit" class="btn btn-primary" id="submit_deparment_details" value="0">Add</button>
 											</div>
 											
-											</div>	
+											<!--table for department-->
+											<div class="row mb-3">
+											<div class="table-responsive">
+												<table class="table dataTable display nowrap cell-border" id="departmentlisttable" width="100%" cellspacing="0">
+															<thead>
+																<tr>
+																	<th class="all">#</th>
+																	<th class="all">Department</th>
+																	<th class="all">Action</th>
+																</tr>
+															</thead>				
+															
+															<tbody>
+																
+															</tbody>
+															
+														</table>
+											</div>
+											</div>
 											
 										</div>
 										
 									</div>
 									
-									<div class="submit-section">
+									<!--<div class="submit-section">
 										<button class="btn btn-primary submit-btn" id="submit_deparment_details" value="0">Submit</button>
-									</div>
+									</div>-->
 								</form>
 							</div>
 						</div>

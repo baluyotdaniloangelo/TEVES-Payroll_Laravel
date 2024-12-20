@@ -3,29 +3,13 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\EmployeeManagementController;
-// use App\Http\Controllers\CAMRGatewayController;
-// use App\Http\Controllers\CAMRMeterController;
-// use App\Http\Controllers\CAMRBuildingController;
-// use App\Http\Controllers\CAMRMeterLocationController;
-// use App\Http\Controllers\CAMRGatewayDeviceController;
-
-// use App\Http\Controllers\ReportSettingsController;
-// use App\Http\Controllers\SAPReportController;
-// use App\Http\Controllers\RAWReportController;
-// use App\Http\Controllers\SiteReportController;
-// use App\Http\Controllers\SiteAsBuiltController;
-// use App\Http\Controllers\OfflineReportController;
-
-// use App\Http\Controllers\ConsumptionReportController;
-// use App\Http\Controllers\DemandReportController;
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserSiteAccessController;
 use App\Http\Controllers\BranchController;
-// use App\Http\Controllers\CAMRSampleExcel;
+use App\Http\Controllers\DepartmentController;
 
-// use App\Http\Controllers\CompanyController;
-// use App\Http\Controllers\DivisionController;
+// use App\Http\Controllers\CAMRSampleExcel;
 
 use App\Http\Controllers\EmailController;
 
@@ -68,14 +52,21 @@ Route::post('/delete_employee_confirmed', [EmployeeManagementController::class, 
 /*Load Branch List*/
 Route::get('/branch', [BranchController::class,'branch'])->name('branch')->middleware('isLoggedIn');
 Route::get('branch/list', [BranchController::class, 'getBranchList'])->name('getBranchList')->middleware('isLoggedIn');
-/*Create Product*/
+/*Create or Update Branch*/
 Route::post('/sumbit_branch_post', [BranchController::class,'sumbit_branch_post'])->name('SubmitBranch')->middleware('isLoggedIn');
-/*GET Product Info*/
+/*GET Branch Info*/
 Route::post('/branch_info', [BranchController::class, 'branch_info'])->name('BranchInfo')->middleware('isLoggedIn');
-/*Update Product*/
-//Route::post('/update_branch_post', [BranchController::class,'update_branch_post'])->name('UpdateBranch')->middleware('isLoggedIn');
-/*Confirm Delete Product*/
+/*Confirm Delete Branch*/
 Route::post('/delete_branch_confirmed', [BranchController::class, 'delete_branch_confirmed'])->name('DeleteBranch')->middleware('isLoggedIn');
+
+/*Load Department List*/
+Route::post('department/list', [DepartmentController::class, 'getDepartmentList'])->name('getDepartmentList')->middleware('isLoggedIn');
+/*Create or Update Department*/
+Route::post('/sumbit_department_post', [DepartmentController::class,'sumbit_department_post'])->name('SubmitDepartment')->middleware('isLoggedIn');
+/*GET Department Info*/
+Route::post('/department_info', [DepartmentController::class, 'department_info'])->name('DepartmentInfo')->middleware('isLoggedIn');
+/*Confirm Delete Department*/
+Route::post('/delete_department_confirmed', [DepartmentController::class, 'delete_department_confirmed'])->name('DeleteDepartment')->middleware('isLoggedIn');
 
 
 /*Load User Account List for Admin Only*/

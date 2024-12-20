@@ -12,8 +12,8 @@
 					responsive: true,
 					serverSide: true,
 					stateSave: true,/*Remember Searches*/
-					scrollCollapse: true,
-					scrollY: '500px',
+					//scrollCollapse: true,
+					//scrollY: '500px',
 					//scrollX: '100%',
 					ajax: "{{ route('getEmployeeList') }}",
 					columns: [

@@ -26,6 +26,7 @@ if (Request::is('branch')){
 
 ?>
 @include('layouts.branch_script')
+@include('layouts.department_script')
 <?php
 
 }
