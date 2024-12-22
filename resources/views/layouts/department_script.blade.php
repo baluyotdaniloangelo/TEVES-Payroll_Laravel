@@ -81,6 +81,120 @@
 
 	
 
+	<!--Save New Site-->
+	$("#submit_deparment_details").click(function(event){
+			
+			event.preventDefault();
+			
+			/*Reset Warnings*/					  
+			$('#department_nameError').text('');
 
-	
+			document.getElementById('BranchDepartmentForm').className = "g-3 needs-validation was-validated";
+			
+			let branch_idx			= $('#submit_deparment_details').data('id');
+			let department_id 		= document.getElementById("submit_deparment_details").value;
+			let department_name 	= $("input[name=department_name]").val();
+			
+			alert(branch_idx);
+			  $.ajax({
+				url: "{{ route('SubmitDepartment') }}",
+				type:"POST",
+				data:{
+				  department_id:department_id,
+				  department_name:department_name,
+				  branch_idx:branch_idx,
+				  _token: "{{ csrf_token() }}"
+				},
+				success:function(response){
+				  console.log(response);
+				 
+				  if(response) {
+					  
+					alert("Department Information successfully "+response.success);
+					LoadDepartmentList(branch_idx)
+				  
+					/*Department Form Reset*/
+					ResetBranchDepartmentForm();
+					
+				  }
+				},
+				error: function(error) {
+				 console.log(error);	
+				
+					/*Branch Name Error Notification*/
+					 if(error.responseJSON.errors.department_name=="validation.unique"){
+								  
+					  $('#department_nameError').html("The <b>"+ department_name +"</b> has already been taken.");
+					  document.getElementById('department_nameError').className = "invalid-feedback";
+					  document.getElementById('department_name').className = "form-control is-invalid";
+					  $('#department_name').val("");
+				  
+					}else{
+						
+					  $('#department_nameError').text('Department Name Required');
+					  document.getElementById('department_nameError').className = "invalid-feedback";
+					  
+					}
+				  
+				  $('#InvalidModal').modal('toggle');				
+				  
+				}
+			   });
+		
+	  });
+
+	<!--Select Site For Update-->
+	$('body').on('click','#edit_department',function(){
+			
+			event.preventDefault();
+			let department_id = $(this).data('id');
+			
+			  $.ajax({
+				url: "{{ route('DepartmentInfo') }}",
+				type:"POST",
+				data:{
+				  department_id:department_id,
+				  _token: "{{ csrf_token() }}"
+				},
+				success:function(response){
+				  console.log(response);
+				  if(response) {
+					
+					$('#submit_deparment_details').html('Update');
+					document.getElementById("submit_deparment_details").value = department_id;
+					$('#submit_deparment_details').data('id',response.branch_idx);
+					//document.getElementById("update-company").disabled = true;
+					
+					/*Set Department Details*/
+					document.getElementById("department_name").value = response.department_name;
+					
+					//$('#UpdateCompanyModal').modal('toggle');					
+				  
+				  }
+				},
+				error: function(error) {
+				 console.log(error);
+					alert(error);
+				}
+			   });		
+	  });
+
+  	function ResetBranchDepartmentForm(){
+			
+			event.preventDefault();
+			
+					/*Reset Warnings*/
+					$('#department_nameError').text('');
+					
+					document.getElementById('department_nameError').className = "";
+					document.getElementById('department_name').className = "form-control";
+					
+					$('#BranchDepartmentForm')[0].reset();
+					document.getElementById('BranchDepartmentForm').className = "g-3 needs-validation";
+					
+					$('#submit_deparment_details').html('Add');
+					
+					document.getElementById("submit_deparment_details").value = 0;
+				
+	}		
 </script>

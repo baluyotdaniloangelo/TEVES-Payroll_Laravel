@@ -255,7 +255,7 @@
 					  
 					$('#modal_title_branch_department_management').html('Department Management');
 					
-					//document.getElementById("submit_branch_details").value = branchID;
+					$('#submit_deparment_details').data('id',branchID);
 					
 					/*Set Details*/
 					$('#branch_code_department_details').html(response.branch_code);

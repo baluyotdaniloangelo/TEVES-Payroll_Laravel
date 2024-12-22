@@ -62,7 +62,7 @@ Route::post('/delete_branch_confirmed', [BranchController::class, 'delete_branch
 /*Load Department List*/
 Route::post('department/list', [DepartmentController::class, 'getDepartmentList'])->name('getDepartmentList')->middleware('isLoggedIn');
 /*Create or Update Department*/
-Route::post('/sumbit_department_post', [DepartmentController::class,'sumbit_department_post'])->name('SubmitDepartment')->middleware('isLoggedIn');
+Route::post('/submit_department_post', [DepartmentController::class,'submit_department_post'])->name('SubmitDepartment')->middleware('isLoggedIn');
 /*GET Department Info*/
 Route::post('/department_info', [DepartmentController::class, 'department_info'])->name('DepartmentInfo')->middleware('isLoggedIn');
 /*Confirm Delete Department*/

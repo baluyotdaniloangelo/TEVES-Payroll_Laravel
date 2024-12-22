@@ -177,7 +177,8 @@
 										
 											<div class="input-block mb-3">
 												<label class="col-form-label">Department</label>
-												<input type="text" class="form-control">
+												<input type="text" class="form-control" name="department_name" id="department_name" required>
+												<span class="valid-feedback" id="department_nameError" title="Required"></span>
 											</div>
 											<div class="text-end mb-3">
 											<button type="submit" class="btn btn-primary" id="submit_deparment_details" value="0">Add</button>
