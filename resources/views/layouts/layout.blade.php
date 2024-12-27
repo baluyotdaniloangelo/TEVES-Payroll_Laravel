@@ -30,6 +30,13 @@ if (Request::is('branch')){
 <?php
 
 }
+if (Request::is('holiday')){
+
+?>
+@include('layouts.holiday_script')
+<?php
+
+}
 
 
 ?>

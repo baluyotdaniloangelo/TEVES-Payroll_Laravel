@@ -101,7 +101,7 @@
 										<div class="col-sm-4">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Birth Date <span class="text-danger">*</span></label>
-												<input class="form-control datetimepicker" type="text" id="employee_birthday" name="employee_birthday" required>
+												<input class="form-control" type="date" id="employee_birthday" name="employee_birthday" required>
 												<span class="valid-feedback" id="employee_birthdayError" title="Required"></span>
 											</div>
 										</div>

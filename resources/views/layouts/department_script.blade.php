@@ -81,7 +81,7 @@
 
 	
 
-	<!--Save New Site-->
+	<!--Save New Department-->
 	$("#submit_deparment_details").click(function(event){
 			
 			event.preventDefault();
@@ -95,7 +95,6 @@
 			let department_id 		= document.getElementById("submit_deparment_details").value;
 			let department_name 	= $("input[name=department_name]").val();
 			
-			alert(branch_idx);
 			  $.ajax({
 				url: "{{ route('SubmitDepartment') }}",
 				type:"POST",
@@ -143,7 +142,7 @@
 		
 	  });
 
-	<!--Select Site For Update-->
+	<!--Select Department For Update-->
 	$('body').on('click','#edit_department',function(){
 			
 			event.preventDefault();
@@ -163,12 +162,9 @@
 					$('#submit_deparment_details').html('Update');
 					document.getElementById("submit_deparment_details").value = department_id;
 					$('#submit_deparment_details').data('id',response.branch_idx);
-					//document.getElementById("update-company").disabled = true;
 					
 					/*Set Department Details*/
-					document.getElementById("department_name").value = response.department_name;
-					
-					//$('#UpdateCompanyModal').modal('toggle');					
+					document.getElementById("department_name").value = response.department_name;	
 				  
 				  }
 				},
@@ -179,6 +175,77 @@
 			   });		
 	  });
 
+	<!--Department Deletion Confirmation-->
+	$('body').on('click','#delete_department',function(){
+			
+			event.preventDefault();
+			let departmentID = $(this).data('id');
+			
+			  $.ajax({
+				url: "{{ route('DepartmentInfo') }}",
+				type:"POST",
+				data:{
+				  department_id:departmentID,
+				  _token: "{{ csrf_token() }}"
+				},
+				success:function(response){
+				  console.log(response);
+				  if(response) {
+					
+					document.getElementById("deleteDepartmentConfirmed").value = departmentID;
+					
+					/*Set Details*/
+					$('#delete_department_complete_name').html(response.department_name);
+				
+					$('#DepartmentDeleteModal').modal('show');		
+				  
+				  }
+				},
+				error: function(error) {
+				 console.log(error);
+					alert(error);
+				}
+			   });		
+	  });
+	  
+	  
+	  <!--Department Confirmed For Deletion-->
+	  $('body').on('click','#deleteDepartmentConfirmed',function(){
+			
+			event.preventDefault();
+
+			let departmentID = document.getElementById("deleteDepartmentConfirmed").value;
+			let branch_idx 	= document.getElementById("deleteDepartmentBranch_idx_Confirmed").value;
+			
+			$.ajax({
+				url: "{{ route('DeleteDepartment') }}",
+				type:"POST",
+				data:{
+				  department_id:departmentID,
+				  _token: "{{ csrf_token() }}"
+				},
+				success:function(response){
+				  console.log(response);
+				  if(response) {
+					
+					
+					
+					//$('#modal_success_details').html("Department Information Succefully Deleted");
+					alert("Department Information Succefully Deleted");
+					LoadDepartmentList(branch_idx);
+					/*Show Modal*/
+					$('#branch_department_details_modal').modal('toggle');
+					//$('#DepartmentDeleteModal').modal('hide');
+					//$('#success-alert-modal').modal('show');
+					
+				  }
+				},
+				error: function(error) {
+				 console.log(error);
+				}
+			   });		
+	  });	  
+	  
   	function ResetBranchDepartmentForm(){
 			
 			event.preventDefault();

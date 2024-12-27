@@ -84,7 +84,7 @@ class BranchController extends Controller
 	} 
 	
 	/*Create/Update Branch Information*/
-	public function sumbit_branch_post(Request $request){
+	public function submit_branch_post(Request $request){
 		
 		$branch_id = $request->branch_id;
 		

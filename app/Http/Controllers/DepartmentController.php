@@ -60,12 +60,25 @@ class DepartmentController extends Controller
 	/*Delete department Information*/
 	public function delete_department_confirmed(Request $request){
 
-		$departmentID = $request->departmentID;
-		departmentModel::find($departmentID)->delete();
+		$departmentID = $request->department_id;
+		DepartmentModel::find($departmentID)->delete();
 		
-		.
-												->where('department_id', '<>',  $department_id )											
-										)]
+		return 'Deleted';
+	} 
+	
+	/*Create/Update department Information*/
+	public function submit_department_post(Request $request){
+		
+		$department_id  = $request->department_id;
+		$branch_idx 	= $request->branch_idx;
+		
+		$request->validate([
+		  'department_name'   	=> ['required',Rule::unique('teves_department_table')->where( 
+									fn ($query) =>$query
+											->where('department_name', $request->department_name)
+											->where('branch_idx', $request->branch_idx)
+											->where('department_id', '<>',  $department_id )											
+									)]
         ]);
 		
 			if($department_id==0){

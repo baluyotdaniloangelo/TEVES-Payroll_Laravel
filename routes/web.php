@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserSiteAccessController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\HolidayController;
 
 // use App\Http\Controllers\CAMRSampleExcel;
 
@@ -53,7 +54,7 @@ Route::post('/delete_employee_confirmed', [EmployeeManagementController::class, 
 Route::get('/branch', [BranchController::class,'branch'])->name('branch')->middleware('isLoggedIn');
 Route::get('branch/list', [BranchController::class, 'getBranchList'])->name('getBranchList')->middleware('isLoggedIn');
 /*Create or Update Branch*/
-Route::post('/sumbit_branch_post', [BranchController::class,'sumbit_branch_post'])->name('SubmitBranch')->middleware('isLoggedIn');
+Route::post('/submit_branch_post', [BranchController::class,'submit_branch_post'])->name('SubmitBranch')->middleware('isLoggedIn');
 /*GET Branch Info*/
 Route::post('/branch_info', [BranchController::class, 'branch_info'])->name('BranchInfo')->middleware('isLoggedIn');
 /*Confirm Delete Branch*/
@@ -67,6 +68,18 @@ Route::post('/submit_department_post', [DepartmentController::class,'submit_depa
 Route::post('/department_info', [DepartmentController::class, 'department_info'])->name('DepartmentInfo')->middleware('isLoggedIn');
 /*Confirm Delete Department*/
 Route::post('/delete_department_confirmed', [DepartmentController::class, 'delete_department_confirmed'])->name('DeleteDepartment')->middleware('isLoggedIn');
+
+/*Load holiday List*/
+Route::get('/holiday', [HolidayController::class,'holiday'])->name('holiday')->middleware('isLoggedIn');
+Route::get('holiday/list', [HolidayController::class, 'getholidayList'])->name('getholidayList')->middleware('isLoggedIn');
+/*Create or Update holiday*/
+Route::post('/submit_holiday_post', [HolidayController::class,'submit_holiday_post'])->name('SubmitHoliday')->middleware('isLoggedIn');
+/*GET holiday Info*/
+Route::post('/holiday_info', [HolidayController::class, 'holiday_info'])->name('HolidayInfo')->middleware('isLoggedIn');
+/*Confirm Delete holiday*/
+Route::post('/delete_holiday_confirmed', [HolidayController::class, 'delete_holiday_confirmed'])->name('DeleteHoliday')->middleware('isLoggedIn');
+
+
 
 
 /*Load User Account List for Admin Only*/

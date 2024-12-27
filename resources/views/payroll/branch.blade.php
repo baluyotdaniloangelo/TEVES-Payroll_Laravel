@@ -238,9 +238,9 @@
 									<span class="ms-auto shadow-lg fs-17"></span>
 								</div>
 								<div class="card-body pt-1">
-									<span class="avatar avatar-xl avatar-rounded me-2 mb-2">
+									<!--<span class="avatar avatar-xl avatar-rounded me-2 mb-2">
 										<img src="assets/img/avatar/avatar-7.jpg" alt="img">
-									</span>
+									</span>-->
 									<div class="fw-semibold fs-16"><span id="delete_branch_complete_name"></span></div>
 								</div>
 							</div>
@@ -277,6 +277,45 @@
 				</div>
 				
 				<!-- Succeful Action End -->
+				
+				
+				<!-- Delete Department Modal -->
+				<div class="modal custom-modal fade" id="DepartmentDeleteModal" role="dialog">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content">
+							<div class="modal-body">
+								<div class="form-header">
+									<h3>Delete Department</h3>
+									<p>Are you sure want to delete this Department from Branch <span id="branch_department_delete"></span>?</p>
+								</div>
+								<div class="modal-btn delete-action">
+									<div class="row">
+									<div class="card text-center">
+								<div class="card-header border-bottom-0 pb-0">
+									<span class="ms-auto shadow-lg fs-17"></span>
+								</div>
+								<div class="card-body">
+									<!--<span class="avatar avatar-xl avatar-rounded me-2 mb-2">
+										<img src="assets/img/avatar/avatar-7.jpg" alt="img">
+									</span>-->
+									<div class="fw-semibold fs-16"><span id="delete_department_complete_name"></span></div>
+								</div>
+							</div>
+									</div>
+									
+									<div class="row">
+										<button type="submit" class="col-6 btn btn-primary continue-btn" id="deleteDepartmentConfirmed">Delete</button>
+										<input type="hidden" id="deleteDepartmentBranch_idx_Confirmed">
+										<div class="col-6">
+											<a href="javascript:void(0);" data-bs-dismiss="modal" class="btn btn-primary cancel-btn">Cancel</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+	
 				
 				</div>
 				

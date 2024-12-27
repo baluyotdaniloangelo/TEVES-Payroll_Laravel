@@ -262,6 +262,10 @@
 					$('#branch_initial_department_details').html(response.branch_initial);
 					$('#branch_name_department_details').html(response.branch_name);
 					
+					$('#branch_department_delete').html(response.branch_name);
+					
+					document.getElementById("deleteDepartmentBranch_idx_Confirmed").value = branchID;
+					
 					/*Call Department Function to Load the List*/
 					LoadDepartmentList(branchID);
 					
@@ -277,9 +281,7 @@
 			   });	
 	  });
 
-
-
-	<!--client Deletion Confirmation-->
+	<!--Branch Deletion Confirmation-->
 	$('body').on('click','#delete_branch',function(){
 			
 			event.preventDefault();
@@ -312,7 +314,7 @@
 			   });		
 	  });
 
-	  <!--client Confirmed For Deletion-->
+	  <!--Branch Confirmed For Deletion-->
 	  $('body').on('click','#deleteBranchConfirmed',function(){
 			
 			event.preventDefault();
@@ -338,7 +340,7 @@
 					var table = $("#getbranchList").DataTable();
 				    table.ajax.reload(null, false);
 					
-					$('#modal_success_details').html("Employee Information Succefully Deleted");
+					$('#modal_success_details').html("Branch Information Succefully Deleted");
 					$('#BranchDeleteModal').modal('hide');
 					$('#success-alert-modal').modal('show');
 					
