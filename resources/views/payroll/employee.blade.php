@@ -168,28 +168,36 @@
 											</div>
 										</div>
 										
-										<div class="col-sm-4">  
+										<div class="col-sm-3">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Time In <span class="text-danger">*</span></label>
-												<input class="form-control timepicker" type="text" id="time_in" name="time_in" required value="08:00">
+												<input class="form-control " type="time" id="time_in" name="time_in" required value="08:00:00">
 												<span class="valid-feedback" id="time_inError" title="Required"></span>
 											</div>
 										</div>
-										<div class="col-sm-4">  
+										<div class="col-sm-3">  
 											<div class="input-block mb-3">
-												<label class="col-form-label">Breaktime <span class="text-danger">*</span></label>
-												<input class="form-control timepicker" type="text" id="break_time" name="break_time" required value="12:00">
-												<span class="valid-feedback" id="break_timeError" title="Required"></span>
+												<label class="col-form-label">Breaktime In <span class="text-danger">*</span></label>
+												<input class="form-control " type="time" id="break_time_in" name="break_time_in" required value="12:00:00">
+												<span class="valid-feedback" id="break_time_inError" title="Required"></span>
 											</div>
 										</div>
-										<div class="col-sm-4">  
+										<div class="col-sm-3">  
+											<div class="input-block mb-3">
+												<label class="col-form-label">Breaktime Out <span class="text-danger">*</span></label>
+												<input class="form-control " type="time" id="break_time_out" name="break_time_out" required value="13:00:00">
+												<span class="valid-feedback" id="break_time_outError" title="Required"></span>
+											</div>
+										</div>
+										<div class="col-sm-3">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Time Out <span class="text-danger">*</span></label>
-												<input class="form-control timepicker" type="text" id="time_out" name="time_out" required value="17:00">
+												<input class="form-control " type="time" id="time_out" name="time_out" required value="17:00:00">
 												<span class="valid-feedback" id="time_outError" title="Required"></span>
 											</div>
 										</div>
 									</div>
+									
 									<div class="table-responsive m-t-15">
 										<table class="table table-striped custom-table">
 											<thead>

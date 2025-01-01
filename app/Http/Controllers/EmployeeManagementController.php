@@ -106,7 +106,8 @@ class EmployeeManagementController extends Controller
 					'teves_department_table.department_name',
 					'teves_employee_table.employee_status',
 					'teves_employee_table.time_in',
-					'teves_employee_table.break_time',
+					'teves_employee_table.break_time_in',
+					'teves_employee_table.break_time_out',
 					'teves_employee_table.time_out',
 					'teves_employee_table.restday_monday',
 					'teves_employee_table.restday_tuesday',
@@ -146,7 +147,8 @@ class EmployeeManagementController extends Controller
 			  'branch_idx'    				=> 'required',
 			  'department_idx' 				=> 'required',
 			  'time_in'    					=> 'required',
-			  'break_time'    				=> 'required',
+			  'break_time_in'    			=> 'required',
+			  'break_time_out'    			=> 'required',
 			  'time_out'    				=> 'required',
 			]);
 			
@@ -172,7 +174,8 @@ class EmployeeManagementController extends Controller
 				$EmployeeDetails->department_idx 			= $request->department_idx;
 				
 				$EmployeeDetails->time_in 					= $request->time_in;
-				$EmployeeDetails->break_time 				= $request->break_time;
+				$EmployeeDetails->break_time_in 			= $request->break_time_in;
+				$EmployeeDetails->break_time_out 			= $request->break_time_out;
 				$EmployeeDetails->time_out 					= $request->time_out;
 				
 				$EmployeeDetails->restday_monday 			= $request->restday_monday;
@@ -218,7 +221,8 @@ class EmployeeManagementController extends Controller
 				$EmployeeDetails->department_idx 			= $request->department_idx;
 				
 				$EmployeeDetails->time_in 					= $request->time_in;
-				$EmployeeDetails->break_time 				= $request->break_time;
+				$EmployeeDetails->break_time_in 			= $request->break_time_in;
+				$EmployeeDetails->break_time_out 			= $request->break_time_out;
 				$EmployeeDetails->time_out 					= $request->time_out;
 				
 				$EmployeeDetails->restday_monday 			= $request->restday_monday;
@@ -245,82 +249,6 @@ class EmployeeManagementController extends Controller
 			
 	}
 
-	public function update_EmployeeDetails_post(Request $request){
-		
-		$request->validate([
-          'employee_number'      		=> ['required',Rule::unique('teves_employee_table')->where( 
-										fn ($query) =>$query
-											->where('employee_number', $request->employee_number)
-											->where('building_id', '<>',  $request->building_id )											
-										)],
-		  'employee_last_name'    => ['required',Rule::unique('teves_employee_table')->where( 
-										fn ($query) =>$query
-											->where('employee_last_name', $request->employee_last_name)
-											->where('building_id', '<>',  $request->building_id )
-										)],
-		  'department_id'    			=> 'required',
-		  'branch_id' 				=> 'required'
-        ], 
-        [
-			'employee_number.required' 		=> 'Building Code is Required',
-			'employee_last_name.required' => 'Building Description is Required',
-			'department_id.required' 			=> 'Division is Required',
-			'branch_id.required' 			=> 'Company is Required',
-        ]
-		);
-		
-			// $data = $request->all();
-			#update
-					
-			$EmployeeDetails = new EmployeeModel();
-			$EmployeeDetails = EmployeeModel::find($request->EmployeeDetailsID);
-			$EmployeeDetails->department_idx 		= $request->department_id;
-			$EmployeeDetails->branch_idx 			= $request->branch_id;
-			$EmployeeDetails->EmployeeDetails_code 			= $request->employee_number;
-			$EmployeeDetails->modified_by_user_idx = Session::get('loginID');
-			
-			$result = $EmployeeDetails->update();
 
-			/*Update Building*/
-			$Bldg = BuildingModel::where('employee_id', $request->EmployeeDetailsID)
-				->firstOrFail()
-				->update([
-					'employee_number' 		=> $request->employee_number,
-					'employee_last_name' 	=> $request->employee_last_name,
-					'device_ip_range' 		=> $request->device_ip_range,
-					'ip_network' 			=> $request->ip_network,
-					'ip_netmask' 			=> $request->ip_netmask,
-					'ip_gateway' 			=> $request->ip_gateway,
-					'modified_by_user_idx' 	=> Session::get('loginID'),
-				]);
-
-			/*Update Meter EmployeeDetails Code*/
-			$meter_update = MeterModel::where('employee_id', $request->EmployeeDetailsID)
-				->update([
-					'EmployeeDetails_code' => $request->employee_number
-				]);
-			
-			/*Update Gateway EmployeeDetails Code*/
-			$gateway_update = GatewayModel::where('employee_id', $request->EmployeeDetailsID)
-				->update([
-					'EmployeeDetails_code' => $request->employee_number,
-					'update_rtu_location' => 1
-				]);
-				
-			if($result){
-				return response()->json(['success'=>'Building Information Successfully Updated!']);
-			}
-			else{
-				return response()->json(['success'=>'Error on Update Building Information']);
-			}
-	}
-
-	public function save_EmployeeDetails_tab(Request $request){ 
-
-        $tab = $request->tab;		
-		$request->session()->put('EmployeeDetails_current_tab', $tab);
-				
-    }
-	
 }
 

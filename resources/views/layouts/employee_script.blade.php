@@ -79,7 +79,9 @@
 			/*#11*/let department_idx					= $("#department_idx").val();
 			
 			/*#12*/let time_in 							= $("input[name=time_in]").val();
-			/*#13*/let break_time 						= $("input[name=break_time]").val();
+			/*#13*/let break_time_in 					= $("input[name=break_time_in]").val();
+			/*#13*/let break_time_out 					= $("input[name=break_time_out]").val();
+			
 			/*#14*/let time_out 						= $("input[name=time_out]").val();
 			
 			 /*#15*/var _restday_monday 				= $('.restday_monday:checked').val() || 'off';
@@ -121,7 +123,8 @@
 				  /*#10*/branch_idx:branch_idx,
 				  /*#11*/department_idx:department_idx,
 				  /*#12*/time_in:time_in,
-				  /*#13*/break_time:break_time,
+				  /*#13*/break_time_in:break_time_in,
+						break_time_out:break_time_out,
 				  /*#14*/time_out:time_out,
 				  /*#15*/restday_monday:restday_monday,
 				  /*#16*/restday_tuesday:restday_tuesday,
@@ -198,8 +201,8 @@
 				
 				if(error.responseJSON.errors.time_in=="validation.required"){
 							  
-				  $('#break_timeError').html("Break Time is Required");
-				  document.getElementById('break_timeError').className = "invalid-feedback";
+				  $('#break_time_inError').html("Break Time is Required");
+				  document.getElementById('break_time_inError').className = "invalid-feedback";
 				  
 				}
 				
@@ -279,7 +282,8 @@
 					document.getElementById("branch_idx").value					= response[0].branch_id;
 					document.getElementById("department_idx").value 			= response[0].department_id;
 					document.getElementById("time_in").value 					= response[0].time_in;
-					document.getElementById("break_time").value 				= response[0].break_time;
+					document.getElementById("break_time_in").value 				= response[0].break_time_in;
+					document.getElementById("break_time_out").value 			= response[0].break_time_out;
 					document.getElementById("time_out").value 					= response[0].time_out;
 					
 					if(response[0].restday_monday ==1){
@@ -335,146 +339,6 @@
 				}
 			   });
 				  
-	  });
-
-	$("#update-site").click(function(event){
-			
-			event.preventDefault();
-			
-					/*Reset Warnings*/
-					let siteID = document.getElementById("update-site").value;
-					$('#update_employee_last_nameError').text('');
-					$('#update_employee_last_nameError').text('');
-					$('#update_employee_first_nameError').text('');				  
-					//$('#update_site_cut_offError').text('');
-					$('#update_employee_middle_nameError').text('');
-					$('#update_employee_extension_nameError').text('');
-					$('#update_employee_birthdayError').text('');
-					$('#update_employee_positionError').text('');
-
-			document.getElementById('updateEmployeeform').className = " g-2 needs-validation was-validated";
-			
-			let building_id				= $("input[name=update_building_id]").val();
-			
-			let employee_last_name 			= $("input[name=update_employee_last_name]").val();
-			let employee_first_name 	= $("input[name=update_employee_first_name]").val();
-			
-			let branch_idx 			= $("#update_division_list option[value='" + $('#update_branch_idx').val() + "']").attr('data-id');
-			let department_idx				= $("#update_company_list option[value='" + $('#update_department_idx').val() + "']").attr('data-id');
-			
-			//let site_cut_off 			= $("input[name=update_site_cut_off]").val();
-			let employee_middle_name 		= $("input[name=update_employee_middle_name]").val();
-			let employee_extension_name 				= $("input[name=update_employee_extension_name]").val();
-			let employee_birthday 				= $("input[name=update_employee_birthday]").val();
-			let employee_position 				= $("input[name=update_employee_position]").val();
-			
-			  $.ajax({
-				url: "/update_site_post",
-				type:"POST",
-				data:{
-				  SiteID:siteID,
-				  building_id:building_id,
-				  employee_last_name:employee_last_name,
-				  employee_first_name:employee_first_name,
-				  branch_idx:branch_idx,
-				  department_idx:department_idx,
-				  //site_cut_off:site_cut_off,
-				  employee_middle_name:employee_middle_name,
-				  employee_extension_name:employee_extension_name,
-				  employee_birthday:employee_birthday,
-				  employee_position:employee_position,
-				  _token: "{{ csrf_token() }}"
-				},
-				success:function(response){
-				  console.log(response);
-				  if(response) {
-					  
-					$('.success_modal_bg').html(response.success);
-					$('#SuccessModal').modal('toggle');
-					
-					$('#employee_last_nameError').text('');	
-					$('#employee_first_nameError').text('');				  
-				  
-					var table = $("#siteList").DataTable();
-				    table.ajax.reload(null, false);
-					
-					$('#update_branch_idxError').text('');
-					document.getElementById('update_branch_idxError').className = "invalid-tooltip";	
-					document.getElementById('update_branch_idx').className = "form-control";
-				  
-					$('#update_department_idxError').text('');
-					document.getElementById('update_department_idxError').className = "invalid-tooltip";	
-					document.getElementById('update_department_idx').className = "form-control";
-					
-					$('#updateEmployeeform')[0].reset();
-					$('#UpdateSiteModal').modal('toggle');	
-					
-				  }
-				},
-				error: function(error) {
-				 console.log(error);	
-				  			  
-				if(error.responseJSON.errors.employee_last_name=="The building code has already been taken."){
-							  
-				  $('#update_employee_last_nameError').html("<b>"+ employee_last_name +"</b> has already been taken.");
-				  document.getElementById('update_employee_last_nameError').className = "invalid-tooltip";
-				  document.getElementById('update_employee_last_name').className = "form-control is-invalid";
-				  $('#update_employee_last_name').val("");
-				  
-				}else{
-					
-				  $('#update_employee_last_nameError').text(error.responseJSON.errors.employee_last_name);
-				  document.getElementById('update_employee_last_nameError').className = "invalid-tooltip";		
-				
-				}
-				
-				if(error.responseJSON.errors.employee_first_name=="The building description has already been taken."){
-							  
-				  $('#update_employee_first_nameError').html("<b>"+ employee_first_name +"</b> has already been taken.");
-				  document.getElementById('update_employee_first_nameError').className = "invalid-tooltip";
-				  document.getElementById('update_employee_first_name').className = "form-control is-invalid";
-				  $('#update_employee_first_name').val("");
-				  
-				}else{
-					
-				  $('#update_employee_first_nameError').text(error.responseJSON.errors.employee_first_name);
-				  document.getElementById('update_employee_first_nameError').className = "invalid-tooltip";		
-				
-				}
-				
-				
-				if(branch_idx==0||branch_idx==undefined){
-					
-					$('#update_branch_idxError').text('Please Select a Division');
-					document.getElementById('update_branch_idxError').className = "invalid-tooltip";	
-					document.getElementById('update_branch_idx').className = "form-control is-invalid";
-				
-				}else{     
-					
-					$('#update_branch_idxError').text('');
-					document.getElementById('update_branch_idxError').className = "invalid-tooltip";	
-					document.getElementById('update_branch_idx').className = "form-control";
-					
-				}
-				
-				if(department_idx==0||department_idx==undefined){
-					
-					$('#update_department_idxError').text('Please Select a Company');
-					document.getElementById('update_department_idxError').className = "invalid-tooltip";	
-					document.getElementById('update_department_idx').className = "form-control is-invalid";
-				
-				}else{
-					
-					$('#update_department_idxError').text('');
-					document.getElementById('update_department_idxError').className = "invalid-tooltip";	
-					document.getElementById('update_department_idx').className = "form-control";
-					
-				}
-				
-				$('#InvalidModal').modal('toggle');				  
-				  
-				}
-			   });
 	  });
 	  
 	<!--Employee Deletion Confirmation-->
@@ -653,6 +517,5 @@
 				}
 			   });	
     }
-	  
-  
+	
   </script>
