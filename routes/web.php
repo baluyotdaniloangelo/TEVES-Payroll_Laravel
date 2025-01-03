@@ -9,6 +9,7 @@ use App\Http\Controllers\UserSiteAccessController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\HolidayController;
+use App\Http\Controllers\EmployeeLogsController;
 
 // use App\Http\Controllers\CAMRSampleExcel;
 
@@ -80,6 +81,15 @@ Route::post('/holiday_info', [HolidayController::class, 'holiday_info'])->name('
 Route::post('/delete_holiday_confirmed', [HolidayController::class, 'delete_holiday_confirmed'])->name('DeleteHoliday')->middleware('isLoggedIn');
 
 
+/*01/03/2025*/
+Route::get('/employee-attendance-logs', [EmployeeLogsController::class,'employee_attendance_logs'])->name('employee_attendance_logs')->middleware('isLoggedIn');
+//Route::get('holiday/list', [EmployeeLogsController::class, 'getholidayList'])->name('getholidayList')->middleware('isLoggedIn');
+/*Create or Update holiday*/
+//Route::post('/submit_holiday_post', [EmployeeLogsController::class,'submit_holiday_post'])->name('SubmitHoliday')->middleware('isLoggedIn');
+/*GET holiday Info*/
+//Route::post('/holiday_info', [EmployeeLogsController::class, 'holiday_info'])->name('HolidayInfo')->middleware('isLoggedIn');
+/*Confirm Delete holiday*/
+//Route::post('/delete_holiday_confirmed', [EmployeeLogsController::class, 'delete_holiday_confirmed'])->name('DeleteHoliday')->middleware('isLoggedIn');
 
 
 /*Load User Account List for Admin Only*/

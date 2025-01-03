@@ -177,14 +177,14 @@
 										</div>
 										<div class="col-sm-3">  
 											<div class="input-block mb-3">
-												<label class="col-form-label">Breaktime In <span class="text-danger">*</span></label>
+												<label class="col-form-label">Breaktime Start <span class="text-danger">*</span></label>
 												<input class="form-control " type="time" id="break_time_in" name="break_time_in" required value="12:00:00">
 												<span class="valid-feedback" id="break_time_inError" title="Required"></span>
 											</div>
 										</div>
 										<div class="col-sm-3">  
 											<div class="input-block mb-3">
-												<label class="col-form-label">Breaktime Out <span class="text-danger">*</span></label>
+												<label class="col-form-label">Breaktime End <span class="text-danger">*</span></label>
 												<input class="form-control " type="time" id="break_time_out" name="break_time_out" required value="13:00:00">
 												<span class="valid-feedback" id="break_time_outError" title="Required"></span>
 											</div>

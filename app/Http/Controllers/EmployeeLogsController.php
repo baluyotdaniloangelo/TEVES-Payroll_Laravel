@@ -5,39 +5,30 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\User;
 use App\Models\EmployeeModel;
-use App\Models\BranchModel;
-use App\Models\DepartmentModel;
 use Session;
 use Validator;
 use DataTables;
 use Illuminate\Support\Facades\DB;
 
-class EmployeeManagementController extends Controller
+class EmployeeLogsController extends Controller
 {
 	
 	/*Load Employee Interface*/
-	public function employee(){
+	public function employee_attendance_logs(){
 		
 		if(Session::has('loginID')){
 			
-			$title = 'Employee List';
+			$title = 'Employee Logs';
 			$data = array();
 			
 			$data = User::where('user_id', '=', Session::get('loginID'))->first();
 			
-			if(Session::has('EmployeeDetails_current_tab')){
-				Session::pull('EmployeeDetails_current_tab');
-			}
-			
-			$department_data = DepartmentModel::orderby('department_name')->get();
-			$branch_data = BranchModel::orderby('branch_name')->get();
-			
-			return view("payroll.employee", compact('data', 'title', 'department_data', 'branch_data'));
+			return view("payroll.employee_attendance_logs", compact('data', 'title'));
 		}
 	} 
 
-	/*Fetch Employee List using Datatable*/
-	public function getEmployeeList(Request $request)
+	/*Fetch Employee Logs using Datatable*/
+	public function getEmployeeRegularLogsList(Request $request)
     {
 
 		if ($request->ajax()) {
