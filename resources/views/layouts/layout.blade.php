@@ -22,7 +22,7 @@ if (Request::is('employee')){
 <?php
 
 }
-if (Request::is('branch')){
+else if (Request::is('branch')){
 
 ?>
 @include('layouts.branch_script')
@@ -30,14 +30,16 @@ if (Request::is('branch')){
 <?php
 
 }
-if (Request::is('holiday')){
-
+else if (Request::is('holiday')){
 ?>
 @include('layouts.holiday_script')
 <?php
-
 }
-
+else if (Request::is('employee-attendance-logs')){
+?>
+@include('layouts.employee_attendance_logs_script')
+<?php
+}
 
 ?>
 	</body>
