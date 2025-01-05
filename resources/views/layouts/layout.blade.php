@@ -14,21 +14,16 @@
 		
 @include('layouts.footer')
 <?php
-
 if (Request::is('employee')){
-
 ?>
 @include('layouts.employee_script')
 <?php
-
 }
 else if (Request::is('branch')){
-
 ?>
 @include('layouts.branch_script')
 @include('layouts.department_script')
 <?php
-
 }
 else if (Request::is('holiday')){
 ?>
@@ -40,7 +35,6 @@ else if (Request::is('employee-attendance-logs')){
 @include('layouts.employee_attendance_logs_script')
 <?php
 }
-
 ?>
 	</body>
 </html>
