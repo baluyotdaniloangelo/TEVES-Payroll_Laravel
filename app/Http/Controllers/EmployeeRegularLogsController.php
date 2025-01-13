@@ -12,20 +12,6 @@ use Illuminate\Support\Facades\DB;
 
 class EmployeeRegularLogsController extends Controller
 {
-	
-	/*Load Employee Interface*/
-	public function employee_logs(){
-		
-		if(Session::has('loginID')){
-			
-			$title = 'Employee Logs';
-			$data = array();
-			
-			$data = User::where('user_id', '=', Session::get('loginID'))->first();
-			
-			return view("payroll.Employee", compact('data', 'title', 'department_data', 'branch_data'));
-		}
-	} 
 
 	/*Fetch Employee List using Datatable*/
 	public function getEmployeeRegularLogsList(Request $request)

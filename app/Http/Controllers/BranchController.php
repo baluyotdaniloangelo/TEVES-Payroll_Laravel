@@ -21,13 +21,38 @@ class BranchController extends Controller
 			$data = array();
 		
 			$data = User::where('user_id', '=', Session::get('loginID'))->first();
-			$client_data = BranchModel::all();		
+			//$client_data = BranchModel::all();		
 			
 			return view("payroll.Branch", compact('data','title'));
 		}
 		
 	}   
 
+	/* Branch List for Employee Logs Interface*/
+	public function getBranchList_for_item_selection(){
+
+		if(Session::has('loginID')){	
+		
+			$branch_data = BranchModel::all();
+			return response()->json($branch_data);	
+			
+		}
+		
+	}  
+	
+	
+	// public function get_product_list_pricing_per_branch(Request $request){		
+
+			// $raw_query_product = "SELECT a.product_id,a.product_name,ifnull(b.branch_price,a.product_price) AS product_price ,c.branch_code FROM teves_product_table AS a
+			// LEFT JOIN teves_product_branch_price_table b ON b.product_idx = a.product_id LEFT JOIN teves_branch_table c ON c.branch_id = b.branch_idx
+			// WHERE c.branch_id = ?";			
+			// $product_data = DB::select("$raw_query_product", [$request->branch_idx]);
+
+			// return response()->json($product_data);			
+	// }
+	
+	
+	
 	/*Fetch Branch List using Datatable*/
 	public function getBranchList(Request $request)
     {

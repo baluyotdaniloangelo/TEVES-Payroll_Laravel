@@ -46,14 +46,25 @@ class DepartmentController extends Controller
 			->make(true);
 	}
 	
-	
+	/*Fetch department List using Datatable*/
+	public function getDepartmentList_for_item_selection(Request $request)
+    {
+
+		$branchID = $request->branchID;
+					
+		/*Using Raw Query*/
+		$raw_query = "select `department_id`,`department_name` from `teves_department_table` where `branch_idx` = ?";			
+		$data = DB::select("$raw_query", [$branchID]);
+		return response()->json($data);
+
+	}	
 
 	/*Fetch department Information*/
 	public function department_info(Request $request){
 		
 		$departmentID = $request->department_id;
 		$data = DepartmentModel::find($departmentID, ['department_id', 'branch_idx', 'department_name']);
-		return response()->json($data);
+				return response()->json($data);
 
 	}
 

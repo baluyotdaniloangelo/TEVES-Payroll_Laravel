@@ -4,6 +4,83 @@
    <script src="{{asset('Datatables/responsive/3.0.2/js/dataTables.responsive.js')}}"></script>
    <script type="text/javascript">
 
+	/*Load Branch*/
+	LoadBranch();
+	function LoadBranch() {		
+	
+		$("#branch_list_regular_logs span").remove();
+		$('<span style="display: none;"></span>').appendTo('#branch_list_regular_logs');
+
+			  $.ajax({
+				url: "{{ route('getBranchList_for_selection') }}",
+				type:"POST",
+				data:{
+				  _token: "{{ csrf_token() }}"
+				},
+				success:function(response){						
+				  console.log(response);
+				  if(response!='') {			  
+						var len = response.length;
+						for(var i=0; i<len; i++){
+						
+							var branch_id = response[i].branch_id;						
+							var branch_name = response[i].branch_name;				
+							var branch_code = response[i].branch_code;
+	
+							$('#branch_list_regular_logs span:last').after(""+
+							"<option label='"+branch_code+" - "+branch_name+"' data-id='"+branch_id+"' value='"+branch_code+" - "+branch_name+"'>" +
+							"");	
+							
+					}			
+				  }else{
+							/*No Result Found or Error*/	
+				  }
+				},
+				error: function(error) {
+				 console.log(error);	 
+				}
+			   });
+	}
+	
+	//LoadDepartment_regular_logs();
+	function LoadDepartment_regular_logs() {		
+	
+		var branchID 			= $('#branch_list_regular_logs option[value="' + $('#branch_idx_regular_logs').val() + '"]').attr('data-id');
+		
+		$("#department_list_regular_logs span").remove();
+		$('<span style="display: none;"></span>').appendTo('#department_list_regular_logs');
+
+			  $.ajax({
+				url: "{{ route('getDepartmentList_for_selection') }}",
+				type:"POST",
+				data:{
+				  branchID:branchID,
+				  _token: "{{ csrf_token() }}"
+				},
+				success:function(response){						
+				  console.log(response);
+				  if(response!='') {			  
+						var len = response.length;
+						for(var i=0; i<len; i++){
+						
+							var department_id = response[i].department_id;						
+							var department_name = response[i].department_name;
+	
+							$('#department_list_regular_logs span:last').after(""+
+							"<option label='"+department_name+"' data-id='"+department_id+"' value='"+department_name+"'>" +
+							"");	
+							
+					}			
+				  }else{
+							/*No Result Found or Error*/	
+				  }
+				},
+				error: function(error) {
+				 console.log(error);	 
+				}
+			   });
+	}	
+
 			<!--Load Table-->
 			$(function () {
 			
@@ -148,7 +225,7 @@
 					$('#modal_success_details').html("Employee Information successfully "+response.success);
 					$('#success-alert-modal').modal('show');
 					
-					ResetEmployeeForm();
+					ResetEmployeeRegularLogsForm();
 					
 					$('#branch_idxError').text('');
 					document.getElementById('branch_idxError').className = "invalid-tooltip";	
@@ -414,7 +491,7 @@
 		
 	  });
   
-  	function ResetEmployeeForm(){
+  	function ResetEmployeeRegularLogsForm(){
 			
 			event.preventDefault();
 			$('#Employeeform')[0].reset();

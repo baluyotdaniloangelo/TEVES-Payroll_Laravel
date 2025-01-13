@@ -83,6 +83,9 @@ Route::post('/delete_holiday_confirmed', [HolidayController::class, 'delete_holi
 
 /*01/03/2025*/
 Route::get('/employee-attendance-logs', [EmployeeLogsController::class,'employee_attendance_logs'])->name('employee_attendance_logs')->middleware('isLoggedIn');
+Route::post('/branch-item-select', [BranchController::class,'getBranchList_for_item_selection'])->name('getBranchList_for_selection')->middleware('isLoggedIn');
+Route::post('/department-item-select', [DepartmentController::class,'getDepartmentList_for_item_selection'])->name('getDepartmentList_for_selection')->middleware('isLoggedIn');
+
 //Route::get('holiday/list', [EmployeeLogsController::class, 'getholidayList'])->name('getholidayList')->middleware('isLoggedIn');
 /*Create or Update holiday*/
 //Route::post('/submit_holiday_post', [EmployeeLogsController::class,'submit_holiday_post'])->name('SubmitHoliday')->middleware('isLoggedIn');

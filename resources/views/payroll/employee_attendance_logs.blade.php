@@ -17,8 +17,8 @@
 								</ul>
 							</div>
 							<div class="col-auto float-end ms-auto">
-								<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#employee_details_modal" onclick="ResetEmployeeForm()"><i class="fa-solid fa-plus"></i> Add Employee</a>
-								
+								<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#employee_regular_logs_details_modal"><i class="fa-solid fa-plus"></i> Add Regular Logs</a>
+								<!-- onclick="ResetEmployeeRegularLogsForm()"-->
 							</div>
 						</div>
 					</div>
@@ -57,19 +57,40 @@
 				<!-- /Page Content -->
 				
 				<!-- Add Employee Modal -->
-				<div id="employee_details_modal" class="modal custom-modal fade" data-bs-backdrop="static" role="dialog">
+				<div id="employee_regular_logs_details_modal" class="modal custom-modal fade" data-bs-backdrop="static" role="dialog">
 					<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title" id="modal_title_action_employee">Add Employee</h5>
+								<h5 class="modal-title" id="modal_title_action_employee">Add Regular Logs</h5>
 								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
 									<span aria-hidden="true">&times;</span>
 								</button>
 							</div>
 							<div class="modal-body">
-								 <form class="g-2 needs-validation" id="Employeeform">
+								 <form class="g-2 needs-validation" id="EmployeeRegularLogsForm">
 									
 									<div class="row">
+									
+										<div class="col-sm-12">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Branch <span class="text-danger">*</span></label>
+												<input class="form-control " type="text" list="branch_list_regular_logs" id="branch_idx_regular_logs" name="branch_idx_regular_logs" onchange="LoadDepartment_regular_logs()">
+												<span class="valid-feedback" id="branch_idx_regular_logsError" title="Required"></span>
+												<datalist id="branch_list_regular_logs">
+													<!--List Here-->
+												</datalist>	
+											</div>
+										</div>
+										
+										<div class="col-sm-12">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Department <span class="text-danger">*</span></label>
+												<input class="form-control " type="text" list="department_list_regular_logs" id="department_idx_regular_logs" name="department_idx_regular_logs" onchange="LoadEmployee_regular_logs()">
+												<span class="valid-feedback" id="department_idx_regular_logsError" title="Required"></span>
+												<datalist id="department_list_regular_logs">
+											</div>
+										</div>
+										
 										<div class="col-sm-12">
 											<div class="input-block mb-3">
 												<label class="col-form-label">Employee <span class="text-danger">*</span></label>
@@ -118,7 +139,7 @@
 									
 									
 									<div class="submit-section">
-										<button class="btn btn-primary submit-btn" id="submit_employee_details" value="0">Submit</button>
+										<button class="btn btn-primary submit-btn" id="submit_regular_logs_details" value="0">Submit</button>
 									</div>
 								</form>
 							</div>
