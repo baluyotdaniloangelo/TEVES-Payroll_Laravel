@@ -15,24 +15,8 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
-class EmployeeLogsController extends Controller
+class EmployeeRegularLogsController extends Controller
 {
-	
-	/*Load Employee Interface*/
-	public function employee_attendance_logs(){
-		
-		if(Session::has('loginID')){
-			
-			$title = 'Employee Logs';
-			$data = array();
-			
-			$data = User::where('user_id', '=', Session::get('loginID'))->first();
-			
-			$active_link = 'employee_attendance_logs';
-			
-			return view("payroll.employee_attendance_logs", compact('data', 'title', 'active_link'));
-		}
-	} 
 
 	/*Fetch Employee Regular Log List using Datatable*/
 	public function getEmployeeRegularLogsList(Request $request)

@@ -19,14 +19,12 @@
 					columns: [
 							{data: 'DT_RowIndex', name: 'DT_RowIndex' , orderable: false, searchable: false, className: "text-right"},       
 							{data: 'employee_number', className: "text-left"},
-							{data: 'employee_last_name', className: "text-left"},
-							{data: 'employee_first_name', className: "text-left"},
-							{data: 'employee_middle_name', className: "text-left"},
-							{data: 'employee_extension_name', className: "text-left"},
-							{data: 'branch_name', className: "text-left"},
-							{data: 'department_name', className: "text-left"},
-							{data: 'employee_position', className: "text-left"},
-							{data: 'employee_status', className: "text-left"},
+							{data: 'employee_full_name'},
+							{data: 'branch_name'},
+							{data: 'department_name'},
+							{data: 'employee_position'},
+							{data: 'employee_rate'},
+							{data: 'employee_status'},
 							{data: 'action', name: 'action', orderable: false, searchable: false, className: "text-center"},
 					]
 				});
@@ -46,7 +44,46 @@
 			});	
 
 		
+	//LoadDepartment_regular_logs();
+	function LoadDepartment() {		
+	
+		var branchID 			= $('#branch_list option[value="' + $('#branch_idx').val() + '"]').attr('data-id');
+		//alert(branchID);
+		$("#department_list option").remove();
+		$('<option style="display: none;"></option>').appendTo('#department_list');
 
+			  $.ajax({
+				url: "{{ route('getDepartmentList_for_selection') }}",
+				type:"POST",
+				data:{
+				  branchID:branchID,
+				  _token: "{{ csrf_token() }}"
+				},
+				success:function(response){						
+				  console.log(response);
+				  if(response!='') {			  
+						var len = response.length;
+						for(var i=0; i<len; i++){
+						
+							var department_id = response[i].department_id;						
+							var department_name = response[i].department_name;
+	
+							$('#department_list option:last').after(""+
+							"<option label='"+department_name+"' data-id='"+department_id+"' value='"+department_name+"'>" +
+							"");	
+							
+					}			
+				  }else{
+							/*No Result Found or Error*/	
+				  }
+				},
+				error: function(error) {
+				 console.log(error);	 
+				}
+			   });
+	}	
+	
+	
 	<!--Save New Site-->
 	$("#submit_employee_details").click(function(event){
 			
@@ -72,12 +109,16 @@
 			/*#6*/let employee_birthday 				= $("input[name=employee_birthday]").val();
 			/*#7*/let employee_position 				= $("input[name=employee_position]").val();
 				  let employee_status					= $("#employee_status").val();
+				  let employee_rate						= $("#employee_rate").val();
 			/*#8*/let employee_phone 					= $("input[name=employee_phone]").val();
 			/*#9*/let employee_email 					= $("input[name=employee_email]").val();
 			
-			/*#10*/let branch_idx 						= $("#branch_idx").val();
-			/*#11*/let department_idx					= $("#department_idx").val();
-			
+			/*#10*///let branch_idx 						= $("#branch_idx").val();
+				   var branch_idx 						= $('#branch_list option[value="' + $('#branch_idx').val() + '"]').attr('data-id');
+					
+			/*#11*///let department_idx					= $("#department_idx").val();
+				   var department_idx 					= $('#department_list option[value="' + $('#department_idx').val() + '"]').attr('data-id');
+					
 			/*#12*/let time_in 							= $("input[name=time_in]").val();
 			/*#13*/let break_time_in 					= $("input[name=break_time_in]").val();
 			/*#13*/let break_time_out 					= $("input[name=break_time_out]").val();
@@ -118,6 +159,7 @@
 				  /*#6*/employee_birthday:employee_birthday,
 				  /*#7*/employee_position:employee_position,
 				  /*#7*/employee_status:employee_status,
+						employee_rate:employee_rate,
 				  /*#8*/employee_phone:employee_phone,
 				  /*#9*/employee_email:employee_email,
 				  /*#10*/branch_idx:branch_idx,
@@ -212,6 +254,13 @@
 				  document.getElementById('time_outError').className = "invalid-feedback";
 				  
 				}
+				
+				if(error.responseJSON.errors.employee_rate=="validation.required"){
+							  
+				  $('#employee_rateError').html("Rate is Required");
+				  document.getElementById('employee_rateError').className = "invalid-feedback";
+				  
+				}
 				/*
 				if(branch_idx==0||branch_idx==undefined){
 					
@@ -277,10 +326,13 @@
 					document.getElementById("employee_birthday").value 			= response[0].employee_birthday;
 					document.getElementById("employee_position").value 			= response[0].employee_position;
 					document.getElementById("employee_status").value 			= response[0].employee_status;
+					document.getElementById("employee_rate").value 				= response[0].employee_rate;
 					document.getElementById("employee_phone").value 			= response[0].employee_phone;
 					document.getElementById("employee_email").value 			= response[0].employee_email;
-					document.getElementById("branch_idx").value					= response[0].branch_id;
-					document.getElementById("department_idx").value 			= response[0].department_id;
+					//{{$branch_data_cols->branch_code}} - {{$branch_data_cols->branch_name}}
+					document.getElementById("branch_idx").value					= response[0].branch_code+" - "+response[0].branch_name;
+					LoadDepartment();
+					document.getElementById("department_idx").value 			= response[0].department_name;
 					document.getElementById("time_in").value 					= response[0].time_in;
 					document.getElementById("break_time_in").value 				= response[0].break_time_in;
 					document.getElementById("break_time_out").value 			= response[0].break_time_out;
@@ -438,6 +490,12 @@
 			$('#employee_numberError').text('');	
 			document.getElementById('employee_numberError').className = "valid-feedback";
 			document.getElementById('employee_number').className = "form-control";
+			
+			$('#employee_rateError').text('');	
+			document.getElementById('employee_rateError').className = "valid-feedback";
+			document.getElementById('employee_rate').className = "form-control";
+			
+			
 			
 	}	
   

@@ -17,13 +17,14 @@ class EmployeeModel extends Model
 	}
 
 	protected $table = 'teves_employee_table';
-	
+				
 	protected $fillable = [
         'employee_number',
         'employee_last_name',
         'employee_first_name',
         'employee_middle_name',
         'employee_extension_name',
+		'employee_full_name',
         'employee_birthday',
 		'employee_position',
 		'employee_picture',
@@ -35,6 +36,8 @@ class EmployeeModel extends Model
 		'break_time_in',
 		'break_time_out',
 		'time_out',
+		'total_shift_hours',
+		'total_breaktime_hours',
 		'restday_monday',
 		'restday_tuesday',
 		'restday_wednesday',
@@ -60,6 +63,7 @@ class EmployeeModel extends Model
         'employee_first_name',
         'employee_middle_name',
         'employee_extension_name',
+		'employee_full_name',
         'employee_birthday',
 		'employee_position',
 		'employee_picture',
@@ -70,6 +74,8 @@ class EmployeeModel extends Model
 		'time_in',
 		'break_time',
 		'time_out',
+		'total_shift_hours',
+		'total_breaktime_hours',
 		'restday_monday',
 		'restday_tuesday',
 		'restday_wednesday',

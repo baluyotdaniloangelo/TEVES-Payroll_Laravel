@@ -27,18 +27,16 @@
 					<div class="row">
 						<div class="col-md-12">
 							<div class="table-responsive">
-								<table class="table dataTable display nowrap cell-border"" id="EmployeeListDatatable" width="100%" cellspacing="0">
+								<table class="table dataTable display nowrap cell-border" id="EmployeeListDatatable" width="100%" cellspacing="0">
 											<thead>
 												<tr>
 													<th class="all">#</th>
-										 			<th class="all" title="Employee Number">Employee Number</th>
-													<th class="all" title="Employee Name">Last Name</th>
-													<th class="all" title="Employee Name">First Name</th>
-													<th class="all" title="Employee Name">Middle Name</th>
-													<th class="all" title="Employee Name">Extension Name</th>
+										 			<th class="all" title="Employee Number">Employee No.</th>
+													<th class="all" title="Employee Name">Employee Name</th>
 													<th>Branch</th>
 													<th>Department</th>			
-													<th>Position</th>				
+													<th>Position</th>			
+													<th>Rate</th>				
 													<th class="all">Status</th>
 													<th class="all">Action</th>
 												</tr>
@@ -118,7 +116,7 @@
 											</div>
 										</div>
 										
-										<div class="col-sm-4">  
+										<div class="col-sm-3">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Employee ID <span class="text-danger">*</span></label>
 												<input type="text" class="form-control" id="employee_number" name="employee_number" required>
@@ -126,14 +124,22 @@
 											</div>
 										</div>
 										
-										<div class="col-sm-4">  
+										<div class="col-sm-3">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Position <span class="text-danger"></span></label>
 												<input type="text" class="form-control" id="employee_position" name="employee_position">
 											</div>
 										</div>
 										
-										<div class="col-sm-4">
+										<div class="col-sm-3">  
+											<div class="input-block mb-3">
+												<label class="col-form-label">Rate <span class="text-danger">*</span></label>
+												<input type="text" class="form-control" id="employee_rate" name="employee_rate" required>
+												<span class="valid-feedback" id="employee_rateError" title="Required"></span>
+											</div>
+										</div>
+										
+										<div class="col-sm-3">
 											<div class="input-block mb-3">
 												<label class="col-form-label">Status</label>
 												<select class="form-select form-control" name="employee_status" id="employee_status">
@@ -146,24 +152,25 @@
 										<div class="col-sm-6">
 											<div class="input-block mb-3">
 												<label class="col-form-label">Branch</label>
-												<select class="form-select form-control" required="" name="branch_idx" id="branch_idx">
+												<input class="form-control " type="text" list="branch_list" id="branch_idx" name="branch_idx" onchange="LoadDepartment()">
+												<datalist id="branch_list">
+												<!--List Here -->
 													@foreach ($branch_data as $branch_data_cols)
-													<option value="{{$branch_data_cols->branch_id}}">
-														{{$branch_data_cols->branch_code}}
-													</option>
+													<option label="{{$branch_data_cols->branch_code}} - {{$branch_data_cols->branch_name}}" data-id="{{$branch_data_cols->branch_id}}" value="{{$branch_data_cols->branch_code}} - {{$branch_data_cols->branch_name}}"> </option>
 													@endforeach
-												</select>
+												</datalist>
+												<!--</select>-->x''lhg
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="input-block mb-3">
 												<label class="col-form-label">Department</label>
-												<select class="select" id="department_idx" name="department_idx">
-													@foreach ($department_data as $department_data_cols)
-													<option value="{{$department_data_cols->department_id}}">
-														{{$department_data_cols->department_name}}
-													</option>
-													@endforeach
+												<!--<select class="select" id="department_idx" name="department_idx">-->
+												<input class="form-control " type="text" list="department_list" id="department_idx" name="department_idx">
+												
+													<datalist id="department_list">
+														<option value=""></option>
+													</datalist>
 												</select>
 											</div>
 										</div>

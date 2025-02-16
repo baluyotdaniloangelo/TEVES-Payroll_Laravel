@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Session;
 
-class EmployeeRegularLogsModel extends Model
+class EmployeeLogsModel extends Model
 {
 	use LogsActivity;
 	
@@ -16,10 +16,12 @@ class EmployeeRegularLogsModel extends Model
     $activity->causer_id = Session::get('loginID');
 	}
 
-	protected $table = 'teves_employee_regular_logs';
+	protected $table = 'teves_employee_logs';
 
 	protected $fillable = [
         'employee_idx',
+		'branch_idx',
+		'department_idx',
 		'current_rate',
 		'attendance_date',
 		'override_shift',
@@ -48,7 +50,7 @@ class EmployeeRegularLogsModel extends Model
 		'updated_by_user_idx'
     ];
     
-	protected $primaryKey = 'regular_logs_id';
+	protected $primaryKey = 'employee_logs_id';
 	
 	protected static $logName = 'Employee Regular Logs';
 	
@@ -56,6 +58,8 @@ class EmployeeRegularLogsModel extends Model
 	
 	protected static $logAttributes = [
         'employee_idx',
+		'branch_idx',
+		'department_idx',
 		'current_rate',
 		'attendance_date',
 		'override_shift',

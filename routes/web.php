@@ -10,7 +10,6 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\EmployeeLogsController;
-
 // use App\Http\Controllers\CAMRSampleExcel;
 
 use App\Http\Controllers\EmailController;
@@ -85,6 +84,19 @@ Route::post('/delete_holiday_confirmed', [HolidayController::class, 'delete_holi
 Route::get('/employee-attendance-logs', [EmployeeLogsController::class,'employee_attendance_logs'])->name('employee_attendance_logs')->middleware('isLoggedIn');
 Route::post('/branch-item-select', [BranchController::class,'getBranchList_for_item_selection'])->name('getBranchList_for_selection')->middleware('isLoggedIn');
 Route::post('/department-item-select', [DepartmentController::class,'getDepartmentList_for_item_selection'])->name('getDepartmentList_for_selection')->middleware('isLoggedIn');
+Route::post('/employee-item-select', [EmployeeManagementController::class,'getEmployeeList_for_item_selection'])->name('getEmployeeList_for_selection')->middleware('isLoggedIn');
+/*Regular Logs - January 18, 2024*/
+Route::get('employee-regular-logs/list', [EmployeeLogsController::class, 'getEmployeeRegularLogsList'])->name('getEmployeeRegularLogsList')->middleware('isLoggedIn');
+Route::post('/submit_employee_regular_logs_information', [EmployeeLogsController::class,'submit_employee_regular_logs_information'])->name('submit_employee_regular_logs_information')->middleware('isLoggedIn');
+/*Regular OT Logs - Feb 5, 2024*/
+Route::get('employee-regular-ot-logs/list', [EmployeeLogsController::class, 'getEmployeeRegularOTLogsList'])->name('getEmployeeRegularOTLogsList')->middleware('isLoggedIn');
+/*Restday OT Logs - Feb 5, 2024*/
+Route::get('employee-restday-ot-logs/list', [EmployeeLogsController::class, 'getEmployeeRestDayOTLogsList'])->name('getEmployeeRestDayOTLogsList')->middleware('isLoggedIn');
+/*GET Employee Log Info*/
+Route::post('/employee_log_info', [EmployeeLogsController::class, 'employee_log_info'])->name('EmployeeLogsInformation')->middleware('isLoggedIn');
+/*Confirm Delete Employee Log*/
+Route::post('/delete_employee_log_confirmed', [EmployeeLogsController::class, 'delete_employee_log_confirmed'])->name('DeleteEmployeeLog')->middleware('isLoggedIn');
+
 
 //Route::get('holiday/list', [EmployeeLogsController::class, 'getholidayList'])->name('getholidayList')->middleware('isLoggedIn');
 /*Create or Update holiday*/

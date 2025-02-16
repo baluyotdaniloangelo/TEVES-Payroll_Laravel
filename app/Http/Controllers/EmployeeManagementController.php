@@ -29,10 +29,11 @@ class EmployeeManagementController extends Controller
 				Session::pull('EmployeeDetails_current_tab');
 			}
 			
-			$department_data = DepartmentModel::orderby('department_name')->get();
+			$active_link = 'employee';
+			
 			$branch_data = BranchModel::orderby('branch_name')->get();
 			
-			return view("payroll.employee", compact('data', 'title', 'department_data', 'branch_data'));
+			return view("payroll.employee", compact('data', 'title', 'branch_data', 'active_link'));
 		}
 	} 
 
@@ -43,18 +44,16 @@ class EmployeeManagementController extends Controller
 		if ($request->ajax()) {
 
 		$user_data = User::where('user_id', '=', Session::get('loginID'))->first();
-			
+
 		$employee_list_data = EmployeeModel::join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
 					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
               		->get([
 					'teves_employee_table.employee_id',
-					'teves_employee_table.employee_last_name',
-					'teves_employee_table.employee_first_name',
-					'teves_employee_table.employee_middle_name',
-					'teves_employee_table.employee_extension_name',
+					'teves_employee_table.employee_full_name',
 					'teves_employee_table.employee_number',
 					'teves_employee_table.employee_position',
 					'teves_employee_table.employee_status',
+					'teves_employee_table.employee_rate',
 					'teves_branch_table.branch_name',
 					'teves_department_table.department_name']);
 
@@ -102,8 +101,10 @@ class EmployeeManagementController extends Controller
 					'teves_employee_table.employee_email',
 					'teves_branch_table.branch_id',
 					'teves_branch_table.branch_name',
+					'teves_branch_table.branch_code',
 					'teves_department_table.department_id',
 					'teves_department_table.department_name',
+					'teves_employee_table.employee_rate',
 					'teves_employee_table.employee_status',
 					'teves_employee_table.time_in',
 					'teves_employee_table.break_time_in',
@@ -144,6 +145,7 @@ class EmployeeManagementController extends Controller
 			  'employee_last_name'    		=> 'required',
 			  'employee_first_name'    		=> 'required',
 			  'employee_birthday'    		=> 'required',
+			  'employee_rate'    			=> 'required',
 			  'branch_idx'    				=> 'required',
 			  'department_idx' 				=> 'required',
 			  'time_in'    					=> 'required',
@@ -151,6 +153,20 @@ class EmployeeManagementController extends Controller
 			  'break_time_out'    			=> 'required',
 			  'time_out'    				=> 'required',
 			]);
+			
+			
+			$employee_default_time_in_strtotime = strtotime("2025-01-01 ".$request->time_in);
+			$employee_default_time_out_strtotime = strtotime("2025-01-01 ".$request->time_out);
+			$employee_default_breaktime_in_strtotime = strtotime("2025-01-01 ".$request->break_time_in);
+			$employee_default_breaktime_out_strtotime = strtotime("2025-01-01 ".$request->break_time_out);
+
+
+			/*Total Shift Hours*/
+			$total_shift_hours = ($employee_default_time_out_strtotime - $employee_default_time_in_strtotime) / 3600;
+			/*Total Breaktime Hours*/
+			$total_breaktime_hours = ($employee_default_breaktime_out_strtotime - $employee_default_breaktime_in_strtotime) / 3600;
+			
+			$employee_full_name = $request->employee_last_name.", ".$request->employee_first_name." ".$request->employee_middle_name." ".$request->employee_extension_name;
 			
 			if($employee_id==0){
 			
@@ -162,11 +178,11 @@ class EmployeeManagementController extends Controller
 				$EmployeeDetails->employee_first_name 		= $request->employee_first_name;
 				$EmployeeDetails->employee_middle_name 		= $request->employee_middle_name;
 				$EmployeeDetails->employee_extension_name 	= $request->employee_extension_name;
-				
+				$EmployeeDetails->employee_full_name		= $employee_full_name;
 				$EmployeeDetails->employee_birthday 		= $request->employee_birthday;
 				$EmployeeDetails->employee_position 		= $request->employee_position;
 				$EmployeeDetails->employee_status	 		= $request->employee_status;
-				//$EmployeeDetails->employee_picture 		= $request->employee_picture;
+				$EmployeeDetails->employee_rate 			= $request->employee_rate;
 				$EmployeeDetails->employee_phone 			= $request->employee_phone;
 				$EmployeeDetails->employee_email 			= $request->employee_email;
 				
@@ -177,6 +193,9 @@ class EmployeeManagementController extends Controller
 				$EmployeeDetails->break_time_in 			= $request->break_time_in;
 				$EmployeeDetails->break_time_out 			= $request->break_time_out;
 				$EmployeeDetails->time_out 					= $request->time_out;
+				
+				$EmployeeDetails->total_shift_hours			= $total_shift_hours;
+				$EmployeeDetails->total_breaktime_hours		= $total_breaktime_hours;
 				
 				$EmployeeDetails->restday_monday 			= $request->restday_monday;
 				$EmployeeDetails->restday_tuesday 			= $request->restday_tuesday;
@@ -209,11 +228,11 @@ class EmployeeManagementController extends Controller
 				$EmployeeDetails->employee_first_name 		= $request->employee_first_name;
 				$EmployeeDetails->employee_middle_name 		= $request->employee_middle_name;
 				$EmployeeDetails->employee_extension_name 	= $request->employee_extension_name;
-				
+				$EmployeeDetails->employee_full_name		= $employee_full_name;
 				$EmployeeDetails->employee_birthday 		= $request->employee_birthday;
 				$EmployeeDetails->employee_position 		= $request->employee_position;
 				$EmployeeDetails->employee_status	 		= $request->employee_status;
-				//$EmployeeDetails->employee_picture 		= $request->employee_picture;
+				$EmployeeDetails->employee_rate 			= $request->employee_rate;
 				$EmployeeDetails->employee_phone 			= $request->employee_phone;
 				$EmployeeDetails->employee_email 			= $request->employee_email;
 				
@@ -224,6 +243,8 @@ class EmployeeManagementController extends Controller
 				$EmployeeDetails->break_time_in 			= $request->break_time_in;
 				$EmployeeDetails->break_time_out 			= $request->break_time_out;
 				$EmployeeDetails->time_out 					= $request->time_out;
+				$EmployeeDetails->total_shift_hours			= $total_shift_hours;
+				$EmployeeDetails->total_breaktime_hours		= $total_breaktime_hours;
 				
 				$EmployeeDetails->restday_monday 			= $request->restday_monday;
 				$EmployeeDetails->restday_tuesday 			= $request->restday_tuesday;
@@ -249,6 +270,21 @@ class EmployeeManagementController extends Controller
 			
 	}
 
+	public function getEmployeeList_for_item_selection(Request $request){
+
+		$branchID	  = $request->branchID;
+		
+		$data = EmployeeModel::join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
+					->where('teves_employee_table.branch_idx', $branchID)
+              		->get([
+					'teves_employee_table.employee_id',
+					'teves_employee_table.employee_number',
+					'teves_employee_table.employee_full_name'
+					]);
+		
+		return response()->json($data);
+		
+	}
 
 }
 
