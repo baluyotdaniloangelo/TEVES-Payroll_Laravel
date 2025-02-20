@@ -71,6 +71,7 @@
 								<ul>
 									<li><a class="<?php if(@$active_link=='employee'){ echo "active"; }?>" href="{{ route('employee') }}">Employees List</a></li>
 									<li><a class="<?php if(@$active_link=='employee_attendance_logs'){ echo "active"; }?>" href="{{ route('employee_attendance_logs') }}">Attendance Logs</a></li>
+									<li><a class="<?php if(@$active_link=='employee_attendance_logs'){ echo "active"; }?>" href="{{ route('employee_attendance_logs') }}">Deduction Logs</a></li>
 									
 								</ul>
 							</li>
@@ -83,7 +84,7 @@
 									
 									<li><a href="{{ route('branch') }}">Branch</a></li>
 									<li><a href="{{ route('holiday') }}">Holidays</a></li>
-									<li><a href="{{ route('branch') }}">Deduction Type</a></li>
+									<li><a href="{{ route('deduction_type') }}">Deduction Type</a></li>
 									
 								</ul>
 							</li>

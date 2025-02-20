@@ -10,6 +10,7 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\EmployeeLogsController;
+use App\Http\Controllers\DeductionTypeController;
 // use App\Http\Controllers\CAMRSampleExcel;
 
 use App\Http\Controllers\EmailController;
@@ -96,6 +97,16 @@ Route::get('employee-restday-ot-logs/list', [EmployeeLogsController::class, 'get
 Route::post('/employee_log_info', [EmployeeLogsController::class, 'employee_log_info'])->name('EmployeeLogsInformation')->middleware('isLoggedIn');
 /*Confirm Delete Employee Log*/
 Route::post('/delete_employee_log_confirmed', [EmployeeLogsController::class, 'delete_employee_log_confirmed'])->name('DeleteEmployeeLog')->middleware('isLoggedIn');
+
+/*Deduction Type*/
+Route::get('/deduction_type', [DeductionTypeController::class,'DeductionType'])->name('deduction_type')->middleware('isLoggedIn');
+Route::get('deduction_type/list', [DeductionTypeController::class, 'getDeductionTypeList'])->name('getDeductionTypeList')->middleware('isLoggedIn');
+/*Create or Update holiday*/
+Route::post('/submit_deduction_type_post', [DeductionTypeController::class,'submit_deduction_type_post'])->name('SubmitDeductionType')->middleware('isLoggedIn');
+/*GET holiday Info*/
+Route::post('/deduction_type_info', [DeductionTypeController::class, 'deduction_type_info'])->name('DeductionTypeInfo')->middleware('isLoggedIn');
+/*Confirm Delete holiday*/
+Route::post('/delete_deduction_type_confirmed', [DeductionTypeController::class, 'delete_deduction_type_confirmed'])->name('DeleteDeductionType')->middleware('isLoggedIn');
 
 
 //Route::get('holiday/list', [EmployeeLogsController::class, 'getholidayList'])->name('getholidayList')->middleware('isLoggedIn');

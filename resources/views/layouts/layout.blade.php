@@ -29,6 +29,10 @@ else if (Request::is('holiday')){
 ?>
 @include('layouts.holiday_script')
 <?php
+}else if (Request::is('deduction_type')){
+?>
+@include('layouts.deduction_type_script')
+<?php
 }
 else if (Request::is('employee-attendance-logs')){
 ?>
