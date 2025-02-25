@@ -28,6 +28,18 @@ class DeductionTypeController extends Controller
 		
 	}   
 
+	/* Deduction Type List for Employee Deduction Logs Interface*/
+	public function getDeductionTypeList_for_selection(){
+
+		if(Session::has('loginID')){	
+		
+			$deduction_type_data = DeductionTypeModel::all();
+			return response()->json($deduction_type_data);	
+			
+		}
+		
+	} 
+
 	/*Fetch DeductionType List using Datatable*/
 	public function getDeductionTypeList(Request $request)
     {

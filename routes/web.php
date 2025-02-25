@@ -11,6 +11,8 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\EmployeeLogsController;
 use App\Http\Controllers\DeductionTypeController;
+
+use App\Http\Controllers\EmployeeDeductionLogsController;
 // use App\Http\Controllers\CAMRSampleExcel;
 
 use App\Http\Controllers\EmailController;
@@ -107,6 +109,16 @@ Route::post('/submit_deduction_type_post', [DeductionTypeController::class,'subm
 Route::post('/deduction_type_info', [DeductionTypeController::class, 'deduction_type_info'])->name('DeductionTypeInfo')->middleware('isLoggedIn');
 /*Confirm Delete holiday*/
 Route::post('/delete_deduction_type_confirmed', [DeductionTypeController::class, 'delete_deduction_type_confirmed'])->name('DeleteDeductionType')->middleware('isLoggedIn');
+
+
+Route::get('/employee-deduction-logs', [EmployeeDeductionLogsController::class,'employee_deduction_logs'])->name('employee_deduction_logs')->middleware('isLoggedIn');
+Route::post('/deduction-item-select', [DeductionTypeController::class,'getDeductionTypeList_for_selection'])->name('getDeductionTypeList_for_selection')->middleware('isLoggedIn');
+Route::get('employee-deduction-logs/list', [EmployeeDeductionLogsController::class, 'getEmployeeDeductionLogsList'])->name('getEmployeeDeductionLogsList')->middleware('isLoggedIn');
+Route::post('/employee_deduction_info', [EmployeeDeductionLogsController::class, 'employee_deduction_info'])->name('EmployeeDeductionLogsInformation')->middleware('isLoggedIn');
+Route::post('/delete_employee_deduction_log_confirmed', [EmployeeDeductionLogsController::class, 'delete_employee_deduction_log_confirmed'])->name('DeleteEmployeeDeductionLog')->middleware('isLoggedIn');
+
+Route::post('/submit_employee_deduction_logs_information', [EmployeeDeductionLogsController::class,'submit_employee_deduction_logs_information'])->name('submit_employee_deduction_logs_information')->middleware('isLoggedIn');
+
 
 
 //Route::get('holiday/list', [EmployeeLogsController::class, 'getholidayList'])->name('getholidayList')->middleware('isLoggedIn');

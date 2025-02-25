@@ -159,7 +159,7 @@
 													<option label="{{$branch_data_cols->branch_code}} - {{$branch_data_cols->branch_name}}" data-id="{{$branch_data_cols->branch_id}}" value="{{$branch_data_cols->branch_code}} - {{$branch_data_cols->branch_name}}"> </option>
 													@endforeach
 												</datalist>
-												<!--</select>-->x''lhg
+												<!--</select>-->
 											</div>
 										</div>
 										<div class="col-md-6">
