@@ -3,8 +3,8 @@
 			
 				<!-- Logo -->
                 <div class="header-left">
-                     <a href="admin-dashboard.html" class="logo">
-						<img src="assets/img/logo.svg" alt="Logo">
+                     <a href="#" class="logo">
+						<!--<img src="assets/img/logo.svg" alt="Logo">-->
 					</a>
 					<a href="admin-dashboard.html" class="logo collapse-logo">
 						<img src="assets/img/collapse-logo.svg" alt="Logo">

@@ -100,6 +100,7 @@
 									<!--<li><a href="payroll-items.html"> Payroll Items </a></li>-->
 								</ul>
 							</li>
+							<!--
 							<li class="submenu">
 								<a href="#"><i class="la la-files-o"></i> <span> Accounting </span> <span class="menu-arrow"></span></a>
 								<ul>
@@ -109,16 +110,16 @@
 									<li><a href="budget-revenues.html">Budget Revenues</a></li>
 								</ul>
 							</li>
-							
+							-->
 							
 							<li class="submenu">
 								<a href="#"><i class="la la-pie-chart"></i> <span> Reports </span> <span class="menu-arrow"></span></a>
 								<ul>
-									<li><a href="employee-reports.html"> Employee Report </a></li>
+									<!--<li><a href="employee-reports.html"> Employee Report </a></li>-->
 									<li><a href="payslip-reports.html"> Payslip Report </a></li>
 									<li><a href="attendance-reports.html"> Attendance Report </a></li>
-									<li><a href="leave-reports.html"> Leave Report </a></li>
-									<li><a href="daily-reports.html"> Daily Report </a></li>
+									<!--<li><a href="leave-reports.html"> Leave Report </a></li>
+									<li><a href="daily-reports.html"> Daily Report </a></li>-->
 								</ul>
 							</li>
 						

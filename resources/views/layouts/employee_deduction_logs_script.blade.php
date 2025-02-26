@@ -270,7 +270,8 @@
 				  
 				}
 
-				$('#InvalidModal').modal('toggle');				  	  
+				//$('#InvalidModal').modal('toggle');				
+					alert("Invalid Input");
 				  
 				}
 			   });

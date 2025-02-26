@@ -30,7 +30,7 @@
 					{data: 'action', name: 'action', orderable: false, searchable: false, className: "text-center"},
 			],
 			columnDefs: [
-					{ className: 'text-center', targets: [0, 1] },
+					{ className: 'text-center', targets: [0, 2] },
 			]
 		});
 	
