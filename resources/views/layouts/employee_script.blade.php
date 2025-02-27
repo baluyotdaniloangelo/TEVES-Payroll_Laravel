@@ -329,7 +329,7 @@
 					document.getElementById("employee_rate").value 				= response[0].employee_rate;
 					document.getElementById("employee_phone").value 			= response[0].employee_phone;
 					document.getElementById("employee_email").value 			= response[0].employee_email;
-					//{{$branch_data_cols->branch_code}} - {{$branch_data_cols->branch_name}}
+					
 					document.getElementById("branch_idx").value					= response[0].branch_code+" - "+response[0].branch_name;
 					LoadDepartment();
 					document.getElementById("department_idx").value 			= response[0].department_name;
