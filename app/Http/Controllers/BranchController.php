@@ -22,7 +22,7 @@ class BranchController extends Controller
 		
 			$data = User::where('user_id', '=', Session::get('loginID'))->first();
 			
-			return view("payroll.Branch", compact('data','title'));
+			return view("payroll.branch", compact('data','title'));
 		}
 		
 	}   
