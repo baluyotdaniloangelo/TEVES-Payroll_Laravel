@@ -13,6 +13,7 @@ use App\Http\Controllers\EmployeeLogsController;
 use App\Http\Controllers\DeductionTypeController;
 
 use App\Http\Controllers\EmployeeDeductionLogsController;
+use App\Http\Controllers\PayslipController;
 // use App\Http\Controllers\CAMRSampleExcel;
 
 use App\Http\Controllers\EmailController;
@@ -119,17 +120,6 @@ Route::post('/delete_employee_deduction_log_confirmed', [EmployeeDeductionLogsCo
 
 Route::post('/submit_employee_deduction_logs_information', [EmployeeDeductionLogsController::class,'submit_employee_deduction_logs_information'])->name('submit_employee_deduction_logs_information')->middleware('isLoggedIn');
 
-
-
-//Route::get('holiday/list', [EmployeeLogsController::class, 'getholidayList'])->name('getholidayList')->middleware('isLoggedIn');
-/*Create or Update holiday*/
-//Route::post('/submit_holiday_post', [EmployeeLogsController::class,'submit_holiday_post'])->name('SubmitHoliday')->middleware('isLoggedIn');
-/*GET holiday Info*/
-//Route::post('/holiday_info', [EmployeeLogsController::class, 'holiday_info'])->name('HolidayInfo')->middleware('isLoggedIn');
-/*Confirm Delete holiday*/
-//Route::post('/delete_holiday_confirmed', [EmployeeLogsController::class, 'delete_holiday_confirmed'])->name('DeleteHoliday')->middleware('isLoggedIn');
-
-
 /*Load User Account List for Admin Only*/
 Route::get('/user', [UserController::class,'user'])->name('user')->middleware('isLoggedIn');
 /*Get List of User*/
@@ -150,3 +140,7 @@ Route::post('/update_user_post', [UserController::class,'update_user_post'])->na
 Route::post('/delete_user_confirmed', [UserController::class, 'delete_user_confirmed'])->name('delete_user_confirmed')->middleware('isLoggedIn');
 /*Update User Account*/
 Route::post('/user_account_post', [UserController::class,'user_account_post'])->name('user_account_post')->middleware('isLoggedIn');
+
+
+/*Payslip*/
+Route::get('/payslip', [PayslipController::class,'employees_payslip'])->name('payslip')->middleware('isLoggedIn');
