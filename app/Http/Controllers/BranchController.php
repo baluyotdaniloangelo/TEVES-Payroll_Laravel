@@ -106,11 +106,7 @@ class BranchController extends Controller
 												->where('branch_code', $request->branch_code)
 												->where('branch_id', '<>',  $branch_id )											
 										)],
-		  'branch_name'   			=> ['required',Rule::unique('teves_branch_table')->where( 
-											fn ($query) =>$query
-												->where('branch_name', $request->branch_name)
-												->where('branch_id', '<>',  $branch_id )											
-										)],
+		  'branch_name'   			=> ['required'],
 		  'branch_initial'   		=> ['required',Rule::unique('teves_branch_table')->where( 
 											fn ($query) =>$query
 												->where('branch_initial', $request->branch_initial)
