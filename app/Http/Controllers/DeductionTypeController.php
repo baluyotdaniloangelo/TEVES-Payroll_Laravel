@@ -93,7 +93,7 @@ class DeductionTypeController extends Controller
 		$deduction_id = $request->deduction_id;
 		
 		$request->validate([
-		  'deduction_description'   			=> ['required',Rule::unique('teves_deduction_type_table')->where( 
+		  'deduction_description'   			=> ['required',Rule::unique('teves_payroll_deduction_type_table')->where( 
 											fn ($query) =>$query
 												->where('deduction_description', $request->deduction_description)
 												->where('deduction_id', '<>',  $deduction_id )											

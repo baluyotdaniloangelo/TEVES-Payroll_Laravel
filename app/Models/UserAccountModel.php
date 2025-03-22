@@ -15,7 +15,7 @@ class UserAccountModel extends Model
     $activity->causer_id = Session::get('loginID');
 	}
 	
-	protected $table = 'teves_user_table';
+	protected $table = 'teves_payroll_user_table';
 	
 	protected $fillable = [
         'user_real_name',

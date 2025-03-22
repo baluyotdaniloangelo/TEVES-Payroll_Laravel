@@ -25,7 +25,7 @@ class DepartmentController extends Controller
 		$branchID = $request->branchID;
 					
 		/*Using Raw Query*/
-		$raw_query = "select `department_id`,`department_name` from `teves_department_table` where `branch_idx` = ?";			
+		$raw_query = "select `department_id`,`department_name` from `teves_payroll_department_table` where `branch_idx` = ?";			
 		$data = DB::select("$raw_query", [$branchID]);
 
 		return DataTables::of($data)
@@ -53,7 +53,7 @@ class DepartmentController extends Controller
 		$branchID = $request->branchID;
 					
 		/*Using Raw Query*/
-		$raw_query = "select `department_id`,`department_name` from `teves_department_table` where `branch_idx` = ?";			
+		$raw_query = "select `department_id`,`department_name` from `teves_payroll_department_table` where `branch_idx` = ?";			
 		$data = DB::select("$raw_query", [$branchID]);
 		return response()->json($data);
 
@@ -84,7 +84,7 @@ class DepartmentController extends Controller
 		$branch_idx 	= $request->branch_idx;
 		
 		$request->validate([
-		  'department_name'   	=> ['required',Rule::unique('teves_department_table')->where( 
+		  'department_name'   	=> ['required',Rule::unique('teves_payroll_department_table')->where( 
 									fn ($query) =>$query
 											->where('department_name', $request->department_name)
 											->where('branch_idx', $request->branch_idx)

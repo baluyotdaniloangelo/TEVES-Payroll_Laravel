@@ -17,8 +17,9 @@
 								</ul>
 							</div>
 							<div class="col-auto float-end ms-auto">
+							<!--
 								<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#branch_details_modal" onclick="ResetBranchForm()"><i class="fa-solid fa-plus"></i> Add Branch</a>
-								
+							-->	
 							</div>
 						</div>
 					</div>

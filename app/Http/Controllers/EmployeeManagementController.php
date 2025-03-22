@@ -45,17 +45,17 @@ class EmployeeManagementController extends Controller
 
 		$user_data = User::where('user_id', '=', Session::get('loginID'))->first();
 
-		$employee_list_data = EmployeeModel::join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
-					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
+		$employee_list_data = EmployeeModel::join('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
+					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
               		->get([
-					'teves_employee_table.employee_id',
-					'teves_employee_table.employee_full_name',
-					'teves_employee_table.employee_number',
-					'teves_employee_table.employee_position',
-					'teves_employee_table.employee_status',
-					'teves_employee_table.employee_rate',
+					'teves_payroll_employee_table.employee_id',
+					'teves_payroll_employee_table.employee_full_name',
+					'teves_payroll_employee_table.employee_number',
+					'teves_payroll_employee_table.employee_position',
+					'teves_payroll_employee_table.employee_status',
+					'teves_payroll_employee_table.employee_rate',
 					'teves_branch_table.branch_name',
-					'teves_department_table.department_name']);
+					'teves_payroll_department_table.department_name']);
 
 		return DataTables::of($employee_list_data)
 				->addIndexColumn()
@@ -84,39 +84,39 @@ class EmployeeManagementController extends Controller
 
 		$employeeID = $request->employeeID;
 		
-		$data = EmployeeModel::join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
-					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
-					->where('teves_employee_table.employee_id', $employeeID)
+		$data = EmployeeModel::join('teves_payroll_employee_table', 'teves_payroll_employee_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
+					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
+					->where('teves_payroll_employee_table.employee_id', $employeeID)
               		->get([
-					'teves_employee_table.employee_number',
-					'teves_employee_table.employee_last_name',
-					'teves_employee_table.employee_first_name',
-					'teves_employee_table.employee_middle_name',
-					'teves_employee_table.employee_extension_name',
-					'teves_employee_table.employee_birthday',
-					'teves_employee_table.employee_position',
-					'teves_employee_table.employee_status',
-					'teves_employee_table.employee_picture',
-					'teves_employee_table.employee_phone',
-					'teves_employee_table.employee_email',
+					'teves_payroll_employee_table.employee_number',
+					'teves_payroll_employee_table.employee_last_name',
+					'teves_payroll_employee_table.employee_first_name',
+					'teves_payroll_employee_table.employee_middle_name',
+					'teves_payroll_employee_table.employee_extension_name',
+					'teves_payroll_employee_table.employee_birthday',
+					'teves_payroll_employee_table.employee_position',
+					'teves_payroll_employee_table.employee_status',
+					'teves_payroll_employee_table.employee_picture',
+					'teves_payroll_employee_table.employee_phone',
+					'teves_payroll_employee_table.employee_email',
 					'teves_branch_table.branch_id',
 					'teves_branch_table.branch_name',
 					'teves_branch_table.branch_code',
-					'teves_department_table.department_id',
-					'teves_department_table.department_name',
-					'teves_employee_table.employee_rate',
-					'teves_employee_table.employee_status',
-					'teves_employee_table.time_in',
-					'teves_employee_table.break_time_in',
-					'teves_employee_table.break_time_out',
-					'teves_employee_table.time_out',
-					'teves_employee_table.restday_monday',
-					'teves_employee_table.restday_tuesday',
-					'teves_employee_table.restday_wednesday',
-					'teves_employee_table.restday_thursday',
-					'teves_employee_table.restday_friday',
-					'teves_employee_table.restday_saturday',
-					'teves_employee_table.restday_sunday',
+					'teves_payroll_employee_table.department_id',
+					'teves_payroll_employee_table.department_name',
+					'teves_payroll_employee_table.employee_rate',
+					'teves_payroll_employee_table.employee_status',
+					'teves_payroll_employee_table.time_in',
+					'teves_payroll_employee_table.break_time_in',
+					'teves_payroll_employee_table.break_time_out',
+					'teves_payroll_employee_table.time_out',
+					'teves_payroll_employee_table.restday_monday',
+					'teves_payroll_employee_table.restday_tuesday',
+					'teves_payroll_employee_table.restday_wednesday',
+					'teves_payroll_employee_table.restday_thursday',
+					'teves_payroll_employee_table.restday_friday',
+					'teves_payroll_employee_table.restday_saturday',
+					'teves_payroll_employee_table.restday_sunday',
 					]);
 		
 		return response()->json($data);
@@ -137,7 +137,7 @@ class EmployeeManagementController extends Controller
 		
 			$employee_id = $request->employee_id;
 			$request->validate([
-			  'employee_number'      		=> ['required',Rule::unique('teves_employee_table')->where( 
+			  'employee_number'      		=> ['required',Rule::unique('teves_payroll_employee_table')->where( 
 												fn ($query) =>$query
 													->where('employee_number', $request->employee_number)
 													->where('employee_id', '<>',  $employee_id )											
@@ -274,12 +274,12 @@ class EmployeeManagementController extends Controller
 
 		$branchID	  = $request->branchID;
 		
-		$data = EmployeeModel::join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
-					->where('teves_employee_table.branch_idx', $branchID)
+		$data = EmployeeModel::join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
+					->where('teves_payroll_employee_table.branch_idx', $branchID)
               		->get([
-					'teves_employee_table.employee_id',
-					'teves_employee_table.employee_number',
-					'teves_employee_table.employee_full_name'
+					'teves_payroll_employee_table.employee_id',
+					'teves_payroll_employee_table.employee_number',
+					'teves_payroll_employee_table.employee_full_name'
 					]);
 		
 		return response()->json($data);

@@ -43,16 +43,16 @@ class EmployeeLogsController extends Controller
 		$user_data = User::where('user_id', '=', Session::get('loginID'))->first();
 
 		$regular_logs = EmployeeLogsModel::query()
-		->join('teves_employee_table', 'teves_employee_logs.employee_idx', '=', 'teves_employee_table.employee_id')
-		->join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
-		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
-		->where('teves_employee_logs.log_type', 'Regular')
+		->join('teves_payroll_employee_table', 'teves_payroll_employee_logs.employee_idx', '=', 'teves_payroll_employee_table.employee_id')
+		->join('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
+		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
+		->where('teves_payroll_employee_logs.log_type', 'Regular')
 		->select([
-			'teves_employee_logs.*',
+			'teves_payroll_employee_logs.*',
 			'teves_branch_table.branch_name',
-			'teves_department_table.department_name',
-			'teves_employee_table.employee_number',
-			DB::raw("CONCAT(teves_employee_table.employee_last_name, ', ', teves_employee_table.employee_first_name, ' ', IFNULL(teves_employee_table.employee_middle_name,''), ' ', IFNULL(teves_employee_table.employee_extension_name,''), ' ') as employee_full_name"),
+			'teves_payroll_department_table.department_name',
+			'teves_payroll_employee_table.employee_number',
+			DB::raw("CONCAT(teves_payroll_employee_table.employee_last_name, ', ', teves_payroll_employee_table.employee_first_name, ' ', IFNULL(teves_payroll_employee_table.employee_middle_name,''), ' ', IFNULL(teves_payroll_employee_table.employee_extension_name,''), ' ') as employee_full_name"),
 		]);
 	
 		return DataTables::of($regular_logs)
@@ -84,16 +84,16 @@ class EmployeeLogsController extends Controller
 		$user_data = User::where('user_id', '=', Session::get('loginID'))->first();
 
 		$regular_logs = EmployeeLogsModel::query()
-		->join('teves_employee_table', 'teves_employee_logs.employee_idx', '=', 'teves_employee_table.employee_id')
-		->join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
-		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
-		->where('teves_employee_logs.log_type', 'RegularOT')
+		->join('teves_payroll_employee_table', 'teves_payroll_employee_logs.employee_idx', '=', 'teves_payroll_employee_table.employee_id')
+		->join('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
+		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
+		->where('teves_payroll_employee_logs.log_type', 'RegularOT')
 		->select([
-			'teves_employee_logs.*',
+			'teves_payroll_employee_logs.*',
 			'teves_branch_table.branch_name',
-			'teves_department_table.department_name',
-			'teves_employee_table.employee_number',
-			DB::raw("CONCAT(teves_employee_table.employee_last_name, ', ', teves_employee_table.employee_first_name, ' ', IFNULL(teves_employee_table.employee_middle_name,''), ' ', IFNULL(teves_employee_table.employee_extension_name,''), ' ') as employee_full_name"),
+			'teves_payroll_department_table.department_name',
+			'teves_payroll_employee_table.employee_number',
+			DB::raw("CONCAT(teves_payroll_employee_table.employee_last_name, ', ', teves_payroll_employee_table.employee_first_name, ' ', IFNULL(teves_payroll_employee_table.employee_middle_name,''), ' ', IFNULL(teves_payroll_employee_table.employee_extension_name,''), ' ') as employee_full_name"),
 		]);
 	
 		return DataTables::of($regular_logs)
@@ -125,17 +125,17 @@ class EmployeeLogsController extends Controller
 		$user_data = User::where('user_id', '=', Session::get('loginID'))->first();
 
 		$regular_logs = EmployeeLogsModel::query()
-		->join('teves_employee_table', 'teves_employee_logs.employee_idx', '=', 'teves_employee_table.employee_id')
-		->join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
-		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
-		->where('teves_employee_logs.log_type', 'RestDayOT')
-		//->where('teves_employee_logs.employee_logs_id', 1)
+		->join('teves_payroll_employee_table', 'teves_payroll_employee_logs.employee_idx', '=', 'teves_payroll_employee_table.employee_id')
+		->join('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
+		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
+		->where('teves_payroll_employee_logs.log_type', 'RestDayOT')
+		//->where('teves_payroll_employee_logs.employee_logs_id', 1)
 		->select([
-			'teves_employee_logs.*',
+			'teves_payroll_employee_logs.*',
 			'teves_branch_table.branch_name',
-			'teves_department_table.department_name',
-			'teves_employee_table.employee_number',
-			DB::raw("CONCAT(teves_employee_table.employee_last_name, ', ', teves_employee_table.employee_first_name, ' ', IFNULL(teves_employee_table.employee_middle_name,''), ' ', IFNULL(teves_employee_table.employee_extension_name,''), ' ') as employee_full_name"),
+			'teves_payroll_department_table.department_name',
+			'teves_payroll_employee_table.employee_number',
+			DB::raw("CONCAT(teves_payroll_employee_table.employee_last_name, ', ', teves_payroll_employee_table.employee_first_name, ' ', IFNULL(teves_payroll_employee_table.employee_middle_name,''), ' ', IFNULL(teves_payroll_employee_table.employee_extension_name,''), ' ') as employee_full_name"),
 		]);
 	
 		return DataTables::of($regular_logs)
@@ -163,28 +163,28 @@ class EmployeeLogsController extends Controller
 
 		$employeelogsID = $request->employeelogsID;
 
-		$data = EmployeeLogsModel::join('teves_employee_table', 'teves_employee_logs.employee_idx', '=', 'teves_employee_table.employee_id')
-					->join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
-					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
-					->where('teves_employee_logs.employee_logs_id', $employeelogsID)
+		$data = EmployeeLogsModel::join('teves_payroll_employee_table', 'teves_payroll_employee_logs.employee_idx', '=', 'teves_payroll_employee_table.employee_id')
+					->join('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
+					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
+					->where('teves_payroll_employee_logs.employee_logs_id', $employeelogsID)
               		->get([
-					'teves_employee_table.employee_number',
-					'teves_employee_table.employee_last_name',
-					'teves_employee_table.employee_first_name',
-					'teves_employee_table.employee_middle_name',
-					'teves_employee_table.employee_extension_name',
+					'teves_payroll_employee_table.employee_number',
+					'teves_payroll_employee_table.employee_last_name',
+					'teves_payroll_employee_table.employee_first_name',
+					'teves_payroll_employee_table.employee_middle_name',
+					'teves_payroll_employee_table.employee_extension_name',
 					'teves_branch_table.branch_id',
 					'teves_branch_table.branch_name',
 					'teves_branch_table.branch_code',
-					'teves_department_table.department_id',
-					'teves_department_table.department_name',
-					'teves_employee_logs.attendance_date',
-					'teves_employee_logs.override_shift',
-					'teves_employee_logs.log_type',
-					'teves_employee_logs.log_in',
-					'teves_employee_logs.log_out',
-					'teves_employee_logs.breaktime_start',
-					'teves_employee_logs.breaktime_end'
+					'teves_payroll_department_table.department_id',
+					'teves_payroll_department_table.department_name',
+					'teves_payroll_employee_logs.attendance_date',
+					'teves_payroll_employee_logs.override_shift',
+					'teves_payroll_employee_logs.log_type',
+					'teves_payroll_employee_logs.log_in',
+					'teves_payroll_employee_logs.log_out',
+					'teves_payroll_employee_logs.breaktime_start',
+					'teves_payroll_employee_logs.breaktime_end'
 					]);
 		return response()->json($data);
 		
@@ -224,24 +224,24 @@ class EmployeeLogsController extends Controller
 			if($branch_idx!=0 && $employee_idx!=0){
 			/*Query Employee Information*/
 			/*jj*/
-			$employee_data = EmployeeModel::where('teves_employee_table.employee_id', $employee_idx)
+			$employee_data = EmployeeModel::where('teves_payroll_employee_table.employee_id', $employee_idx)
 						->get([
-						'teves_employee_table.branch_idx',
-						'teves_employee_table.department_idx',
-						'teves_employee_table.employee_rate',
-						'teves_employee_table.time_in',
-						'teves_employee_table.break_time_in',
-						'teves_employee_table.break_time_out',
-						'teves_employee_table.time_out',
-						'teves_employee_table.total_shift_hours',
-						'teves_employee_table.total_breaktime_hours',
-						'teves_employee_table.restday_monday',
-						'teves_employee_table.restday_tuesday',
-						'teves_employee_table.restday_wednesday',
-						'teves_employee_table.restday_thursday',
-						'teves_employee_table.restday_friday',
-						'teves_employee_table.restday_saturday',
-						'teves_employee_table.restday_sunday',
+						'teves_payroll_employee_table.branch_idx',
+						'teves_payroll_employee_table.department_idx',
+						'teves_payroll_employee_table.employee_rate',
+						'teves_payroll_employee_table.time_in',
+						'teves_payroll_employee_table.break_time_in',
+						'teves_payroll_employee_table.break_time_out',
+						'teves_payroll_employee_table.time_out',
+						'teves_payroll_employee_table.total_shift_hours',
+						'teves_payroll_employee_table.total_breaktime_hours',
+						'teves_payroll_employee_table.restday_monday',
+						'teves_payroll_employee_table.restday_tuesday',
+						'teves_payroll_employee_table.restday_wednesday',
+						'teves_payroll_employee_table.restday_thursday',
+						'teves_payroll_employee_table.restday_friday',
+						'teves_payroll_employee_table.restday_saturday',
+						'teves_payroll_employee_table.restday_sunday',
 						]);
 			
 			$branch_idx 						= $employee_data[0]->branch_idx;
@@ -320,7 +320,7 @@ class EmployeeLogsController extends Controller
 				$request->validate([
 				  'branch_idx'				=> ['required'],
 				  'employee_idx'      		=> ['required'],
-				  'attendance_date'    		=> ['required',Rule::unique('teves_employee_logs')->where( 
+				  'attendance_date'    		=> ['required',Rule::unique('teves_payroll_employee_logs')->where( 
 													fn ($query) =>$query
 														->where('employee_idx', $employee_idx)
 														->where('attendance_date', $attendance_date)
@@ -336,26 +336,26 @@ class EmployeeLogsController extends Controller
 				//echo "|$employee_logs_id|";
 				$request->validate([
 				  'branch_idx'				=> ['required'],
-				  'employee_idx'      		=> ['required',Rule::unique('teves_employee_logs')->where( 
+				  'employee_idx'      		=> ['required',Rule::unique('teves_payroll_employee_logs')->where( 
 													fn ($query) =>$query
 														->where('employee_idx', $employee_idx)
 														->where('attendance_date', $attendance_date)
 														->where('log_type', '<>',  $log_type )
 														->where(function ($q) use($employee_logs_id) {
 															if ($employee_logs_id!=0) {
-															   $q->where('teves_employee_logs.employee_logs_id', '<>', $employee_logs_id);
+															   $q->where('teves_payroll_employee_logs.employee_logs_id', '<>', $employee_logs_id);
 															}
 														})
 														/*->where('employee_logs_id', '<>',  $employee_logs_id )	*/										
 													)],
-				  'attendance_date'    		=> ['required',Rule::unique('teves_employee_logs')->where( 
+				  'attendance_date'    		=> ['required',Rule::unique('teves_payroll_employee_logs')->where( 
 													fn ($query) =>$query
 														->where('employee_idx', $employee_idx)
 														->where('attendance_date', $attendance_date)
 														->where('log_type', '<>',  $log_type )
 														->where(function ($q) use($employee_logs_id) {
 															if ($employee_logs_id!=0) {
-															   $q->where('teves_employee_logs.employee_logs_id', '<>', $employee_logs_id);
+															   $q->where('teves_payroll_employee_logs.employee_logs_id', '<>', $employee_logs_id);
 															}
 														})
 														/*->where('employee_logs_id', '<>',  $employee_logs_id )	*/										

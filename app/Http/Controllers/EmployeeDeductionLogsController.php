@@ -42,17 +42,17 @@ class EmployeeDeductionLogsController extends Controller
 		$user_data = User::where('user_id', '=', Session::get('loginID'))->first();
 
 		$regular_logs = EmployeeDeductionLogsModel::query()
-		->join('teves_employee_table', 'teves_employee_deduction_logs.employee_idx', '=', 'teves_employee_table.employee_id')
-		->join('teves_deduction_type_table', 'teves_employee_deduction_logs.deduction_idx', '=', 'teves_deduction_type_table.deduction_id')
-		->join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
-		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
+		->join('teves_payroll_employee_table', 'teves_payroll_employee_deduction_logs.employee_idx', '=', 'teves_payroll_employee_table.employee_id')
+		->join('teves_payroll_deduction_type_table', 'teves_payroll_employee_deduction_logs.deduction_idx', '=', 'teves_payroll_deduction_type_table.deduction_id')
+		->join('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
+		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
 		->select([
-			'teves_employee_deduction_logs.*',
-			'teves_deduction_type_table.deduction_description',
+			'teves_payroll_employee_deduction_logs.*',
+			'teves_payroll_deduction_type_table.deduction_description',
 			'teves_branch_table.branch_name',
-			'teves_department_table.department_name',
-			'teves_employee_table.employee_number',
-			DB::raw("CONCAT(teves_employee_table.employee_last_name, ', ', teves_employee_table.employee_first_name, ' ', IFNULL(teves_employee_table.employee_middle_name,''), ' ', IFNULL(teves_employee_table.employee_extension_name,''), ' ') as employee_full_name"),
+			'teves_payroll_department_table.department_name',
+			'teves_payroll_employee_table.employee_number',
+			DB::raw("CONCAT(teves_payroll_employee_table.employee_last_name, ', ', teves_payroll_employee_table.employee_first_name, ' ', IFNULL(teves_payroll_employee_table.employee_middle_name,''), ' ', IFNULL(teves_payroll_employee_table.employee_extension_name,''), ' ') as employee_full_name"),
 		]);
 	
 		return DataTables::of($regular_logs)
@@ -80,25 +80,25 @@ class EmployeeDeductionLogsController extends Controller
 
 		$employeedeductionlogsID = $request->employeedeductionlogsID;
 
-		$data = EmployeeDeductionLogsModel::join('teves_employee_table', 'teves_employee_deduction_logs.employee_idx', '=', 'teves_employee_table.employee_id')
-					->join('teves_deduction_type_table', 'teves_employee_deduction_logs.deduction_idx', '=', 'teves_deduction_type_table.deduction_id')
-					->join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
-					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
-					->where('teves_employee_deduction_logs.deduction_logs_id', $employeedeductionlogsID)
+		$data = EmployeeDeductionLogsModel::join('teves_payroll_employee_table', 'teves_payroll_employee_deduction_logs.employee_idx', '=', 'teves_payroll_employee_table.employee_id')
+					->join('teves_payroll_deduction_type_table', 'teves_payroll_employee_deduction_logs.deduction_idx', '=', 'teves_payroll_deduction_type_table.deduction_id')
+					->join('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
+					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
+					->where('teves_payroll_employee_deduction_logs.deduction_logs_id', $employeedeductionlogsID)
               		->get([
-					'teves_employee_table.employee_number',
-					'teves_employee_table.employee_last_name',
-					'teves_employee_table.employee_first_name',
-					'teves_employee_table.employee_middle_name',
-					'teves_employee_table.employee_extension_name',
+					'teves_payroll_employee_table.employee_number',
+					'teves_payroll_employee_table.employee_last_name',
+					'teves_payroll_employee_table.employee_first_name',
+					'teves_payroll_employee_table.employee_middle_name',
+					'teves_payroll_employee_table.employee_extension_name',
 					'teves_branch_table.branch_id',
 					'teves_branch_table.branch_name',
 					'teves_branch_table.branch_code',
-					'teves_department_table.department_id',
-					'teves_department_table.department_name',
-					'teves_employee_deduction_logs.deduction_date',
-					'teves_employee_deduction_logs.deduction_amount',
-					'teves_deduction_type_table.deduction_description'
+					'teves_payroll_department_table.department_id',
+					'teves_payroll_department_table.department_name',
+					'teves_payroll_employee_deduction_logs.deduction_date',
+					'teves_payroll_employee_deduction_logs.deduction_amount',
+					'teves_payroll_deduction_type_table.deduction_description'
 					]);
 		return response()->json($data);
 		
@@ -126,24 +126,24 @@ class EmployeeDeductionLogsController extends Controller
 			
 			if($branch_idx!=0 && $employee_idx!=0 && $deduction_amount!=0){
 			/*Query Employee Information*/
-			$employee_data = EmployeeModel::where('teves_employee_table.employee_id', $employee_idx)
+			$employee_data = EmployeeModel::where('teves_payroll_employee_table.employee_id', $employee_idx)
 						->get([
-						'teves_employee_table.branch_idx',
-						'teves_employee_table.department_idx',
-						'teves_employee_table.employee_rate',
-						'teves_employee_table.time_in',
-						'teves_employee_table.break_time_in',
-						'teves_employee_table.break_time_out',
-						'teves_employee_table.time_out',
-						'teves_employee_table.total_shift_hours',
-						'teves_employee_table.total_breaktime_hours',
-						'teves_employee_table.restday_monday',
-						'teves_employee_table.restday_tuesday',
-						'teves_employee_table.restday_wednesday',
-						'teves_employee_table.restday_thursday',
-						'teves_employee_table.restday_friday',
-						'teves_employee_table.restday_saturday',
-						'teves_employee_table.restday_sunday',
+						'teves_payroll_employee_table.branch_idx',
+						'teves_payroll_employee_table.department_idx',
+						'teves_payroll_employee_table.employee_rate',
+						'teves_payroll_employee_table.time_in',
+						'teves_payroll_employee_table.break_time_in',
+						'teves_payroll_employee_table.break_time_out',
+						'teves_payroll_employee_table.time_out',
+						'teves_payroll_employee_table.total_shift_hours',
+						'teves_payroll_employee_table.total_breaktime_hours',
+						'teves_payroll_employee_table.restday_monday',
+						'teves_payroll_employee_table.restday_tuesday',
+						'teves_payroll_employee_table.restday_wednesday',
+						'teves_payroll_employee_table.restday_thursday',
+						'teves_payroll_employee_table.restday_friday',
+						'teves_payroll_employee_table.restday_saturday',
+						'teves_payroll_employee_table.restday_sunday',
 						]);
 			
 			$branch_idx 						= $employee_data[0]->branch_idx;

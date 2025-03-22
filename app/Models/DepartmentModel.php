@@ -15,7 +15,7 @@ class DepartmentModel extends Model
     $activity->causer_id = Session::get('loginID');
 	}
 	
-	protected $table = 'teves_department_table';
+	protected $table = 'teves_payroll_department_table';
 	
 	protected $fillable = [
         'department_name',

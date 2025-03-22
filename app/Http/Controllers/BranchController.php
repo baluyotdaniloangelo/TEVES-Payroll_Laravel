@@ -64,8 +64,8 @@ class BranchController extends Controller
 								<a href="#" class="action-icon dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="true"><i class="si si-options-vertical" data-bs-toggle="tooltip" aria-label="si-options-vertical" data-bs-original-title="si-options-vertical"></i></a>
 									<div class="dropdown-menu dropdown-menu-right " data-popper-placement="bottom-end" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);">
 										<a class="dropdown-item" href="#" data-id="'.$row->branch_id.'" id="branch_department_management" title="Branch Department Maintenance"><i class="fa-solid fa-eye m-r-5"></i> Department</a>
-										<a class="dropdown-item" href="#" data-id="'.$row->branch_id.'" id="edit_branch"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
-										<a class="dropdown-item" href="#" data-id="'.$row->branch_id.'" id="delete_branch"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>
+										<!--<a class="dropdown-item" href="#" data-id="'.$row->branch_id.'" id="edit_branch"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
+										<a class="dropdown-item" href="#" data-id="'.$row->branch_id.'" id="delete_branch"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>-->
 									</div>
 							</div>';
 					

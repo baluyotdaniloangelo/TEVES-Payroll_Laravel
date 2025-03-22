@@ -15,7 +15,7 @@ class DeductionTypeModel extends Model
     $activity->causer_id = Session::get('loginID');
 	}
 	
-	protected $table = 'teves_deduction_type_table';
+	protected $table = 'teves_payroll_deduction_type_table';
 	
 	protected $fillable = [
         'deduction_description',

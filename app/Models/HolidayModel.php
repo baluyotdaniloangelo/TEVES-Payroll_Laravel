@@ -15,7 +15,7 @@ class HolidayModel extends Model
     $activity->causer_id = Session::get('loginID');
 	}
 	
-	protected $table = 'teves_holiday_table';
+	protected $table = 'teves_payroll_holiday_table';
 	
 	protected $fillable = [
         'holiday_description',

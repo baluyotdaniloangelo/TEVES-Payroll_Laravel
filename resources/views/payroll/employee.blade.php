@@ -133,7 +133,7 @@
 										
 										<div class="col-sm-3">  
 											<div class="input-block mb-3">
-												<label class="col-form-label">Rate <span class="text-danger">*</span></label>
+												<label class="col-form-label">Hourly Rate <span class="text-danger">*</span></label>
 												<input type="text" class="form-control" id="employee_rate" name="employee_rate" required>
 												<span class="valid-feedback" id="employee_rateError" title="Required"></span>
 											</div>

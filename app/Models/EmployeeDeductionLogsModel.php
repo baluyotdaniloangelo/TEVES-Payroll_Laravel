@@ -16,7 +16,7 @@ class EmployeeDeductionLogsModel extends Model
     $activity->causer_id = Session::get('loginID');
 	}
 
-	protected $table = 'teves_employee_deduction_logs';
+	protected $table = 'teves_payroll_employee_deduction_logs';
 
 	protected $fillable = [
         'deduction_idx',

@@ -83,7 +83,7 @@ class holidayController extends Controller
 		$holiday_id = $request->holiday_id;
 		
 		$request->validate([
-		  'holiday_description'   			=> ['required',Rule::unique('teves_holiday_table')->where( 
+		  'holiday_description'   			=> ['required',Rule::unique('teves_payroll_holiday_table')->where( 
 											fn ($query) =>$query
 												->where('holiday_description', $request->holiday_description)
 												->where('holiday_date', $request->holiday_date)
