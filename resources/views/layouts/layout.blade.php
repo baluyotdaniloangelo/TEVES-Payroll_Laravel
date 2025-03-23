@@ -43,6 +43,10 @@ else if (Request::is('employee-deduction-logs')){
 ?>
 @include('layouts.employee_deduction_logs_script')
 <?php
+}else if (Request::is('employee-allowance-logs')){
+?>
+@include('layouts.employee_allowance_logs_script')
+<?php
 }
 ?>
 	</body>

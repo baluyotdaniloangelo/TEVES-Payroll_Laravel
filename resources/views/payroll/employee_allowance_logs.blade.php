@@ -10,14 +10,14 @@
 					<div class="page-header">
 						<div class="row align-items-center">
 							<div class="col">
-								<h3 class="page-title">Deduction Logs</h3>
+								<h3 class="page-title">Allowance Logs</h3>
 								<!--<ul class="breadcrumb">
 									<li class="breadcrumb-item"><a href="admin-dashboard.html">Dashboard</a></li>
 									<li class="breadcrumb-item active">Employee</li>
 								</ul>-->
 							</div>
 							<div class="col-auto float-end ms-auto">
-								<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#employee_deduction_logs_details_modal" onclick="ResetEmployeeDeductionLogsForm()"><i class="fa-solid fa-plus"></i> Add Deduction</a>
+								<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#employee_deduction_logs_details_modal" onclick="ResetEmployeeAllowanceLogsForm()"><i class="fa-solid fa-plus"></i> Add Allowance</a>
 								<!-- onclick="ResetEmployeeAttendanceLogsForm()"-->
 							</div>
 						</div>
@@ -33,7 +33,7 @@
 											<div class="tab-pane active show" id="solid-tab1" role="tabpanel">
 													
 													<div class="table-responsive">
-													<table class="table dataTable display nowrap cell-border" id="EmployeeDeductionLogsListDatatable" width="100%" cellspacing="0">
+													<table class="table dataTable display nowrap cell-border" id="EmployeeAllowanceLogsListDatatable" width="100%" cellspacing="0">
 																<thead>
 																	<tr>
 																		<th class="all">#</th>
@@ -41,6 +41,7 @@
 																		<th class="all" title="Employee Number">Employee Number</th>
 																		<th class="all" title="Employee Name">Employee Name</th>
 																		<th class="all">Description</th>
+																		<th class="all">Type</th>
 																		<th class="all">Amount</th>
 																		<th class="all">Action</th>
 																		<th class="none">Branch</th>
@@ -71,13 +72,13 @@
 					<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title" id="modal_title_action_employee_logs">Add Deduction</h5>
+								<h5 class="modal-title" id="modal_title_action_employee_logs">Add Allowance</h5>
 								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
 									<span aria-hidden="true">&times;</span>
 								</button>
 							</div>
 							<div class="modal-body">
-								 <form class="g-2 needs-validation" id="EmployeeDeductionLogsForm">
+								 <form class="g-2 needs-validation" id="EmployeeAllowanceLogsForm">
 									
 									<div class="row">
 									
@@ -101,18 +102,33 @@
 										
 										<div class="col-sm-12">
 											<div class="input-block mb-3">
-												<label class="col-form-label">Deduction Type <span class="text-danger">*</span></label>
-												<input class="form-control " type="text" list="deduction_list_logs" id="deduction_idx" name="deduction_idx" required autocomplete="off">
-												<span class="valid-feedback" id="deduction_idxError" title="Required"></span>
-												<datalist id="deduction_list_logs"><!--List Here--></datalist>	
+												<label class="col-form-label">Date <span class="text-danger">*</span></label>
+												<input class="form-control" type="date" id="deduction_date" name="deduction_date" required value="<?=date('Y-m-d');?>">
+												<span class="valid-feedback" id="deduction_dateError" title="Required"></span>
+											</div>
+										</div>
+										
+										<div class="col-sm-12">  
+											<div class="input-block mb-3">
+												<label class="col-form-label">Description <span class="text-danger">*</span></label>
+												<input class="form-control" type="number" id="allowance_title" name="allowance_title" required>
+												<span class="valid-feedback" id="allowance_titleError" title="Required"></span>
 											</div>
 										</div>
 										
 										<div class="col-sm-12">
 											<div class="input-block mb-3">
-												<label class="col-form-label">Date <span class="text-danger">*</span></label>
-												<input class="form-control" type="date" id="deduction_date" name="deduction_date" required value="<?=date('Y-m-d');?>">
-												<span class="valid-feedback" id="deduction_dateError" title="Required"></span>
+												<label class="col-form-label">Allowance Type <span class="text-danger">*</span></label>
+												<select class="form-select form-control" name="allowance_type" id="allowance_type">
+												<!--travel, meals, transportation, supplies, training, Healthcare,Miscellaneous expenses -->
+													<option value="Allowance">Travel</option>
+													<option value="Meals">Meal</option>
+													<option value="Transportation">Transportation</option>
+													<option value="Supplies">Supplies</option>
+													<option value="Training">Training</option>
+													<option value="Healthcare">Healthcare</option>
+													<option value="Miscellaneous" selected>Miscellaneous</option>
+												</select>	
 											</div>
 										</div>
 										
@@ -123,6 +139,8 @@
 												<span class="valid-feedback" id="deduction_amountError" title="Required"></span>
 											</div>
 										</div>
+										
+										
 										
 									</div>
 									
@@ -138,12 +156,12 @@
 				
 				<!-- Delete Employee Modal -->
 				<!-- <div class="modal custom-modal fade" id="EmployeeDeleteModal" role="dialog" tabindex="-1" role="dialog">-->
-				<div class="modal custom-modal fade" id="EmployeeDeductionLogDeleteModal" role="dialog">
+				<div class="modal custom-modal fade" id="EmployeeAllowanceLogDeleteModal" role="dialog">
 					<div class="modal-dialog modal-dialog-centered">
 						<div class="modal-content">
 							<div class="modal-body">
 								<div class="form-header">
-									<h3>Employee Deduction Log</h3>
+									<h3>Employee Allowance Log</h3>
 									<p>Are you sure want to delete?</p>
 								</div>
 								<div class="modal-btn delete-action">
@@ -162,14 +180,14 @@
 									-->
 									<p class="mb-2 fs-16">Name:<span id="delete_employee_deduction_logs_complete_name"></span></p>
 									<p class="mb-2 fs-16">Date:<span id="delete_deduction_date"></span></p>
-									<p class="mb-2 fs-16">Deduction Description:<span id="delete_deduction_description"></span></p>
+									<p class="mb-2 fs-16">Allowance Description:<span id="delete_deduction_description"></span></p>
 									<p class="mb-2 fs-16">Amount:<span id="delete_deduction_amount"></span></p>
 								</div>
 							</div>
 									</div>
 									
 									<div class="row">
-										<button type="submit" class="col-6 btn btn-primary continue-btn" id="deleteEmployeeDeductionLogConfirmed">Delete</button>
+										<button type="submit" class="col-6 btn btn-primary continue-btn" id="deleteEmployeeAllowanceLogConfirmed">Delete</button>
 										<div class="col-6">
 											<a href="javascript:void(0);" data-bs-dismiss="modal" class="btn btn-primary cancel-btn">Cancel</a>
 										</div>

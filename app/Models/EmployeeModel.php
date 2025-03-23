@@ -32,6 +32,8 @@ class EmployeeModel extends Model
 		'employee_email',
 		'branch_idx',
 		'department_idx',
+		'employee_status',
+		'employment_type',
 		'time_in',
 		'break_time_in',
 		'break_time_out',

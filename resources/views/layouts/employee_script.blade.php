@@ -25,6 +25,7 @@
 							{data: 'employee_position'},
 							{data: 'employee_rate'},
 							{data: 'employee_status'},
+							{data: 'employment_type'},
 							{data: 'action', name: 'action', orderable: false, searchable: false, className: "text-center"},
 					]
 				});
@@ -109,6 +110,7 @@
 			/*#6*/let employee_birthday 				= $("input[name=employee_birthday]").val();
 			/*#7*/let employee_position 				= $("input[name=employee_position]").val();
 				  let employee_status					= $("#employee_status").val();
+				  let employment_type					= $("#employment_type").val();
 				  let employee_rate						= $("#employee_rate").val();
 			/*#8*/let employee_phone 					= $("input[name=employee_phone]").val();
 			/*#9*/let employee_email 					= $("input[name=employee_email]").val();
@@ -159,6 +161,7 @@
 				  /*#6*/employee_birthday:employee_birthday,
 				  /*#7*/employee_position:employee_position,
 				  /*#7*/employee_status:employee_status,
+				  /*#7*/employment_type:employment_type,
 						employee_rate:employee_rate,
 				  /*#8*/employee_phone:employee_phone,
 				  /*#9*/employee_email:employee_email,
@@ -326,6 +329,7 @@
 					document.getElementById("employee_birthday").value 			= response[0].employee_birthday;
 					document.getElementById("employee_position").value 			= response[0].employee_position;
 					document.getElementById("employee_status").value 			= response[0].employee_status;
+					document.getElementById("employment_type").value 			= response[0].employment_type;
 					document.getElementById("employee_rate").value 				= response[0].employee_rate;
 					document.getElementById("employee_phone").value 			= response[0].employee_phone;
 					document.getElementById("employee_email").value 			= response[0].employee_email;
@@ -516,13 +520,13 @@
 			let siteID = document.getElementById("update-site").value;
 			
 			let employee_last_name 			= $("input[name=update_employee_last_name]").val();
-			let employee_first_name 	= $("input[name=update_employee_first_name]").val();
-			let branch_idx 			= $("#update_division_list option[value='" + $('#update_branch_idx').val() + "']").attr('data-id');
+			let employee_first_name 		= $("input[name=update_employee_first_name]").val();
+			let branch_idx 					= $("#update_division_list option[value='" + $('#update_branch_idx').val() + "']").attr('data-id');
 			let department_idx				= $("#update_company_list option[value='" + $('#update_department_idx').val() + "']").attr('data-id');
 			let employee_middle_name 		= $("input[name=update_employee_middle_name]").val();
-			let employee_extension_name 				= $("input[name=update_employee_extension_name]").val();
-			let employee_birthday 				= $("input[name=update_employee_birthday]").val();
-			let employee_position 				= $("input[name=update_employee_position]").val();
+			let employee_extension_name 	= $("input[name=update_employee_extension_name]").val();
+			let employee_birthday 			= $("input[name=update_employee_birthday]").val();
+			let employee_position 			= $("input[name=update_employee_position]").val();
 	
 				$.ajax({
 				url: "/site_info",

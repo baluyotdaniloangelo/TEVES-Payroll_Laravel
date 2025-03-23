@@ -53,6 +53,7 @@ class EmployeeManagementController extends Controller
 					'teves_payroll_employee_table.employee_number',
 					'teves_payroll_employee_table.employee_position',
 					'teves_payroll_employee_table.employee_status',
+					'teves_payroll_employee_table.employment_type',
 					'teves_payroll_employee_table.employee_rate',
 					'teves_branch_table.branch_name',
 					'teves_payroll_department_table.department_name']);
@@ -84,7 +85,7 @@ class EmployeeManagementController extends Controller
 
 		$employeeID = $request->employeeID;
 		
-		$data = EmployeeModel::join('teves_payroll_employee_table', 'teves_payroll_employee_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
+		$data = EmployeeModel::join('teves_payroll_department_table', 'teves_payroll_employee_table.department_idx', '=', 'teves_payroll_department_table.department_id')
 					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
 					->where('teves_payroll_employee_table.employee_id', $employeeID)
               		->get([
@@ -96,16 +97,16 @@ class EmployeeManagementController extends Controller
 					'teves_payroll_employee_table.employee_birthday',
 					'teves_payroll_employee_table.employee_position',
 					'teves_payroll_employee_table.employee_status',
+					'teves_payroll_employee_table.employment_type',
 					'teves_payroll_employee_table.employee_picture',
 					'teves_payroll_employee_table.employee_phone',
 					'teves_payroll_employee_table.employee_email',
 					'teves_branch_table.branch_id',
 					'teves_branch_table.branch_name',
 					'teves_branch_table.branch_code',
-					'teves_payroll_employee_table.department_id',
-					'teves_payroll_employee_table.department_name',
+					'teves_payroll_department_table.department_id',
+					'teves_payroll_department_table.department_name',
 					'teves_payroll_employee_table.employee_rate',
-					'teves_payroll_employee_table.employee_status',
 					'teves_payroll_employee_table.time_in',
 					'teves_payroll_employee_table.break_time_in',
 					'teves_payroll_employee_table.break_time_out',
@@ -182,6 +183,7 @@ class EmployeeManagementController extends Controller
 				$EmployeeDetails->employee_birthday 		= $request->employee_birthday;
 				$EmployeeDetails->employee_position 		= $request->employee_position;
 				$EmployeeDetails->employee_status	 		= $request->employee_status;
+				$EmployeeDetails->employment_type	 		= $request->employment_type;
 				$EmployeeDetails->employee_rate 			= $request->employee_rate;
 				$EmployeeDetails->employee_phone 			= $request->employee_phone;
 				$EmployeeDetails->employee_email 			= $request->employee_email;
@@ -232,6 +234,7 @@ class EmployeeManagementController extends Controller
 				$EmployeeDetails->employee_birthday 		= $request->employee_birthday;
 				$EmployeeDetails->employee_position 		= $request->employee_position;
 				$EmployeeDetails->employee_status	 		= $request->employee_status;
+				$EmployeeDetails->employment_type	 		= $request->employment_type;
 				$EmployeeDetails->employee_rate 			= $request->employee_rate;
 				$EmployeeDetails->employee_phone 			= $request->employee_phone;
 				$EmployeeDetails->employee_email 			= $request->employee_email;

@@ -34,10 +34,11 @@
 										 			<th class="all" title="Employee Number">Employee No.</th>
 													<th class="all" title="Employee Name">Employee Name</th>
 													<th>Branch</th>
-													<th>Department</th>			
-													<th>Position</th>			
-													<th>Rate</th>				
-													<th class="all">Status</th>
+													<th class="none">Department</th>			
+													<th class="none">Position</th>			
+													<th class="none">Hourly Rate</th>				
+													<th class="all">Employment Status</th>
+													<th class="all">Employment Type</th>
 													<th class="all">Action</th>
 												</tr>
 											</thead>				
@@ -116,7 +117,7 @@
 											</div>
 										</div>
 										
-										<div class="col-sm-3">  
+										<div class="col-sm-2">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Employee ID <span class="text-danger">*</span></label>
 												<input type="text" class="form-control" id="employee_number" name="employee_number" required>
@@ -139,16 +140,26 @@
 											</div>
 										</div>
 										
-										<div class="col-sm-3">
+										<div class="col-sm-2">
 											<div class="input-block mb-3">
-												<label class="col-form-label">Status</label>
+												<label class="col-form-label">Employment Status</label>
 												<select class="form-select form-control" name="employee_status" id="employee_status">
 													<option value="Active">Active</option>
 													<option value="Inactive">Inactive</option>
 												</select>
 											</div>
 										</div>
-										
+										<div class="col-sm-2">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Employment Type</label>
+												<select class="form-select form-control" name="employment_type" id="employment_type">
+													<option value="Regular" selected>Regular</option>
+													<option value="Probationary">Probationary</option>
+													<option value="Contractual">Contractual</option>
+													<option value="Others">Others/Outsource</option>
+												</select>
+											</div>
+										</div>
 										<div class="col-sm-6">
 											<div class="input-block mb-3">
 												<label class="col-form-label">Branch</label>
