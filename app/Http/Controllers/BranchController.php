@@ -20,9 +20,11 @@ class BranchController extends Controller
 			$title = 'Branch';
 			$data = array();
 		
+			$active_link = 'branch';
+			
 			$data = User::where('user_id', '=', Session::get('loginID'))->first();
 			
-			return view("payroll.branch", compact('data','title'));
+			return view("payroll.branch", compact('data','title', 'active_link'));
 		}
 		
 	}   

@@ -80,7 +80,7 @@ class EmployeeAllowanceLogsController extends Controller
 
 		$data = EmployeeAllowanceLogsModel::join('teves_payroll_employee_table', 'teves_payroll_employee_allowance_logs.employee_idx', '=', 'teves_payroll_employee_table.employee_id')
 					//->join('teves_payroll_allowance_type_table', 'teves_payroll_employee_allowance_logs.allowance_idx', '=', 'teves_payroll_allowance_type_table.allowance_id')
-					->join('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
+					//->join('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
 					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
 					->where('teves_payroll_employee_allowance_logs.allowance_logs_id', $employeeallowancelogsID)
               		->get([
@@ -92,9 +92,9 @@ class EmployeeAllowanceLogsController extends Controller
 					'teves_branch_table.branch_id',
 					'teves_branch_table.branch_name',
 					'teves_branch_table.branch_code',
-					'teves_payroll_department_table.department_id',
-					'teves_payroll_department_table.department_name',
 					'teves_payroll_employee_allowance_logs.allowance_date',
+					'teves_payroll_employee_allowance_logs.allowance_description',
+					'teves_payroll_employee_allowance_logs.allowance_type',
 					'teves_payroll_employee_allowance_logs.allowance_amount',
 					]);
 		return response()->json($data);
@@ -116,9 +116,11 @@ class EmployeeAllowanceLogsController extends Controller
 			
 			$branch_idx						= $request->branch_idx;
 			$employee_idx 					= $request->employee_idx;
-			$allowance_idx 					= $request->allowance_idx;
+			//$allowance_idx 					= $request->allowance_idx;
 			$allowance_logs_id 				= $request->allowance_logs_id;
 			$allowance_date 				= $request->allowance_date;
+			$allowance_description				= $request->allowance_description;
+			$allowance_type					= $request->allowance_type;
 			$allowance_amount 				= $request->allowance_amount;
 			
 			if($branch_idx!=0 && $employee_idx!=0 && $allowance_amount!=0){
@@ -127,20 +129,7 @@ class EmployeeAllowanceLogsController extends Controller
 						->get([
 						'teves_payroll_employee_table.branch_idx',
 						'teves_payroll_employee_table.department_idx',
-						'teves_payroll_employee_table.employee_rate',
-						'teves_payroll_employee_table.time_in',
-						'teves_payroll_employee_table.break_time_in',
-						'teves_payroll_employee_table.break_time_out',
-						'teves_payroll_employee_table.time_out',
-						'teves_payroll_employee_table.total_shift_hours',
-						'teves_payroll_employee_table.total_breaktime_hours',
-						'teves_payroll_employee_table.restday_monday',
-						'teves_payroll_employee_table.restday_tuesday',
-						'teves_payroll_employee_table.restday_wednesday',
-						'teves_payroll_employee_table.restday_thursday',
-						'teves_payroll_employee_table.restday_friday',
-						'teves_payroll_employee_table.restday_saturday',
-						'teves_payroll_employee_table.restday_sunday',
+						'teves_payroll_employee_table.employee_rate'
 						]);
 			
 			$branch_idx 						= $employee_data[0]->branch_idx;
@@ -153,8 +142,9 @@ class EmployeeAllowanceLogsController extends Controller
 				$EmployeeAllowanceLogs->employee_idx 					= $employee_idx;
 				$EmployeeAllowanceLogs->branch_idx 						= $branch_idx;
 				$EmployeeAllowanceLogs->department_idx 					= $department_idx;
-				$EmployeeAllowanceLogs->allowance_idx 					= $allowance_idx;
 				$EmployeeAllowanceLogs->allowance_date 					= $allowance_date;
+				$EmployeeAllowanceLogs->allowance_description 			= $allowance_description;
+				$EmployeeAllowanceLogs->allowance_type 					= $allowance_type;
 				$EmployeeAllowanceLogs->allowance_amount 				= $allowance_amount;
 				
 				$EmployeeAllowanceLogs->created_by_user_idx 		= Session::get('loginID');
@@ -176,8 +166,9 @@ class EmployeeAllowanceLogsController extends Controller
 				$EmployeeAllowanceLogs->employee_idx 					= $employee_idx;
 				$EmployeeAllowanceLogs->branch_idx 						= $branch_idx;
 				$EmployeeAllowanceLogs->department_idx 					= $department_idx;
-				$EmployeeAllowanceLogs->allowance_idx 					= $allowance_idx;
 				$EmployeeAllowanceLogs->allowance_date 					= $allowance_date;
+				$EmployeeAllowanceLogs->allowance_description 			= $allowance_description;
+				$EmployeeAllowanceLogs->allowance_type 					= $allowance_type;
 				$EmployeeAllowanceLogs->allowance_amount 				= $allowance_amount;
 				
 				$EmployeeAllowanceLogs->updated_by_user_idx 	= Session::get('loginID');

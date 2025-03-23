@@ -17,7 +17,7 @@
 								</ul>-->
 							</div>
 							<div class="col-auto float-end ms-auto">
-								<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#employee_deduction_logs_details_modal" onclick="ResetEmployeeAllowanceLogsForm()"><i class="fa-solid fa-plus"></i> Add Allowance</a>
+								<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#employee_allowance_logs_details_modal" onclick="ResetEmployeeAllowanceLogsForm()"><i class="fa-solid fa-plus"></i> Add Allowance</a>
 								<!-- onclick="ResetEmployeeAttendanceLogsForm()"-->
 							</div>
 						</div>
@@ -68,11 +68,11 @@
 				<!-- /Page Content -->
 				
 				<!-- Add Employee Modal -->
-				<div id="employee_deduction_logs_details_modal" class="modal custom-modal fade" data-bs-backdrop="static" role="dialog">
+				<div id="employee_allowance_logs_details_modal" class="modal custom-modal fade" data-bs-backdrop="static" role="dialog">
 					<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title" id="modal_title_action_employee_logs">Add Allowance</h5>
+								<h5 class="modal-title" id="modal_title_action_employee_logs">Add Allowance/Reimbursement</h5>
 								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
 									<span aria-hidden="true">&times;</span>
 								</button>
@@ -103,16 +103,16 @@
 										<div class="col-sm-12">
 											<div class="input-block mb-3">
 												<label class="col-form-label">Date <span class="text-danger">*</span></label>
-												<input class="form-control" type="date" id="deduction_date" name="deduction_date" required value="<?=date('Y-m-d');?>">
-												<span class="valid-feedback" id="deduction_dateError" title="Required"></span>
+												<input class="form-control" type="date" id="allowance_date" name="allowance_date" required value="<?=date('Y-m-d');?>">
+												<span class="valid-feedback" id="allowance_dateError" title="Required"></span>
 											</div>
 										</div>
 										
 										<div class="col-sm-12">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Description <span class="text-danger">*</span></label>
-												<input class="form-control" type="number" id="allowance_title" name="allowance_title" required>
-												<span class="valid-feedback" id="allowance_titleError" title="Required"></span>
+												<input class="form-control" type="text" id="allowance_description" name="allowance_description">
+												<span class="valid-feedback" id="allowance_descriptionError" title="Required"></span>
 											</div>
 										</div>
 										
@@ -135,17 +135,15 @@
 										<div class="col-sm-12">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Amount <span class="text-danger">*</span></label>
-												<input class="form-control" type="number" id="deduction_amount" name="deduction_amount" required>
-												<span class="valid-feedback" id="deduction_amountError" title="Required"></span>
+												<input class="form-control" type="number" id="allowance_amount" name="allowance_amount" required>
+												<span class="valid-feedback" id="allowance_amountError" title="Required"></span>
 											</div>
 										</div>
-										
-										
 										
 									</div>
 									
 									<div class="submit-section">
-										<button class="btn btn-primary submit-btn" id="submit_deduction_logs_details" value="0">Submit</button>
+										<button class="btn btn-primary submit-btn" id="submit_allowance_logs_details" value="0">Submit</button>
 									</div>
 								</form>
 							</div>
@@ -178,10 +176,10 @@
 									
 									<div class="fw-semibold fs-16"><span id="delete_employee_log_complete_name"></span></div>
 									-->
-									<p class="mb-2 fs-16">Name:<span id="delete_employee_deduction_logs_complete_name"></span></p>
-									<p class="mb-2 fs-16">Date:<span id="delete_deduction_date"></span></p>
-									<p class="mb-2 fs-16">Allowance Description:<span id="delete_deduction_description"></span></p>
-									<p class="mb-2 fs-16">Amount:<span id="delete_deduction_amount"></span></p>
+									<p class="mb-2 fs-16">Name:<span id="delete_employee_allowance_logs_complete_name"></span></p>
+									<p class="mb-2 fs-16">Date:<span id="delete_allowance_date"></span></p>
+									<p class="mb-2 fs-16">Allowance Description:<span id="delete_allowance_description"></span></p>
+									<p class="mb-2 fs-16">Amount:<span id="delete_allowance_amount"></span></p>
 								</div>
 							</div>
 									</div>

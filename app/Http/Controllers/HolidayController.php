@@ -23,7 +23,9 @@ class holidayController extends Controller
 			$data = User::where('user_id', '=', Session::get('loginID'))->first();
 			$client_data = HolidayModel::all();		
 			
-			return view("payroll.holiday", compact('data','title'));
+			$active_link = 'holiday';
+		
+			return view("payroll.holiday", compact('data','title', 'active_link'));
 		}
 		
 	}   

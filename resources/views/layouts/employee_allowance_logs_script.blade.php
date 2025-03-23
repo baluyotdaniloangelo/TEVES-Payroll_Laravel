@@ -7,10 +7,7 @@
 	/*Load Branch*/
 	LoadBranch();
 	function LoadBranch() {		
-	
-		// $("#employee_list_logs span").remove();
-		// $('<span style="display: none;"></span>').appendTo('#employee_list_logs');
-		
+			
 		$("#branch_list_logs option").remove();
 		$('<option style="display: none;"></option>').appendTo('#branch_list_logs');
 		
@@ -52,7 +49,6 @@
 	function LoadEmployee() {		
 	
 	/*Clear Employee Value*/
-	//document.getElementById("employee_idx").value 		= "";
 	
 		var branchID 		= $('#branch_list_logs option[value="' + $('#branch_idx').val() + '"]').attr('data-id');
 		
@@ -73,8 +69,7 @@
 						for(var i=0; i<len; i++){
 
 							var employee_id = response[i].employee_id;	
-							var employee_full_name = response[i].employee_full_name;				
-							// var employee_rate = response[i].employee_rate;
+							var employee_full_name = response[i].employee_full_name;	
 							$('#employee_list_logs option:last').after(""+
 							"<option label='"+employee_full_name+"' data-id='"+employee_id+"' value='"+employee_full_name+"'>" +
 							"");	
@@ -140,8 +135,9 @@
 			let allowance_logs_id 			= document.getElementById("submit_allowance_logs_details").value;
 			let branch_idx 					= $('#branch_list_logs option[value="' + $('#branch_idx').val() + '"]').attr('data-id');
 			let employee_idx 				= $('#employee_list_logs option[value="' + $('#employee_idx').val() + '"]').attr('data-id');
-			let allowance_idx 				= $('#allowance_list_logs option[value="' + $('#allowance_idx').val() + '"]').attr('data-id');
 			let allowance_date 				= $("input[name=allowance_date]").val();
+			let allowance_description				= $("input[name=allowance_description]").val();
+			let allowance_type 				= $("#allowance_type").val();	  
 			let allowance_amount			= $("input[name=allowance_amount]").val();
 				  
 			  $.ajax({
@@ -151,8 +147,9 @@
 						allowance_logs_id:allowance_logs_id,
 						employee_idx:employee_idx,
 						branch_idx:branch_idx,
-						allowance_idx:allowance_idx,
 						allowance_date:allowance_date,
+						allowance_description:allowance_description,
+						allowance_type:allowance_type,
 						allowance_amount:allowance_amount,
 						_token: "{{ csrf_token() }}"
 				},
@@ -209,7 +206,7 @@
 					}	
 
 					
-					let allowance_name = $("input[name=allowance_idx]").val();					
+					/*let allowance_name = $("input[name=allowance_idx]").val();					
 					if(error.responseJSON.errors.allowance_idx=='validation.required'){
 							
 							if(allowance_name==''){
@@ -222,7 +219,7 @@
 							document.getElementById("allowance_idx").value = "";
 							document.getElementById('allowance_idxError').className = "invalid-feedback";
 					
-					}				
+					}*/				
 				
 				if(error.responseJSON.errors.allowance_date=="validation.required"){
 							  
@@ -271,12 +268,13 @@
 					document.getElementById("submit_allowance_logs_details").value = employeeallowancelogsID;
 
 					/*Set Details*/
-					document.getElementById("branch_idx").value 		= response[0].branch_code+" - "+response[0].branch_name;
+					document.getElementById("branch_idx").value 			= response[0].branch_code+" - "+response[0].branch_name;
 					LoadEmployee();
-					document.getElementById("employee_idx").value 		= response[0].employee_last_name+", "+response[0].employee_first_name+" "+response[0].employee_middle_name+" "+response[0].employee_extension_name;
-					LoadAllowanceType();
-					document.getElementById("allowance_idx").value 		= response[0].allowance_description;
-					document.getElementById("allowance_amount").value 	= response[0].allowance_amount;	
+					document.getElementById("employee_idx").value 			= response[0].employee_last_name+", "+response[0].employee_first_name+" "+response[0].employee_middle_name+" "+response[0].employee_extension_name;
+					//LoadAllowanceType();
+					document.getElementById("allowance_type").value 		= response[0].allowance_type;
+					document.getElementById("allowance_description").value 	= response[0].allowance_description;
+					document.getElementById("allowance_amount").value 		= response[0].allowance_amount;	
 					
 					$('#modal_title_action_employee_logs').html("Edit Employee's Allowance");
 					$('#employee_allowance_logs_details_modal').modal('toggle');					
@@ -363,7 +361,6 @@
 				}
 			   });
 				
-		
 	  });
   
   	function ResetEmployeeAllowanceLogsForm(){

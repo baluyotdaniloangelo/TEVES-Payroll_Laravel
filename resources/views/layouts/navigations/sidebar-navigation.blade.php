@@ -63,39 +63,42 @@
 						<ul class="sidebar-vertical">
 							
 							
-							<li class="menu-title"> 
+							<!--<li class="menu-title"> 
 								<span>Employees</span>
-							</li>
+							</li>-->
 							<li class="submenu">
-								<a href="#" class="<?php if(@$active_link=='employee' || @$active_link=='employee_attendance_logs'){ echo "noti-dot"; }?> "><i class="la la-user"></i> <span> Employees</span> <span class="menu-arrow"></span></a>
+								<a href="#" class="<?php if(@$active_link=='employee_attendance_logs' ||
+								@$active_link=='employee_allowance_logs' ||
+								@$active_link=='employee_deduction_logs'){ echo "noti-dot"; }?> "><i class="la la-user"></i> <span> Payroll Items</span> <span class="menu-arrow"></span></a>
 								<ul>
-									<li><a class="<?php if(@$active_link=='employee'){ echo "active"; }?>" href="{{ route('employee') }}">Employees List</a></li>
 									<li><a class="<?php if(@$active_link=='employee_attendance_logs'){ echo "active"; }?>" href="{{ route('employee_attendance_logs') }}">Attendance Logs</a></li>
 									<li><a class="<?php if(@$active_link=='employee_deduction_logs'){ echo "active"; }?>" href="{{ route('employee_allowance_logs') }}">Allowance Logs</a></li>
 									<li><a class="<?php if(@$active_link=='employee_deduction_logs'){ echo "active"; }?>" href="{{ route('employee_deduction_logs') }}">Deduction Logs</a></li>
 									
 								</ul>
 							</li>
-							<li class="menu-title"> 
+							<!--<li class="menu-title"> 
 								<span>Maintenance</span>
-							</li>
+							</li>-->
 							<li class="submenu">
-								<a href="#" class=""><i class="la la-user"></i> <span> Maintenance</span> <span class="menu-arrow"></span></a>
+								<a href="#" class="<?php if(@$active_link=='employee'||@$active_link=='branch'||@$active_link=='holiday'||@$active_link=='deduction_type'){ echo "noti-dot"; }?> "><i class="la la-user"></i> <span> Maintenance</span> <span class="menu-arrow"></span></a>
 								<ul>
-									
-									<li><a href="{{ route('branch') }}">Branch</a></li>
-									<li><a href="{{ route('holiday') }}">Holidays</a></li>
-									<li><a href="{{ route('deduction_type') }}">Deduction Type</a></li>
+								
+									<li><a class="<?php if(@$active_link=='employee'){ echo "active"; }?>" href="{{ route('employee') }}">Employees List</a></li>
+									<li><a class="<?php if(@$active_link=='branch'){ echo "active"; }?>" href="{{ route('branch') }}">Branch</a></li>
+									<li><a class="<?php if(@$active_link=='holiday'){ echo "active"; }?>" href="{{ route('holiday') }}">Holidays</a></li>
+									<li><a class="<?php if(@$active_link=='deduction_type'){ echo "active"; }?>" href="{{ route('deduction_type') }}">Deduction Type</a></li>
 									
 								</ul>
 							</li>
-							<li class="menu-title"> 
+							<!--<li class="menu-title"> 
 								<span>HR</span>
-							</li>
+							</li>-->
 							
 							<li class="submenu">
 								<a href="#"><i class="la la-money"></i> <span> Payroll </span> <span class="menu-arrow"></span></a>
 								<ul>
+									<li><a href="salary.html"> Create Payroll </a></li>
 									<li><a href="salary.html"> Employee Salary </a></li>
 									<li><a href="salary-view.html"> Payslip </a></li>
 									<!--<li><a href="payroll-items.html"> Payroll Items </a></li>-->
