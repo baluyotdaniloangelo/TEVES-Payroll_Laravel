@@ -1,0 +1,202 @@
+table import for Teves Payroll
+
+CREATE TABLE `teves_payroll_user_table` (
+	`user_id` INT(11) NOT NULL AUTO_INCREMENT,
+	`user_name` TEXT NOT NULL COLLATE 'latin1_swedish_ci',
+	`user_real_name` TEXT NOT NULL COLLATE 'latin1_swedish_ci',
+	`user_job_title` TEXT NOT NULL COLLATE 'latin1_swedish_ci',
+	`user_password` TEXT NOT NULL COLLATE 'latin1_swedish_ci',
+	`user_type` VARCHAR(100) NOT NULL COLLATE 'latin1_swedish_ci',
+	`user_email_address` VARCHAR(100) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`user_branch_access_type` VARCHAR(100) NOT NULL COMMENT 'All or Selected' COLLATE 'latin1_swedish_ci',
+	`created_at` TEXT NOT NULL COLLATE 'latin1_swedish_ci',
+	`created_by_user_id` INT(11) NULL DEFAULT NULL,
+	`updated_at` TEXT NOT NULL COLLATE 'latin1_swedish_ci',
+	`updated_by_user_id` INT(11) NULL DEFAULT NULL,
+	PRIMARY KEY (`user_id`) USING BTREE
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+ROW_FORMAT=DYNAMIC
+;
+
+
+CREATE TABLE `teves_payroll_holiday_table` (
+	`holiday_id` INT(11) NOT NULL AUTO_INCREMENT,
+	`holiday_description` VARCHAR(255) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`holiday_date` DATE NULL DEFAULT NULL,
+	`holiday_type` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Regular, Special Non-Working, ec' COLLATE 'latin1_swedish_ci',
+	`holiday_recursive` INT(11) NULL DEFAULT NULL,
+	`created_at` DATETIME NULL DEFAULT NULL,
+	`created_by_user_idx` INT(11) NULL DEFAULT NULL,
+	`updated_at` DATETIME NULL DEFAULT NULL,
+	`updated_by_user_idx` INT(11) NULL DEFAULT NULL,
+	PRIMARY KEY (`holiday_id`) USING BTREE
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+ROW_FORMAT=DYNAMIC
+;
+
+CREATE TABLE `teves_payroll_employee_table` (
+	`employee_id` INT(11) NOT NULL AUTO_INCREMENT,
+	`employee_number` VARCHAR(100) NOT NULL COLLATE 'latin1_swedish_ci',
+	`employee_last_name` VARCHAR(255) NOT NULL COLLATE 'utf8mb3_general_ci',
+	`employee_first_name` VARCHAR(255) NOT NULL COLLATE 'latin1_swedish_ci',
+	`employee_middle_name` VARCHAR(255) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`employee_extension_name` VARCHAR(255) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`employee_full_name` VARCHAR(255) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`employee_birthday` VARCHAR(50) NOT NULL COLLATE 'latin1_swedish_ci',
+	`employee_position` VARCHAR(50) NOT NULL DEFAULT '' COLLATE 'latin1_swedish_ci',
+	`employee_picture` LONGTEXT NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`employee_phone` VARCHAR(50) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`employee_email` VARCHAR(255) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`branch_idx` INT(11) NOT NULL DEFAULT '0',
+	`department_idx` INT(11) NOT NULL DEFAULT '0',
+	`employee_status` VARCHAR(100) NOT NULL DEFAULT 'Active' COLLATE 'latin1_swedish_ci',
+	`employee_rate` DOUBLE NOT NULL DEFAULT '0',
+	`sss_contribution` DOUBLE NOT NULL DEFAULT '0',
+	`philhealth_contribution` DOUBLE NOT NULL DEFAULT '0',
+	`pagibig_contribution` DOUBLE NOT NULL DEFAULT '0',
+	`time_in` TIME NOT NULL,
+	`break_time_in` TIME NOT NULL,
+	`break_time_out` TIME NOT NULL,
+	`time_out` TIME NOT NULL,
+	`total_shift_hours` DOUBLE NOT NULL DEFAULT '0',
+	`total_breaktime_hours` DOUBLE NOT NULL DEFAULT '0',
+	`restday_monday` INT(11) NOT NULL DEFAULT '0',
+	`restday_tuesday` INT(11) NOT NULL DEFAULT '0',
+	`restday_wednesday` INT(11) NOT NULL DEFAULT '0',
+	`restday_thursday` INT(11) NOT NULL DEFAULT '0',
+	`restday_friday` INT(11) NOT NULL DEFAULT '0',
+	`restday_saturday` INT(11) NOT NULL DEFAULT '0',
+	`restday_sunday` INT(11) NOT NULL DEFAULT '0',
+	`created_at` TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+	`created_by_user_idx` INT(11) NOT NULL DEFAULT '0',
+	`updated_at` TIMESTAMP NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+	`updated_by_user_idx` INT(11) NULL DEFAULT NULL,
+	PRIMARY KEY (`employee_id`) USING BTREE
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `teves_payroll_employee_logs` (
+	`employee_logs_id` INT(11) NOT NULL AUTO_INCREMENT,
+	`employee_idx` INT(11) NULL DEFAULT NULL,
+	`branch_idx` INT(11) NULL DEFAULT NULL COMMENT 'Employee\'s Branch Assignment',
+	`department_idx` INT(11) NULL DEFAULT NULL COMMENT 'Employee\'s Department Assignment',
+	`current_rate` DOUBLE NULL DEFAULT NULL,
+	`attendance_date` DATE NULL DEFAULT NULL,
+	`override_shift` VARCHAR(5) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`log_in` DATETIME NULL DEFAULT NULL,
+	`breaktime_start` DATETIME NULL DEFAULT NULL,
+	`breaktime_end` DATETIME NULL DEFAULT NULL,
+	`log_out` DATETIME NULL DEFAULT NULL,
+	`total_hours` DOUBLE NULL DEFAULT '0',
+	`total_regular_hours` DOUBLE NULL DEFAULT '0',
+	`total_breaktime_hours` DOUBLE NULL DEFAULT '0',
+	`total_tardiness_hours` DOUBLE NULL DEFAULT '0',
+	`total_undertime_hours` DOUBLE NULL DEFAULT '0',
+	`total_night_differential_hours` DOUBLE NULL DEFAULT '0' COMMENT 'Covered Hours',
+	`holiday_idx` INT(11) NULL DEFAULT NULL,
+	`holiday_type` INT(11) NULL DEFAULT NULL,
+	`log_type` VARCHAR(50) NULL DEFAULT NULL COMMENT 'Regular Log(1st 8 hrs), Regular Overtime, Restdat Overtime' COLLATE 'latin1_swedish_ci',
+	`basic_pay` DOUBLE NULL DEFAULT '0',
+	`overtime_pay` DOUBLE NULL DEFAULT '0',
+	`day_off_pay` DOUBLE NULL DEFAULT '0',
+	`night_differential_pay` DOUBLE NULL DEFAULT '0',
+	`regular_holiday_pay` DOUBLE NULL DEFAULT '0',
+	`special_holiday_pay` DOUBLE NULL DEFAULT '0',
+	`created_at` DATETIME NULL DEFAULT NULL,
+	`created_by_user_idx` INT(11) NULL DEFAULT NULL,
+	`updated_at` DATETIME NULL DEFAULT NULL,
+	`updated_by_user_idx` INT(11) NULL DEFAULT NULL,
+	PRIMARY KEY (`employee_logs_id`) USING BTREE
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+ROW_FORMAT=DYNAMIC
+;
+
+
+CREATE TABLE `teves_payroll_employee_deduction_logs` (
+	`deduction_logs_id` INT(11) NOT NULL AUTO_INCREMENT,
+	`deduction_idx` INT(11) NULL DEFAULT NULL,
+	`employee_idx` INT(11) NULL DEFAULT NULL,
+	`branch_idx` INT(11) NULL DEFAULT NULL COMMENT 'Employee\'s Branch Assignment',
+	`department_idx` INT(11) NULL DEFAULT NULL COMMENT 'Employee\'s Department Assignment',
+	`deduction_date` DATE NULL DEFAULT NULL,
+	`deduction_amount` DOUBLE NULL DEFAULT NULL,
+	`created_at` DATETIME NULL DEFAULT NULL,
+	`created_by_user_idx` INT(11) NULL DEFAULT NULL,
+	`updated_at` DATETIME NULL DEFAULT NULL,
+	`updated_by_user_idx` INT(11) NULL DEFAULT NULL,
+	PRIMARY KEY (`deduction_logs_id`) USING BTREE
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+ROW_FORMAT=DYNAMIC
+;
+
+CREATE TABLE `teves_payroll_department_table` (
+	`department_id` INT(11) NOT NULL AUTO_INCREMENT,
+	`department_name` VARCHAR(20) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`branch_idx` VARCHAR(20) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`created_at` DATETIME NULL DEFAULT NULL,
+	`created_by_user_idx` INT(11) NULL DEFAULT NULL,
+	`updated_at` DATETIME NULL DEFAULT NULL,
+	`updated_by_user_idx` INT(11) NULL DEFAULT NULL,
+	PRIMARY KEY (`department_id`) USING BTREE
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+ROW_FORMAT=DYNAMIC
+;
+
+CREATE TABLE `teves_payroll_deduction_type_table` (
+	`deduction_id` INT(11) NOT NULL AUTO_INCREMENT,
+	`deduction_description` VARCHAR(255) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`created_at` DATETIME NULL DEFAULT NULL,
+	`created_by_user_idx` INT(11) NULL DEFAULT NULL,
+	`updated_at` DATETIME NULL DEFAULT NULL,
+	`updated_by_user_idx` INT(11) NULL DEFAULT NULL,
+	PRIMARY KEY (`deduction_id`) USING BTREE
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+ROW_FORMAT=DYNAMIC
+;
+
+
+
+/*Changes*/
+
+ALTER TABLE `teves_payroll_employee_table`
+	ADD COLUMN `employement_type` VARCHAR(100) NOT NULL DEFAULT 'Active' AFTER `employee_status`;
+
+ALTER TABLE `teves_payroll_employee_table`
+	CHANGE COLUMN `employement_type` `employment_type` VARCHAR(100) NOT NULL DEFAULT 'Active' COLLATE 'latin1_swedish_ci' AFTER `employee_status`;
+
+
+CREATE TABLE `teves_payroll_employee_allowance_logs` (
+	`allowance_logs_id` INT(11) NOT NULL AUTO_INCREMENT,
+	`allowance_idx` INT(11) NULL DEFAULT NULL,
+	`employee_idx` INT(11) NULL DEFAULT NULL,
+	`branch_idx` INT(11) NULL DEFAULT NULL COMMENT 'Employee\'s Branch Assignment',
+	`department_idx` INT(11) NULL DEFAULT NULL COMMENT 'Employee\'s Department Assignment',
+	`allowance_date` DATE NULL DEFAULT NULL,
+	`allowance_description` VARCHAR(255) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`allowance_type` VARCHAR(255) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`allowance_amount` DOUBLE NULL DEFAULT NULL,
+	`created_at` DATETIME NULL DEFAULT NULL,
+	`created_by_user_idx` INT(11) NULL DEFAULT NULL,
+	`updated_at` DATETIME NULL DEFAULT NULL,
+	`updated_by_user_idx` INT(11) NULL DEFAULT NULL,
+	PRIMARY KEY (`allowance_logs_id`) USING BTREE
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+ROW_FORMAT=DYNAMIC
+AUTO_INCREMENT=1
+;

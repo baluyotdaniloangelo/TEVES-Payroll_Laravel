@@ -113,16 +113,17 @@ class DriversLogsController extends Controller
 			
 			*/
 			
-			$drivers_logs_id 				= $request->drivers_logs_id;
+			$drivers_logs_id 		= $request->drivers_logs_id;
 			
-			$branch_idx						= $request->branch_idx;
-			$employee_idx 					= $request->employee_idx;
+			$branch_idx				= $request->branch_idx;
+			$employee_idx 			= $request->employee_idx;
 			
-			$travel_date 					= $request->travel_date;
-			$plate_number 					= $request->plate_number;
-			$loading_terminal 				= $request->loading_terminal;
-			$destination 					= $request->destination;
-			$volume 						= $request->volume;
+			$travel_date 			= $request->travel_date;
+			$plate_number 			= $request->plate_number;
+			$loading_terminal 		= $request->loading_terminal;
+			$destination 			= $request->destination;
+			$volume 				= $request->volume;
+			$rate_per_liter 		= $request->rate_per_liter;
 			
 			
 			if($branch_idx!=0 && $employee_idx!=0){
@@ -136,7 +137,6 @@ class DriversLogsController extends Controller
 			
 			$branch_idx 						= $employee_data[0]->branch_idx;
 			$department_idx 					= $employee_data[0]->department_idx;
-			
 			
 			$employee_current_rate = $employee_data[0]->employee_rate;
 			
