@@ -12,9 +12,12 @@ use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\EmployeeLogsController;
 use App\Http\Controllers\DeductionTypeController;
 use App\Http\Controllers\EmployeeAllowanceLogsController;
-
 use App\Http\Controllers\EmployeeDeductionLogsController;
+use App\Http\Controllers\EmployeeLeaveLogsController;
+use App\Http\Controllers\DriversLogsController;
+
 use App\Http\Controllers\PayslipController;
+
 // use App\Http\Controllers\CAMRSampleExcel;
 
 use App\Http\Controllers\EmailController;
@@ -84,7 +87,6 @@ Route::post('/holiday_info', [HolidayController::class, 'holiday_info'])->name('
 /*Confirm Delete holiday*/
 Route::post('/delete_holiday_confirmed', [HolidayController::class, 'delete_holiday_confirmed'])->name('DeleteHoliday')->middleware('isLoggedIn');
 
-
 /*01/03/2025*/
 Route::get('/employee-attendance-logs', [EmployeeLogsController::class,'employee_attendance_logs'])->name('employee_attendance_logs')->middleware('isLoggedIn');
 Route::post('/branch-item-select', [BranchController::class,'getBranchList_for_item_selection'])->name('getBranchList_for_selection')->middleware('isLoggedIn');
@@ -101,6 +103,17 @@ Route::get('employee-restday-ot-logs/list', [EmployeeLogsController::class, 'get
 Route::post('/employee_log_info', [EmployeeLogsController::class, 'employee_log_info'])->name('EmployeeLogsInformation')->middleware('isLoggedIn');
 /*Confirm Delete Employee Log*/
 Route::post('/delete_employee_log_confirmed', [EmployeeLogsController::class, 'delete_employee_log_confirmed'])->name('DeleteEmployeeLog')->middleware('isLoggedIn');
+
+/*Leave - March 25, 2025*/
+Route::get('employee-leave-logs/list', [EmployeeLeaveLogsController::class, 'getEmployeeLeaveLogsList'])->name('getEmployeeLeaveLogsList')->middleware('isLoggedIn');
+Route::post('/submit_employee_leave_logs_information', [EmployeeLeaveLogsController::class,'submit_employee_leave_logs_information'])->name('submit_employee_leave_logs_information')->middleware('isLoggedIn');
+Route::post('/employee_leave_logs_info', [EmployeeLeaveLogsController::class, 'employee_leave_logs_info'])->name('EmployeeLeaveLogsInformation')->middleware('isLoggedIn');
+Route::post('/delete_employee_leave_log_confirmed', [EmployeeLeaveLogsController::class, 'delete_employee_leave_log_confirmed'])->name('DeleteEmployeeLeaveLog')->middleware('isLoggedIn');
+
+/*Drivers Logs*/
+Route::get('drivers-logs/list', [DriversLogsController::class, 'getDriversLogsList'])->name('getDriversLogsList')->middleware('isLoggedIn');
+Route::post('/submit_drivers_logs_information', [DriversLogsController::class,'submit_drivers_logs_information'])->name('submit_drivers_logs_information')->middleware('isLoggedIn');
+
 
 /*Deduction Type*/
 Route::get('/deduction_type', [DeductionTypeController::class,'DeductionType'])->name('deduction_type')->middleware('isLoggedIn');

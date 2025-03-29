@@ -98,7 +98,7 @@
 							<li class="submenu">
 								<a href="#"><i class="la la-money"></i> <span> Payroll </span> <span class="menu-arrow"></span></a>
 								<ul>
-									<li><a href="salary.html"> Create Payroll </a></li>
+									<li><a href="{{ route('deduction_type') }}"> Create Payroll </a></li>
 									<li><a href="salary.html"> Employee Salary </a></li>
 									<li><a href="salary-view.html"> Payslip </a></li>
 									<!--<li><a href="payroll-items.html"> Payroll Items </a></li>-->

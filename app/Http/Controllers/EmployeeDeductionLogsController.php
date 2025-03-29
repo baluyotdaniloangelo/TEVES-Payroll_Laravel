@@ -16,22 +16,6 @@ use Carbon\CarbonPeriod;
 
 class EmployeeDeductionLogsController extends Controller
 {
-	
-	/*Load Employee Interface*/
-	public function employee_deduction_logs(){
-		
-		if(Session::has('loginID')){
-			
-			$title = 'Employee Deductions';
-			$data = array();
-			
-			$data = User::where('user_id', '=', Session::get('loginID'))->first();
-			
-			$active_link = 'employee_deduction_logs';
-			
-			return view("payroll.employee_deduction_logs", compact('data', 'title', 'active_link'));
-		}
-	} 
 
 	/*Fetch Employee Regular Log List using Datatable*/
 	public function getEmployeeDeductionLogsList(Request $request)

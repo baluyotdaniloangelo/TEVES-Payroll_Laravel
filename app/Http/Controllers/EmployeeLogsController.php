@@ -30,7 +30,7 @@ class EmployeeLogsController extends Controller
 			
 			$active_link = 'employee_attendance_logs';
 			
-			return view("payroll.employee_attendance_logs", compact('data', 'title', 'active_link'));
+			return view("payroll.employee_attendance_logs_main", compact('data', 'title', 'active_link'));
 		}
 	} 
 
@@ -211,15 +211,8 @@ class EmployeeLogsController extends Controller
 			$breaktime_end 					= $request->breaktime_end;
 			$log_out 						= $request->log_out;
 			$override_default_shift 		= $request->override_default_shift;
-			$regular_overtime_status		= $request->regular_overtime_status;
+			$overtime_status		= $request->overtime_status;
 			
-			/*
-			->where(function ($q) use($client_idx) {
-						if ($client_idx) {
-						   $q->where('teves_billing_table.client_idx', $client_idx);
-						}
-						})
-			*/
 			
 			if($branch_idx!=0 && $employee_idx!=0){
 			/*Query Employee Information*/
@@ -301,7 +294,7 @@ class EmployeeLogsController extends Controller
 					
 				}else{
 					
-					if($regular_overtime_status=='Yes'){
+					if($overtime_status=='Yes'){
 						
 						$log_type = 'RegularOT';
 						
@@ -315,7 +308,7 @@ class EmployeeLogsController extends Controller
 				}
 				/*jj*/
 			
-			if($regular_overtime_status=='Yes'){
+			if($overtime_status=='Yes'){
 				
 				$request->validate([
 				  'branch_idx'				=> ['required'],
@@ -539,7 +532,7 @@ class EmployeeLogsController extends Controller
 			$night_differential_pay = $total_covered_night_diff_hrs * $employee_current_rate * (10/100);
 			/*End to Compute night shift hrs*/
 			
-			if($regular_overtime_status=='No'){
+			if($overtime_status=='No'){
 				
 			$total_regular_hours = $total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + $excess_hours_after_shift);
 			$total_tardiness_hours = $total_tardiness;
@@ -685,7 +678,7 @@ class EmployeeLogsController extends Controller
 			}
 			
 			if($employee_logs_id==0){
-			
+
 				$EmployeeRegularLogs = new EmployeeLogsModel();
 			
 				$EmployeeRegularLogs->employee_idx 						= $employee_idx;

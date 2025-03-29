@@ -25,7 +25,7 @@ class DeductionTypeController extends Controller
 			
 			$active_link = 'deduction_type';
 			
-			return view("payroll.deduction_type", compact('data','title', 'deduction_type'));
+			return view("payroll.deduction_type", compact('data','title', 'active_link'));
 		}
 		
 	}   

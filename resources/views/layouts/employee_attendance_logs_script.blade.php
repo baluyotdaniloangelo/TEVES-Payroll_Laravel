@@ -7,16 +7,16 @@
 	/*Load Branch*/
 	LoadBranch();
 	function LoadBranch() {		
-	
-		// $("#employee_list_logs span").remove();
-		// $('<span style="display: none;"></span>').appendTo('#employee_list_logs');
-		
+
 		$("#branch_list_logs option").remove();
 		$('<option style="display: none;"></option>').appendTo('#branch_list_logs');
 		
-		/*Clear Employee Selection List*/
-		//$("#employee_list_logs option").remove();
+		$("#leave_branch_list_logs option").remove();
+		$('<option style="display: none;"></option>').appendTo('#leave_branch_list_logs');
 		
+		$("#drivers_branch_list_logs option").remove();
+		$('<option style="display: none;"></option>').appendTo('#drivers_branch_list_logs');
+			
 			  $.ajax({
 				url: "{{ route('getBranchList_for_selection') }}",
 				type:"POST",
@@ -34,6 +34,14 @@
 							$('#branch_list_logs option:last').after(""+
 							"<option label='"+branch_code+" - "+branch_name+"' data-id='"+branch_id+"' value='"+branch_code+" - "+branch_name+"'>" +
 							"");	
+							
+							$('#leave_branch_list_logs option:last').after(""+
+							"<option label='"+branch_code+" - "+branch_name+"' data-id='"+branch_id+"' value='"+branch_code+" - "+branch_name+"'>" +
+							"");	
+							
+							$('#drivers_branch_list_logs option:last').after(""+
+							"<option label='"+branch_code+" - "+branch_name+"' data-id='"+branch_id+"' value='"+branch_code+" - "+branch_name+"'>" +
+							"");	
 					}			
 				  }else{
 							/*No Result Found or Error*/	
@@ -49,7 +57,6 @@
 	function LoadEmployee() {		
 	
 	/*Clear Employee Value*/
-	//document.getElementById("employee_idx").value 		= "";
 	
 		var branchID 		= $('#branch_list_logs option[value="' + $('#branch_idx').val() + '"]').attr('data-id');
 		
@@ -86,6 +93,7 @@
 				}
 			   });
 	}	
+	
 
 	
 	/*Load Default Employee Logs*/
@@ -255,8 +263,7 @@
 			
 					/*Reset Warnings*/
 					$('#employee_id_regular_logsError').text('');
-					$('#attendance_dateError').text('');		
-					$('#attendance_dateeError').text('');	
+					$('#attendance_dateError').text('');	
 					$('#breaktime_endError').text('');		
 
 			document.getElementById('EmployeeAttendanceLogsForm').className = "g-2 needs-validation was-validated";
@@ -568,8 +575,8 @@
 			$("#employee_list_logs span").remove();
 			
 	}	
-  
-  
+
+	
 /*
 	document.getElementById("update_attendance_date").addEventListener('change', doThing_site_management);
 	document.getElementById("update_attendance_date").addEventListener('change', doThing_site_management);
