@@ -50,6 +50,11 @@ else if (Request::is('employee-deduction-logs')){
 @include('layouts.employee_allowance_logs_script')
 <?php
 }
+else if (Request::is('create-payroll')){
+?>
+@include('layouts.create_payroll_script')
+<?php
+}
 ?>
 	</body>
 </html>

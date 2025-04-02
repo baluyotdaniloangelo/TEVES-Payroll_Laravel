@@ -16,6 +16,7 @@ use App\Http\Controllers\EmployeeDeductionLogsController;
 use App\Http\Controllers\EmployeeLeaveLogsController;
 use App\Http\Controllers\DriversLogsController;
 
+use App\Http\Controllers\CreatePayrollController;
 use App\Http\Controllers\PayslipController;
 
 // use App\Http\Controllers\CAMRSampleExcel;
@@ -113,6 +114,8 @@ Route::post('/delete_employee_leave_log_confirmed', [EmployeeLeaveLogsController
 /*Drivers Logs*/
 Route::get('drivers-logs/list', [DriversLogsController::class, 'getDriversLogsList'])->name('getDriversLogsList')->middleware('isLoggedIn');
 Route::post('/submit_drivers_logs_information', [DriversLogsController::class,'submit_drivers_logs_information'])->name('submit_drivers_logs_information')->middleware('isLoggedIn');
+Route::post('/drivers_logs_info', [DriversLogsController::class, 'drivers_logs_info'])->name('DriversLogsInformation')->middleware('isLoggedIn');
+Route::post('/delete_driver_log_confirmed', [DriversLogsController::class, 'delete_driver_log_confirmed'])->name('DeleteDriversLog')->middleware('isLoggedIn');
 
 
 /*Deduction Type*/
@@ -162,6 +165,11 @@ Route::post('/update_user_post', [UserController::class,'update_user_post'])->na
 Route::post('/delete_user_confirmed', [UserController::class, 'delete_user_confirmed'])->name('delete_user_confirmed')->middleware('isLoggedIn');
 /*Update User Account*/
 Route::post('/user_account_post', [UserController::class,'user_account_post'])->name('user_account_post')->middleware('isLoggedIn');
+
+
+/*Create Payroll - April 1, 2025*/
+Route::get('/create-payroll', [CreatePayrollController::class,'create_payroll'])->name('CreatePayroll')->middleware('isLoggedIn');
+Route::post('/generate_review_payroll', [CreatePayrollController::class,'generate_review_payroll'])->name('ReviewPayroll')->middleware('isLoggedIn');
 
 
 /*Payslip*/

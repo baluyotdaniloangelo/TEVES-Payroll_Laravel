@@ -107,7 +107,7 @@
 										<div class="col-sm-6">
 											<div class="input-block mb-3">
 												<label class="col-form-label">Volume <span class="text-danger">*</span></label>
-												<input class="form-control" type="number" id="destination" name="destination" required>
+												<input class="form-control" type="number" id="volume" name="volume" required>
 												<span class="valid-feedback" id="destinationError" title="Required"></span>
 											</div>
 										</div>
@@ -115,7 +115,7 @@
 										<div class="col-sm-6">
 											<div class="input-block mb-3">
 												<label class="col-form-label">Rate per Liter <span class="text-danger">*</span></label>
-												<input class="form-control" type="number" id="rate_per_liter" name="rate_per_liter" required>
+												<input class="form-control" type="number" id="rate_per_liter" name="rate_per_liter" required step="0.1">
 												<span class="valid-feedback" id="rate_per_literError" title="Required"></span>
 											</div>
 										</div>

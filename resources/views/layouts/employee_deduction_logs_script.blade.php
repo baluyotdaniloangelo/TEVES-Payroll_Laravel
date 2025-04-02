@@ -7,16 +7,10 @@
 	/*Load Branch*/
 	LoadBranch();
 	function LoadBranch() {		
-	
-		// $("#employee_list_logs span").remove();
-		// $('<span style="display: none;"></span>').appendTo('#employee_list_logs');
 		
 		$("#branch_list_logs option").remove();
 		$('<option style="display: none;"></option>').appendTo('#branch_list_logs');
-		
-		/*Clear Employee Selection List*/
-		//$("#employee_list_logs option").remove();
-		
+	
 			  $.ajax({
 				url: "{{ route('getBranchList_for_selection') }}",
 				type:"POST",

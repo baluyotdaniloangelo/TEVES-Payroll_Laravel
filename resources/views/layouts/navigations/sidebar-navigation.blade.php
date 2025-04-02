@@ -98,9 +98,7 @@
 							<li class="submenu">
 								<a href="#"><i class="la la-money"></i> <span> Payroll </span> <span class="menu-arrow"></span></a>
 								<ul>
-									<li><a href="{{ route('deduction_type') }}"> Create Payroll </a></li>
-									<li><a href="salary.html"> Employee Salary </a></li>
-									<li><a href="salary-view.html"> Payslip </a></li>
+									<li><a href="{{ route('CreatePayroll') }}"> Create Payroll </a></li>
 									<!--<li><a href="payroll-items.html"> Payroll Items </a></li>-->
 								</ul>
 							</li>
@@ -119,11 +117,9 @@
 							<li class="submenu">
 								<a href="#"><i class="la la-pie-chart"></i> <span> Reports </span> <span class="menu-arrow"></span></a>
 								<ul>
-									<!--<li><a href="employee-reports.html"> Employee Report </a></li>-->
-									<li><a href="payslip-reports.html"> Payslip Report </a></li>
+									<li><a href="salary-view.html"> Payslip </a></li>
+									<li><a href="payslip-reports.html"> Salary Report </a></li>
 									<li><a href="attendance-reports.html"> Attendance Report </a></li>
-									<!--<li><a href="leave-reports.html"> Leave Report </a></li>
-									<li><a href="daily-reports.html"> Daily Report </a></li>-->
 								</ul>
 							</li>
 						

@@ -17,7 +17,6 @@ use Carbon\CarbonPeriod;
 class EmployeeAllowanceLogsController extends Controller
 {
 	
-	/*Load Employee Interface*/
 	public function employee_allowance_logs(){
 		
 		if(Session::has('loginID')){

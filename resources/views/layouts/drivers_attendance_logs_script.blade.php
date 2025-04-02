@@ -15,15 +15,15 @@
 							{data: 'travel_date', className: "text-left"},
 							{data: 'employee_number', className: "text-left"},
 							{data: 'employee_full_name', className: "text-left"},
+							{data: 'volume', render: $.fn.dataTable.render.number( ',', '.', 2, '' )},
+							{data: 'rate_per_liter',  render: $.fn.dataTable.render.number( ',', '.', 2, '' )},
+							{data: 'gross_amount',  render: $.fn.dataTable.render.number( ',', '.', 2, '' )},
+							{data: 'trip_pay',  render: $.fn.dataTable.render.number( ',', '.', 2, '' )},
+							{data: 'action', name: 'action', orderable: false, searchable: false, className: "text-center"},
 							{data: 'plate_number', className: "text-left"},
 							{data: 'loading_terminal', className: "text-left"},
-							{data: 'destination', className: "text-left"},
-							{data: 'volume', className: "text-left"},
-							{data: 'rate_per_liter', className: "text-left"},
-							{data: 'gross_amount', className: "text-left"},
-							{data: 'trip_pay', className: "text-left"},
-							//{data: 'leave_amount', className: "text-left"},
-							{data: 'action', name: 'action', orderable: false, searchable: false, className: "text-center"},
+							{data: 'destination', className: "text-left"}
+							
 					]
 				});
 		autoAdjustColumns(EmployeeList);
@@ -95,15 +95,14 @@
 			
 				let drivers_logs_id 			= document.getElementById("submit_drivers_logs_details").value;
 				
-				let branch_idx 						= $('#drivers_branch_list_logs option[value="' + $('#drivers_branch_idx').val() + '"]').attr('data-id');
-				let employee_idx 					= $('#drivers_list_logs option[value="' + $('#drivers_idx').val() + '"]').attr('data-id');
-				
-				let travel_date 					= $("input[name=travel_date]").val();
-				let plate_number					= $("input[name=plate_number]").val();
-				let loading_terminal				= $("input[name=loading_terminal]").val();
-				let destination						= $("input[name=destination]").val();
-				let volume							= $("input[name=volume]").val();
-				let rate_per_liter					= $("input[name=rate_per_liter]").val();
+				let branch_idx 					= $('#drivers_branch_list_logs option[value="' + $('#drivers_branch_idx').val() + '"]').attr('data-id');
+				let employee_idx 				= $('#drivers_list_logs option[value="' + $('#drivers_idx').val() + '"]').attr('data-id');			
+				let travel_date 				= $("input[name=travel_date]").val();
+				let plate_number				= $("input[name=plate_number]").val();
+				let loading_terminal			= $("input[name=loading_terminal]").val();
+				let destination					= $("input[name=destination]").val();
+				let volume						= $("input[name=volume]").val();
+				let rate_per_liter				= $("input[name=rate_per_liter]").val();
 
 			  $.ajax({
 				url: "/submit_drivers_logs_information",
@@ -219,36 +218,37 @@
 	  });
 
 	<!--Select Employee For Update-->
-	$('body').on('click','#edit_employee_leave_logs',function(){
+	$('body').on('click','#edit_driver_logs',function(){
 			
 			event.preventDefault();
-			let employeeLeavelogsID = $(this).data('id');
+			let DriverlogsID = $(this).data('id');
 			
 			  $.ajax({
-				url: "{{ route('EmployeeLeaveLogsInformation') }}",
+				url: "{{ route('DriversLogsInformation') }}",
 				type:"POST",
 				data:{
-				  employeeLeavelogsID:employeeLeavelogsID,
+				  DriverlogsID:DriverlogsID,
 				  _token: "{{ csrf_token() }}"
 				},
 				success:function(response){
 				  console.log(response);
 				  if(response) {
 					
-					document.getElementById("submit_drivers_logs_details").value = employeeLeavelogsID;
+					document.getElementById("submit_drivers_logs_details").value = DriverlogsID;
 
 					/*Set Details*/
-					document.getElementById("leave_branch_idx").value 		= response[0].branch_code+" - "+response[0].branch_name;
-					leave_LoadEmployee();
-					document.getElementById("drivers_idx").value 		= response[0].employee_last_name+", "+response[0].employee_first_name+" "+response[0].employee_middle_name+" "+response[0].employee_extension_name;
+					document.getElementById("drivers_branch_idx").value 	= response[0].branch_code+" - "+response[0].branch_name;
+					Drivers_LoadList();
+					document.getElementById("drivers_idx").value 			= response[0].employee_last_name+", "+response[0].employee_first_name+" "+response[0].employee_middle_name+" "+response[0].employee_extension_name;		
+					document.getElementById("travel_date").value 			= response[0].travel_date;
+					document.getElementById("plate_number").value 			= response[0].plate_number;	
+					document.getElementById("loading_terminal").value 		= response[0].loading_terminal;
+					document.getElementById("destination").value 			= response[0].destination;
+					document.getElementById("volume").value 				= response[0].volume;
+					document.getElementById("rate_per_liter").value 		= response[0].rate_per_liter;
 					
-					//document.getElementById("deleteEmployeeLogConfirmed").value = employeeLeavelogsID;
-					
-					document.getElementById("travel_date").value 	= response[0].travel_date;
-					document.getElementById("plate_number").value 			= response[0].plate_number;
-					
-					$('#modal_title_action_employee_leave_logs').html('Edit Leave Logs');
-					$('#employee_leave_logs_details_modal').modal('toggle');					
+					$('#modal_title_action_drivers_logs').html('Edit Drivers Logs');
+					$('#drivers_logs_details_modal').modal('toggle');					
 				  
 				  }
 				},
@@ -261,30 +261,28 @@
 	  });
 	  
 	<!--Employee Deletion Confirmation-->
-	$('body').on('click','#delete_employee_leave_logs',function(){
+	$('body').on('click','#delete_driver_logs',function(){
 			
 			event.preventDefault();
-			let employeeLeavelogsID = $(this).data('id');
+			let DriverlogsID = $(this).data('id');
 			
 			  $.ajax({
-				url: "{{ route('EmployeeLeaveLogsInformation') }}",
+				url: "{{ route('DriversLogsInformation') }}",
 				type:"POST",
 				data:{
-				  employeeLeavelogsID:employeeLeavelogsID,
+				  DriverlogsID:DriverlogsID,
 				  _token: "{{ csrf_token() }}"
 				},
 				success:function(response){
 				  console.log(response);
 				  if(response) {
 					  
-					document.getElementById("deleteEmployeeLeaveLogConfirmed").value = employeeLeavelogsID;
+					document.getElementById("deleteDriversLogConfirmed").value = DriverlogsID;
 					
-	
-					$('#delete_employee_leave_logs_date').html(response[0].travel_date);
-					$('#delete_employee_leave_logs_complete_name').html(response[0].employee_last_name+", "+response[0].employee_first_name+" "+response[0].employee_middle_name+" "+response[0].employee_extension_name);
-					$('#delete_employee_leave_logs_reason').html(response[0].plate_number);
-					
-					$('#EmployeeLeaveLogDeleteModal').modal('show');					
+					$('#delete_drivers_logs_complete_name').html(response[0].travel_date);
+					$('#delete_drivers_logs_date').html(response[0].employee_last_name+", "+response[0].employee_first_name+" "+response[0].employee_middle_name+" "+response[0].employee_extension_name);
+						
+					$('#DriversLogDeleteModal').modal('show');					
 				  
 				  }
 				},
@@ -296,17 +294,17 @@
 	  });
 
 	<!--Employee Confirmed For Deletion-->
-	$('body').on('click','#deleteEmployeeLeaveLogConfirmed',function(){
+	$('body').on('click','#deleteDriversLogConfirmed',function(){
 			
 			event.preventDefault();
 			
-			let employeelogID = document.getElementById("deleteEmployeeLeaveLogConfirmed").value;
+			let DriverlogsID = document.getElementById("deleteDriversLogConfirmed").value;
 			
 			  $.ajax({
-				url: "{{ route('DeleteEmployeeLeaveLog') }}",
+				url: "{{ route('DeleteDriversLog') }}",
 				type:"POST",
 				data:{
-				  employeelogID:employeelogID,
+				  DriverlogsID:DriverlogsID,
 				  _token: "{{ csrf_token() }}"
 				},
 				success:function(response){
@@ -318,18 +316,19 @@
 					function to reload the datatable and pass the true or false as a parameter for refresh paging.
 					*/
 					
-					var table = $("#LeaveLogsListDatatable").DataTable();
+					var table = $("#DriversLogsListDatatable").DataTable();
 				    table.ajax.reload(null, false);	
 					
 					$('#modal_success_details').html("Employee Leave Succefully Deleted");
 					$('#EmployeeLeaveLogDeleteModal').modal('hide');
 					$('#success-alert-modal').modal('show');
 					
+					document.getElementById("deleteDriversLogConfirmed").value = 0;
+					
 					}
 				},
 				error: function(error) {
 				 console.log(error);
-					//alert(error);
 				}
 			   });
 				
@@ -341,7 +340,7 @@
 			event.preventDefault();
 			$('#DriversLogsForm')[0].reset();
 			
-			$('#modal_title_action_employee').html('Add Employee');
+			$('#modal_title_action_drivers_logs').html("Add Driver's Logs");
 			
 			document.getElementById('DriversLogsForm').className = "g-3 needs-validation";
 			
@@ -361,6 +360,4 @@
 			$("#drivers_list_logs span").remove();
 			
 	}	
-
-
 </script>

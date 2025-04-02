@@ -186,7 +186,7 @@
 													
 													<div class="row align-items-center mb-3">
 														<div class="col-auto float-end ms-auto">
-															<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#drivers_logs_details_modal"><i class="fa-solid fa-plus"></i> Add Driver's Logs</a>
+															<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#drivers_logs_details_modal" onclick="ResetDriversLogsForm()"><i class="fa-solid fa-plus"></i> Add Driver's Logs</a>
 														</div>
 													</div>
 																										
@@ -198,13 +198,18 @@
 																		<th class="all">Date</th>
 																		<th class="all" title="Employee Number">Employee Number</th>
 																		<th class="all" title="Employee Name">Employee Name</th>
-																		<th class="none">Loading Terminal</th>
-																		<th class="none">Destination</th>
+								
 																		<th class="all" title="Volume">Volume</th>
 																		<th class="all" title="Rate">Rate(P/L)</th>
 																		<th class="all" title="Gross Amount">Gross Amount</th>
 																		<th class="all" title="Trip Pay">Trip Pay</th>
+																		
 																		<th class="all">Action</th>
+																		
+																		<th class="none">Plate Number</th>
+																		<th class="none">Loading Terminal</th>
+																		<th class="none">Destination</th>
+																		
 																	</tr>
 																</thead>				
 																
@@ -232,7 +237,7 @@
 				<!-- Leave Logs -->
 				@include('payroll.employee_attendance_logs_leave')
 				<!-- Driver's Logs -->
-				@include('payroll.employee_attendance_logs_drivers')
+				@include('payroll.drivers_attendance_logs')
 				
 				<!-- Forms -->
 				
