@@ -696,24 +696,24 @@ class EmployeeLogsController extends Controller
 				$EmployeeRegularLogs->breaktime_end 					= $breaktime_end;
 				$EmployeeRegularLogs->log_out 							= $log_out;
 				
-				$EmployeeRegularLogs->total_hours 						= number_format((float)$total_hours_from_log_in_and_out, 2, '.', '');
-				$EmployeeRegularLogs->total_regular_hours 				= number_format((float)$total_regular_hours, 2, '.', '');
-				$EmployeeRegularLogs->total_breaktime_hours 			= number_format((float)$total_breaktime_hours, 2, '.', '');
-				$EmployeeRegularLogs->total_tardiness_hours 			= number_format((float)$total_tardiness_hours, 2, '.', '');
-				$EmployeeRegularLogs->total_undertime_hours 			= number_format((float)$total_undertime_hours,2);
-				$EmployeeRegularLogs->total_night_differential_hours 	= number_format((float)$total_covered_night_diff_hrs, 2, '.', '');
+				$EmployeeRegularLogs->total_hours 						= number_format((float)$total_hours_from_log_in_and_out, 1, '.', '');
+				$EmployeeRegularLogs->total_regular_hours 				= number_format((float)$total_regular_hours, 1, '.', '');
+				$EmployeeRegularLogs->total_breaktime_hours 			= number_format((float)$total_breaktime_hours, 1, '.', '');
+				$EmployeeRegularLogs->total_tardiness_hours 			= number_format((float)$total_tardiness_hours, 1, '.', '');
+				$EmployeeRegularLogs->total_undertime_hours 			= number_format((float)$total_undertime_hours,1);
+				$EmployeeRegularLogs->total_night_differential_hours 	= number_format((float)$total_covered_night_diff_hrs, 1, '.', '');
 
 				if($log_type=='Regular'){
-					$EmployeeRegularLogs->basic_pay						= number_format((float)$Regular_pay, 2, '.', '');
+					$EmployeeRegularLogs->basic_pay						= number_format((float)$Regular_pay, 1, '.', '');
 				}else if($log_type=='RegularOT'){
-					$EmployeeRegularLogs->overtime_pay					= number_format((float)$RegularOT_pay, 2, '.', '');
+					$EmployeeRegularLogs->overtime_pay					= number_format((float)$RegularOT_pay, 1, '.', '');
 				}else{
-					$EmployeeRegularLogs->day_off_pay					= number_format((float)$RestDayOT_pay , 2, '.', '');
+					$EmployeeRegularLogs->day_off_pay					= number_format((float)$RestDayOT_pay , 1, '.', '');
 				}
 				
-				$EmployeeRegularLogs->night_differential_pay			= number_format((float)$night_differential_pay, 2, '.', '');
-				$EmployeeRegularLogs->regular_holiday_pay				= number_format((float)$regular_holiday_pay, 2, '.', '');
-				$EmployeeRegularLogs->special_holiday_pay				= number_format((float)$special_holiday_pay, 2, '.', '');
+				$EmployeeRegularLogs->night_differential_pay			= number_format((float)$night_differential_pay, 1, '.', '');
+				$EmployeeRegularLogs->regular_holiday_pay				= number_format((float)$regular_holiday_pay, 1, '.', '');
+				$EmployeeRegularLogs->special_holiday_pay				= number_format((float)$special_holiday_pay, 1, '.', '');
 				$EmployeeRegularLogs->log_type						 	= $log_type;
 				
 				$EmployeeRegularLogs->created_by_user_idx 		= Session::get('loginID');
@@ -742,24 +742,24 @@ class EmployeeLogsController extends Controller
 				$EmployeeRegularLogs->breaktime_end 					= $breaktime_end;
 				$EmployeeRegularLogs->log_out 							= $log_out;
 				
-				$EmployeeRegularLogs->total_hours 						= number_format((float)$total_hours_from_log_in_and_out, 2, '.', '');
-				$EmployeeRegularLogs->total_regular_hours 				= number_format((float)$total_regular_hours, 2, '.', '');
-				$EmployeeRegularLogs->total_breaktime_hours 			= number_format((float)$total_breaktime_hours, 2, '.', '');
-				$EmployeeRegularLogs->total_tardiness_hours 			= number_format((float)$total_tardiness_hours, 2, '.', '');
-				$EmployeeRegularLogs->total_undertime_hours 			= number_format((float)$total_undertime_hours,2);
-				$EmployeeRegularLogs->total_night_differential_hours 	= number_format((float)$total_covered_night_diff_hrs, 2, '.', '');
+				$EmployeeRegularLogs->total_hours 						= number_format((float)$total_hours_from_log_in_and_out, 1, '.', '');
+				$EmployeeRegularLogs->total_regular_hours 				= number_format((float)$total_regular_hours, 1, '.', '');
+				$EmployeeRegularLogs->total_breaktime_hours 			= number_format((float)$total_breaktime_hours, 1, '.', '');
+				$EmployeeRegularLogs->total_tardiness_hours 			= number_format((float)$total_tardiness_hours, 1, '.', '');
+				$EmployeeRegularLogs->total_undertime_hours 			= number_format((float)$total_undertime_hours,1);
+				$EmployeeRegularLogs->total_night_differential_hours 	= number_format((float)$total_covered_night_diff_hrs, 1, '.', '');
 
 				if($log_type=='Regular'){
-					$EmployeeRegularLogs->basic_pay						= number_format((float)$Regular_pay, 2, '.', '');
+					$EmployeeRegularLogs->basic_pay						= number_format((float)$Regular_pay, 1, '.', '');
 				}else if($log_type=='RegularOT'){
-					$EmployeeRegularLogs->overtime_pay					= number_format((float)$RegularOT_pay, 2, '.', '');
+					$EmployeeRegularLogs->overtime_pay					= number_format((float)$RegularOT_pay, 1, '.', '');
 				}else{
-					$EmployeeRegularLogs->day_off_pay					= number_format((float)$RestDayOT_pay , 2, '.', '');
+					$EmployeeRegularLogs->day_off_pay					= number_format((float)$RestDayOT_pay , 1, '.', '');
 				}
 				
-				$EmployeeRegularLogs->night_differential_pay			= number_format((float)$night_differential_pay, 2, '.', '');
-				$EmployeeRegularLogs->regular_holiday_pay				= number_format((float)$regular_holiday_pay, 2, '.', '');
-				$EmployeeRegularLogs->special_holiday_pay				= number_format((float)$special_holiday_pay, 2, '.', '');
+				$EmployeeRegularLogs->night_differential_pay			= number_format((float)$night_differential_pay, 1, '.', '');
+				$EmployeeRegularLogs->regular_holiday_pay				= number_format((float)$regular_holiday_pay, 1, '.', '');
+				$EmployeeRegularLogs->special_holiday_pay				= number_format((float)$special_holiday_pay, 1, '.', '');
 				$EmployeeRegularLogs->log_type						 	= $log_type;
 				
 				$EmployeeRegularLogs->updated_by_user_idx 	= Session::get('loginID');
