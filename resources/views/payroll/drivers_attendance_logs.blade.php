@@ -65,7 +65,7 @@
 										
 										<div class="col-sm-6">
 											<div class="input-block mb-3">
-												<label class="col-form-label"> <span class="text-danger">*</span></label>
+												<label class="col-form-label">Driver's Name <span class="text-danger">*</span></label>
 												<input class="form-control " type="text" list="drivers_list_logs" id="drivers_idx" name="drivers_idx" required autocomplete="off">
 												<span class="valid-feedback" id="drivers_idxError" title="Required"></span>
 												<datalist id="drivers_list_logs"><!--List Here--></datalist>	

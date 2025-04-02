@@ -407,7 +407,9 @@
 					/*Set Details*/
 					document.getElementById("branch_idx").value 		= response[0].branch_code+" - "+response[0].branch_name;
 					LoadEmployee();
-					document.getElementById("employee_idx").value 		= response[0].employee_last_name+", "+response[0].employee_first_name+" "+response[0].employee_middle_name+" "+response[0].employee_extension_name;
+					//employee_full_name
+					//document.getElementById("employee_idx").value 		= response[0].employee_last_name+", "+response[0].employee_first_name+" "+response[0].employee_middle_name+" "+response[0].employee_extension_name;
+					document.getElementById("employee_idx").value 		= response[0].employee_full_name;
 					
 					document.getElementById("deleteEmployeeLogConfirmed").value = employeelogsID;
 					var _log_type = response[0].log_type;

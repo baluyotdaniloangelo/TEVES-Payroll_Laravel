@@ -173,6 +173,7 @@ class EmployeeLogsController extends Controller
 					'teves_payroll_employee_table.employee_first_name',
 					'teves_payroll_employee_table.employee_middle_name',
 					'teves_payroll_employee_table.employee_extension_name',
+					'teves_payroll_employee_table.employee_full_name',
 					'teves_branch_table.branch_id',
 					'teves_branch_table.branch_name',
 					'teves_branch_table.branch_code',
@@ -388,8 +389,9 @@ class EmployeeLogsController extends Controller
 			$employee_default_breaktime_out_strtotime = strtotime("$attendance_date $employee_default_breaktime_out");
 
 			/*Compute Tardiness*/
-			$tardiness_morning_shift = ($employee_default_time_in_strtotime - $time_in_string_to_time) / 3600;
-			$tardiness_late_afternoon = ($employee_default_breaktime_out_strtotime - $break_time_out_string_to_time) / 3600;
+			 $tardiness_morning_shift = ($employee_default_time_in_strtotime - $time_in_string_to_time) / 3600;
+			//echo "[$tardiness_morning_shift]";
+			 $tardiness_late_afternoon = ($employee_default_breaktime_out_strtotime - $break_time_out_string_to_time) / 3600;
 			/*Tardiness for Morning*/
 			if($tardiness_morning_shift<0){
 				/*Negative Means Late*/
@@ -536,6 +538,8 @@ class EmployeeLogsController extends Controller
 				
 			$total_regular_hours = $total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + $excess_hours_after_shift);
 			$total_tardiness_hours = $total_tardiness;
+				
+			//	echo "$total_regular_hours = $total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + $excess_hours_after_shift)";
 				// $attendance_date_N = (date('N', strtotime($attendance_date)));
 				
 				// if($attendance_date_N==0){
