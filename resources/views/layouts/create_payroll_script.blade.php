@@ -124,7 +124,17 @@
 				$('#generate_payroll_modal').modal('toggle');
 				
 				/*Call Function to Get the Branch Details*/
-				//get_client_details();
+				get_branch_details(branchID);
+				
+				var start_date_new  = new Date(start_date);
+				start_date_new_format = (start_date_new.toLocaleDateString("en-PH")); // 9/17/2016
+							
+				var end_date_new  = new Date(end_date);
+				end_date_new_format = (end_date_new.toLocaleDateString("en-PH")); // 9/17/2016
+
+				$('#covered_period_details').text(start_date_new_format + ' - ' +end_date_new_format);			
+				$('#covered_period_details_save').text(start_date_new_format + ' - ' +end_date_new_format);			
+							
 							
 				  console.log(response);
 				  if(response!='') {
@@ -147,7 +157,15 @@
 						LoadPayrollData.clear().draw();
 						LoadPayrollData.rows.add(response.data).draw();	
 						
+						if(net_salary!=0){
 							
+							$("#save_options").html('<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#SaveCutOffModal"><i class="fa fa-save"></i> Save</a>');
+	
+						}
+							
+						/*Set Details*/
+						/*Save Cut Off must be visible*/
+						
 				  }else{
 							/*Close Form*/
 							$('#generate_payroll_modal').modal('toggle');
@@ -196,7 +214,7 @@
 						"emptyTable": "No Result Found",
 						"infoEmpty": "No entries to show"
 			    }, 
-				// processing: true,
+				//processing: true,
 				//serverSide: true,
 				//stateSave: true,/*Remember Searches*/
 				responsive: true,
@@ -216,8 +234,11 @@
 					{data: 'count_days', className: "text-left", orderable: false },		
 					{data: 'leave_logs_count', className: "text-left", orderable: false },	
 					{data: 'basic_pay_total', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
+					{data: 'night_differential_pay_total', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
 					{data: 'regular_overtime_pay_total', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
-					{data: 'day_off_pay_total', className: "text-center", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
+					{data: 'day_off_pay_total', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
+					{data: 'special_holiday_pay_total', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
+					{data: 'regular_holiday_pay_total', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
 					{data: 'allowance_amount_total', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
 					{data: 'deduction_amount_total', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2 , '' ) },
 					{data: 'gross_salary', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2 , '' ) },
@@ -407,33 +428,35 @@
 		
 	  };
 	    
-	function get_client_details(){
-		  
-			let branchID 			= $('#client_name option[value="' + $('#client_id').val() + '"]').attr('data-id');
+	
+
+
+	<!--Select Branch For Update-->
+	function get_branch_details(branchID){
+			
+			event.preventDefault();
+			//let branchID = $(this).data('id');
 			
 			  $.ajax({
-				url: "/client_info",
+				url: "{{ route('BranchInfo') }}",
 				type:"POST",
 				data:{
-				  clientID:branchID,
+				  branchID:branchID,
 				  _token: "{{ csrf_token() }}"
 				},
 				success:function(response){
 				  console.log(response);
-				  if(response) {		
+				  if(response) {
 					
 					/*Set Details*/
-					$('#client_name_report').text(response.client_name);
-					$('#client_address_report').text(response.client_address);
-					
-					/*Set Details for Receivables*/
-					$('#client_name_receivables').text(response.client_name);
-					$('#client_address_receivables').text(response.client_address);
-					$('#client_tin_receivables').text(response.client_tin);
-					
-					document.getElementById("net_value_percentage").value = response.default_net_percentage;
-					document.getElementById("vat_value_percentage").value = response.default_vat_percentage;
-					document.getElementById("withholding_tax_percentage").value = response.default_withholding_tax_percentage;
+						
+					$('#branch_name_details').text(response.branch_name);	
+					$('#branch_code_details').text(response.branch_code);	
+					$('#branch_tin_details').text(response.branch_tin);	
+
+					$('#branch_name_details_save').text(response.branch_name);	
+					$('#branch_code_details_save').text(response.branch_code);	
+					$('#branch_tin_details_save').text(response.branch_tin);		
 					
 				  }
 				},
@@ -442,9 +465,8 @@
 					alert(error);
 				}
 			   });	
+	  }
 	  
-	}
-	
 	function download_billing_report_excel(){
 		  
 			let branchID 		= $('#client_name option[value="' + $('#client_id').val() + '"]').attr('data-id');
