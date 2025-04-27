@@ -331,13 +331,14 @@
 						LoadPayrollData.rows.add(response['data']['original']['data']).draw();	
 						
 						if(cutoff_idx!=0){ 
-						//
-							$("#save_options").html('&nbsp;');
+							//$("#save_options").html('<span></span>');
+							$("#save_options").html('<a href="#" class="btn add-btn" title><i class="fa fa-save"></i> Saved</a>');
+							
 							$("#print_options").html('<a href="#" class="btn add-btn" onclick="print_payroll_after_save('+cutoff_idx+')"><i class="fa fa-save"></i> Print</a>');
 						}
 							
 						/*Set Details*/
-						/*Save Cut Off must be visible*/
+						/*Save Cut Off must be invisible*/
 						
 				  }else{
 							/*Close Form*/

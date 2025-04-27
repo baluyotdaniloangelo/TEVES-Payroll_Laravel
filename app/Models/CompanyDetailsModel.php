@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Session;
 
-class CutOffModel extends Model
+class CompanyDetailsModel extends Model
 {
 	use LogsActivity;
 	
@@ -15,32 +15,28 @@ class CutOffModel extends Model
     $activity->causer_id = Session::get('loginID');
 	}
 	
-	protected $table = 'teves_payroll_cutoff_table';
+	protected $table = 'teves_payroll_company_details';
 	
 	protected $fillable = [
-        'branch_idx',
-		'cut_off_period_start',
-		'cut_off_period_end',
-		'reviewed_by',
-		'approved_by',
+        'sss_number',
+		'pagibig_number',
+		'pagibig_number',
 		'created_at',
 		'created_by_user_idx',
 		'updated_at',
 		'updated_by_user_idx'
     ];
     
-	protected $primaryKey = 'cutoff_id';
+	protected $primaryKey = 'company_detail_id';
 	
-	protected static $logName = 'Cut-Off Details';
+	protected static $logName = 'Company Details';
 	
 	protected static $logOnlyDirty = true;
 	
 	protected static $logAttributes = [
-		'branch_idx',
-		'cut_off_period_start',
-		'cut_off_period_end',
-		'reviewed_by',
-		'approved_by',
+		'sss_number',
+		'pagibig_number',
+		'pagibig_number',
 		'created_at',
 		'created_by_user_idx',
 		'updated_at',

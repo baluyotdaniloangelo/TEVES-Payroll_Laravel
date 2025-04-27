@@ -13,6 +13,7 @@ use App\Models\EmployeeAllowanceLogsModel;
 use App\Models\EmployeeLeaveLogsModel;
 use App\Models\CutOffModel;
 use App\Models\EmployeesSalaryPerCutOffModel;
+use App\Models\CompanyDetailsModel;
 
 use Session;
 use Validator;
@@ -767,13 +768,15 @@ class CreatePayrollController extends Controller
 		$start_date	= $cut_off_information->cut_off_period_start;
 		$end_date	= $cut_off_information->cut_off_period_end;
 
+
+		$company_information = CompanyDetailsModel::find(1, ['sss_number','pagibig_number','philhealth']);
 		$branch_information = BranchModel::find($branchID, ['branch_code','branch_name','branch_tin','branch_address','branch_contact_number','branch_owner','branch_owner_title','branch_logo']);
 
 		/*USER INFO*/
 		$user_data = User::where('user_id', '=', Session::get('loginID'))->first();
 		
-		$title = 'Payroll';
-        $pdf = PDF::loadView('printables.employees_saved_payroll_pdf', compact('title', 'result', 'user_data', 'branch_information','start_date','end_date'));
+		$title = "Employee's Weekly Payroll";
+        $pdf = PDF::loadView('printables.employees_saved_payroll_pdf', compact('title', 'result', 'user_data', 'branch_information','start_date','end_date', 'company_information'));
 		/*Download Directly*/
         //return $pdf->download($client_data['client_name'].".pdf");
 		/*Stream for Saving/Printing*/
