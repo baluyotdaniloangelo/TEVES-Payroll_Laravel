@@ -69,6 +69,33 @@
 								 <form class="g-2 needs-validation" id="Employeeform">
 								
 									<div class="row">
+										
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Branch</label>
+												<input class="form-control " type="text" list="branch_list" id="branch_idx" name="branch_idx" onchange="LoadDepartment()">
+												<datalist id="branch_list">
+												<!--List Here -->
+													@foreach ($branch_data as $branch_data_cols)
+													<option label="{{$branch_data_cols->branch_code}} - {{$branch_data_cols->branch_name}}" data-id="{{$branch_data_cols->branch_id}}" value="{{$branch_data_cols->branch_code}} - {{$branch_data_cols->branch_name}}"> </option>
+													@endforeach
+												</datalist>
+												<!--</select>-->
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label">Department</label>
+												<!--<select class="select" id="department_idx" name="department_idx">-->
+												<input class="form-control " type="text" list="department_list" id="department_idx" name="department_idx">
+												
+													<datalist id="department_list">
+														<option value=""></option>
+													</datalist>
+												</select>
+											</div>
+										</div>
+										
 										<div class="col-sm-3">
 											<div class="input-block mb-3">
 												<label class="col-form-label">Last Name <span class="text-danger">*</span></label>
@@ -99,6 +126,29 @@
 										</div>
 										<div class="col-sm-4">  
 											<div class="input-block mb-3">
+												<label class="col-form-label">Employee ID <span class="text-danger">*</span></label>
+												<input type="text" class="form-control" id="employee_number" name="employee_number" required>
+												<span class="valid-feedback" id="employee_numberError" title="Required"></span>
+											</div>
+										</div>
+										
+										<div class="col-sm-4">  
+											<div class="input-block mb-3">
+												<label class="col-form-label">Position <span class="text-danger"></span></label>
+												<input type="text" class="form-control" id="employee_position" name="employee_position">
+											</div>
+										</div>
+										
+										<div class="col-sm-4">  
+											<div class="input-block mb-3">
+												<label class="col-form-label">Hourly Rate / Percentage for Driver(Ex. 13) <span class="text-danger">*</span></label>
+												<input type="number" class="form-control" id="employee_rate" name="employee_rate" required>
+												<span class="valid-feedback" id="employee_rateError" title="Required"></span>
+											</div>
+										</div>
+										
+										<div class="col-sm-4">  
+											<div class="input-block mb-3">
 												<label class="col-form-label">Birth Date <span class="text-danger">*</span></label>
 												<input class="form-control" type="date" id="employee_birthday" name="employee_birthday" required>
 												<span class="valid-feedback" id="employee_birthdayError" title="Required"></span>
@@ -117,30 +167,7 @@
 											</div>
 										</div>
 										
-										<div class="col-sm-2">  
-											<div class="input-block mb-3">
-												<label class="col-form-label">Employee ID <span class="text-danger">*</span></label>
-												<input type="text" class="form-control" id="employee_number" name="employee_number" required>
-												<span class="valid-feedback" id="employee_numberError" title="Required"></span>
-											</div>
-										</div>
-										
-										<div class="col-sm-3">  
-											<div class="input-block mb-3">
-												<label class="col-form-label">Position <span class="text-danger"></span></label>
-												<input type="text" class="form-control" id="employee_position" name="employee_position">
-											</div>
-										</div>
-										
-										<div class="col-sm-3">  
-											<div class="input-block mb-3">
-												<label class="col-form-label">Hourly Rate / Percentage for Driver(Ex. 13) <span class="text-danger">*</span></label>
-												<input type="number" class="form-control" id="employee_rate" name="employee_rate" required>
-												<span class="valid-feedback" id="employee_rateError" title="Required"></span>
-											</div>
-										</div>
-										
-										<div class="col-sm-2">
+										<div class="col-sm-4">
 											<div class="input-block mb-3">
 												<label class="col-form-label">Employment Status</label>
 												<select class="form-select form-control" name="employee_status" id="employee_status">
@@ -149,39 +176,24 @@
 												</select>
 											</div>
 										</div>
-										<div class="col-sm-2">
+										<div class="col-sm-4">
 											<div class="input-block mb-3">
 												<label class="col-form-label">Employment Type</label>
 												<select class="form-select form-control" name="employment_type" id="employment_type">
 													<option value="Regular" selected>Regular</option>
 													<option value="Probationary">Probationary</option>
 													<option value="Contractual">Contractual</option>
-													<option value="Others">Others/Outsource</option>
+													<option value="Others">Others/Outsource/Drivers</option>
 												</select>
 											</div>
 										</div>
-										<div class="col-sm-6">
+										
+										<div class="col-sm-4">  
 											<div class="input-block mb-3">
-												<label class="col-form-label">Branch</label>
-												<input class="form-control " type="text" list="branch_list" id="branch_idx" name="branch_idx" onchange="LoadDepartment()">
-												<datalist id="branch_list">
-												<!--List Here -->
-													@foreach ($branch_data as $branch_data_cols)
-													<option label="{{$branch_data_cols->branch_code}} - {{$branch_data_cols->branch_name}}" data-id="{{$branch_data_cols->branch_id}}" value="{{$branch_data_cols->branch_code}} - {{$branch_data_cols->branch_name}}"> </option>
-													@endforeach
-												</datalist>
-												<!--</select>-->
-											</div>
-										</div>
-										<div class="col-md-6">
-											<div class="input-block mb-3">
-												<label class="col-form-label">Department</label>
-												<!--<select class="select" id="department_idx" name="department_idx">-->
-												<input class="form-control " type="text" list="department_list" id="department_idx" name="department_idx">
-												
-													<datalist id="department_list">
-														<option value=""></option>
-													</datalist>
+												<label class="col-form-label">Wtih Night differential Pay?</label>
+												<select class="form-select form-control" name="employee_night_diff_pay" id="employee_night_diff_pay">
+													<option value="No" selected>No</option>
+													<option value="Yes">Yes</option>
 												</select>
 											</div>
 										</div>
@@ -214,6 +226,9 @@
 												<span class="valid-feedback" id="time_outError" title="Required"></span>
 											</div>
 										</div>
+										
+										
+										
 									</div>
 									
 									<div class="table-responsive m-t-15">

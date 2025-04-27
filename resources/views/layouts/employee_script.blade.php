@@ -111,6 +111,7 @@
 			/*#7*/let employee_position 				= $("input[name=employee_position]").val();
 				  let employee_status					= $("#employee_status").val();
 				  let employment_type					= $("#employment_type").val();
+				  let employee_night_diff_pay			= $("#employee_night_diff_pay").val();
 				  let employee_rate						= $("#employee_rate").val();
 			/*#8*/let employee_phone 					= $("input[name=employee_phone]").val();
 			/*#9*/let employee_email 					= $("input[name=employee_email]").val();
@@ -162,6 +163,7 @@
 				  /*#7*/employee_position:employee_position,
 				  /*#7*/employee_status:employee_status,
 				  /*#7*/employment_type:employment_type,
+						employee_night_diff_pay:employee_night_diff_pay,
 						employee_rate:employee_rate,
 				  /*#8*/employee_phone:employee_phone,
 				  /*#9*/employee_email:employee_email,
@@ -330,6 +332,7 @@
 					document.getElementById("employee_position").value 			= response[0].employee_position;
 					document.getElementById("employee_status").value 			= response[0].employee_status;
 					document.getElementById("employment_type").value 			= response[0].employment_type;
+					document.getElementById("employee_night_diff_pay").value 	= response[0].employee_night_diff_pay;
 					document.getElementById("employee_rate").value 				= response[0].employee_rate;
 					document.getElementById("employee_phone").value 			= response[0].employee_phone;
 					document.getElementById("employee_email").value 			= response[0].employee_email;

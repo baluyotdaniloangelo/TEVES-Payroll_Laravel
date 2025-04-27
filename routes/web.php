@@ -93,6 +93,7 @@ Route::get('/employee-attendance-logs', [EmployeeLogsController::class,'employee
 Route::post('/branch-item-select', [BranchController::class,'getBranchList_for_item_selection'])->name('getBranchList_for_selection')->middleware('isLoggedIn');
 Route::post('/department-item-select', [DepartmentController::class,'getDepartmentList_for_item_selection'])->name('getDepartmentList_for_selection')->middleware('isLoggedIn');
 Route::post('/employee-item-select', [EmployeeManagementController::class,'getEmployeeList_for_item_selection'])->name('getEmployeeList_for_selection')->middleware('isLoggedIn');
+Route::post('/drivers-item-select', [EmployeeManagementController::class,'getDriversList_for_item_selection'])->name('getDriversList_for_item_selection')->middleware('isLoggedIn');
 /*Regular Logs - January 18, 2024*/
 Route::get('employee-regular-logs/list', [EmployeeLogsController::class, 'getEmployeeRegularLogsList'])->name('getEmployeeRegularLogsList')->middleware('isLoggedIn');
 Route::post('/submit_employee_regular_logs_information', [EmployeeLogsController::class,'submit_employee_regular_logs_information'])->name('submit_employee_regular_logs_information')->middleware('isLoggedIn');
@@ -170,6 +171,11 @@ Route::post('/user_account_post', [UserController::class,'user_account_post'])->
 /*Create Payroll - April 1, 2025*/
 Route::get('/create-payroll', [CreatePayrollController::class,'create_payroll'])->name('CreatePayroll')->middleware('isLoggedIn');
 Route::post('/generate_review_payroll', [CreatePayrollController::class,'generate_review_payroll'])->name('ReviewPayroll')->middleware('isLoggedIn');
+Route::post('/save_generated_payroll', [CreatePayrollController::class,'save_generated_payroll'])->name('SavePayroll')->middleware('isLoggedIn');
+/*PDF - Draft*/
+Route::get('/generate_employees_payroll_draft_pdf', [CreatePayrollController::class,'generate_employees_payroll_draft_pdf'])->name('EmployeesPayrollDrafts')->middleware('isLoggedIn');
+/*PDF - Saved*/
+Route::get('/generate_employees_saved_payroll_pdf', [CreatePayrollController::class,'generate_employees_saved_payroll_pdf'])->name('EmployeesPayrollSaved')->middleware('isLoggedIn');
 
 
 /*Payslip*/

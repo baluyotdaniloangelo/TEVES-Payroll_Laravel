@@ -97,6 +97,7 @@ class EmployeeManagementController extends Controller
 					'teves_payroll_employee_table.employee_birthday',
 					'teves_payroll_employee_table.employee_position',
 					'teves_payroll_employee_table.employee_status',
+					'teves_payroll_employee_table.employee_night_diff_pay',
 					'teves_payroll_employee_table.employment_type',
 					'teves_payroll_employee_table.employee_picture',
 					'teves_payroll_employee_table.employee_phone',
@@ -184,6 +185,7 @@ class EmployeeManagementController extends Controller
 				$EmployeeDetails->employee_position 		= $request->employee_position;
 				$EmployeeDetails->employee_status	 		= $request->employee_status;
 				$EmployeeDetails->employment_type	 		= $request->employment_type;
+				$EmployeeDetails->employee_night_diff_pay	 		= $request->employee_night_diff_pay;
 				$EmployeeDetails->employee_rate 			= $request->employee_rate;
 				$EmployeeDetails->employee_phone 			= $request->employee_phone;
 				$EmployeeDetails->employee_email 			= $request->employee_email;
@@ -235,6 +237,7 @@ class EmployeeManagementController extends Controller
 				$EmployeeDetails->employee_position 		= $request->employee_position;
 				$EmployeeDetails->employee_status	 		= $request->employee_status;
 				$EmployeeDetails->employment_type	 		= $request->employment_type;
+				$EmployeeDetails->employee_night_diff_pay	 		= $request->employee_night_diff_pay;
 				$EmployeeDetails->employee_rate 			= $request->employee_rate;
 				$EmployeeDetails->employee_phone 			= $request->employee_phone;
 				$EmployeeDetails->employee_email 			= $request->employee_email;
@@ -279,6 +282,7 @@ class EmployeeManagementController extends Controller
 		
 		$data = EmployeeModel::join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
 					->where('teves_payroll_employee_table.branch_idx', $branchID)
+					->where('teves_payroll_employee_table.employment_type', '!=', 'Others')
               		->get([
 					'teves_payroll_employee_table.employee_id',
 					'teves_payroll_employee_table.employee_number',
@@ -289,5 +293,21 @@ class EmployeeManagementController extends Controller
 		
 	}
 
+	public function getDriversList_for_item_selection(Request $request){
+
+		$branchID	  = $request->branchID;
+		
+		$data = EmployeeModel::join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
+					->where('teves_payroll_employee_table.branch_idx', $branchID)
+					->where('teves_payroll_employee_table.employment_type', 'Others')
+              		->get([
+					'teves_payroll_employee_table.employee_id',
+					'teves_payroll_employee_table.employee_number',
+					'teves_payroll_employee_table.employee_full_name'
+					]);
+		
+		return response()->json($data);
+		
+	}
 }
 

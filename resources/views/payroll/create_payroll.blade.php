@@ -19,8 +19,9 @@
 							</div>
 							<div class="col-auto float-end ms-auto">
 								<div class="row">
-									<a href="#" class="col-6 btn add-btn" data-bs-toggle="modal" data-bs-target="#generate_payroll_modal"><i class="fa fa-tasks"></i> Options</a>
-									<div id="save_options" class="col-6 "></div>
+									<div id="save_options" class="col-4"></div>
+									<div id="print_options" class="col-4"></div>
+									<div id="" class="col-4"><a href="#" class="col-6 btn add-btn" data-bs-toggle="modal" data-bs-target="#generate_payroll_modal"><i class="fa fa-tasks"></i> Options</a></div>
 								</div>
 							</div>
 						</div>
@@ -120,8 +121,6 @@
 										</div>
 									</div>
 									
-									
-
 						</div>
 					</div>
                 </div>
@@ -189,12 +188,12 @@
 									<h3>Save Cut Off</h3>
 									<p>Are you sure want to save this cut off?</p>
 								</div>
-								<div class="modal-btn delete-action">
+								<div class="modal-btn">
 									<div class="row">
 									<div class="card">
-								<div class="card-header border-bottom-0 pb-0">
+								<!--<div class="card-header border-bottom-0 pb-0">
 									<span class="ms-auto shadow-lg fs-17"></span>
-								</div>
+								</div>-->
 								<div class="card-body">
 									<table class="table table-bordered">
 													<tbody>

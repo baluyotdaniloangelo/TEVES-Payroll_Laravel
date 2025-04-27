@@ -48,7 +48,7 @@
 		$('<option style="display: none;"></option>').appendTo('#drivers_list_logs');
 
 			  $.ajax({
-				url: "{{ route('getEmployeeList_for_selection') }}",
+				url: "{{ route('getDriversList_for_item_selection') }}",
 				type:"POST",
 				data:{
 				  branchID:branchID,

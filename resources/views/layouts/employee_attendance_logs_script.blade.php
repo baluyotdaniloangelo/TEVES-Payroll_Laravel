@@ -345,7 +345,9 @@
 				  
 				}else if(error.responseJSON.errors.attendance_date=="validation.unique"){
 				
-					$('#attendance_dateError').html("Employee Logs already exist on the selected Date");
+					document.getElementById("attendance_date").value 	= '';
+					
+					$('#attendance_dateError').html("Employee logs already exist for the selected date. Please select another date or check for possible duplicate entries.");
 					document.getElementById('attendance_dateError').className = "invalid-feedback";
 				
 				}

@@ -212,7 +212,7 @@ class EmployeeLogsController extends Controller
 			$breaktime_end 					= $request->breaktime_end;
 			$log_out 						= $request->log_out;
 			$override_default_shift 		= $request->override_default_shift;
-			$overtime_status		= $request->overtime_status;
+			$overtime_status				= $request->overtime_status;
 			
 			
 			if($branch_idx!=0 && $employee_idx!=0){
@@ -223,6 +223,7 @@ class EmployeeLogsController extends Controller
 						'teves_payroll_employee_table.branch_idx',
 						'teves_payroll_employee_table.department_idx',
 						'teves_payroll_employee_table.employee_rate',
+						'teves_payroll_employee_table.employee_night_diff_pay',
 						'teves_payroll_employee_table.time_in',
 						'teves_payroll_employee_table.break_time_in',
 						'teves_payroll_employee_table.break_time_out',
@@ -240,6 +241,8 @@ class EmployeeLogsController extends Controller
 			
 			$branch_idx 						= $employee_data[0]->branch_idx;
 			$department_idx 					= $employee_data[0]->department_idx;
+			
+			$employee_night_diff_pay 					= $employee_data[0]->employee_night_diff_pay;
 			
 			$restday_monday 					= $employee_data[0]->restday_monday;
 			$restday_tuesday 					= $employee_data[0]->restday_tuesday;
@@ -289,9 +292,6 @@ class EmployeeLogsController extends Controller
 				if($check_employee_rest_day == 1){
 					
 					$log_type = 'RestDayOT';
-					//$Regular_pay = 0;
-					//$RegularOT_pay = 0;
-					//$RestDayOT_pay = ($employee_current_rate * $total_regular_hours) * 1.3;
 					
 				}else{
 					
@@ -318,7 +318,12 @@ class EmployeeLogsController extends Controller
 													fn ($query) =>$query
 														->where('employee_idx', $employee_idx)
 														->where('attendance_date', $attendance_date)
-														->where('log_type',  $log_type )											
+														->where('log_type',  $log_type )
+														->where(function ($q) use($employee_logs_id) {
+															if ($employee_logs_id!=0) {
+															   $q->where('teves_payroll_employee_logs.employee_logs_id', '<>', $employee_logs_id);
+															}
+														})											
 													)],
 				  'log_in'    				=> 'required',
 				  'breaktime_start'  		=> 'required',
@@ -327,32 +332,20 @@ class EmployeeLogsController extends Controller
 				]);
 				
 			}else{
-				//echo "|$employee_logs_id|";
+				
 				$request->validate([
 				  'branch_idx'				=> ['required'],
-				  'employee_idx'      		=> ['required',Rule::unique('teves_payroll_employee_logs')->where( 
-													fn ($query) =>$query
-														->where('employee_idx', $employee_idx)
-														->where('attendance_date', $attendance_date)
-														->where('log_type', '<>',  $log_type )
-														->where(function ($q) use($employee_logs_id) {
-															if ($employee_logs_id!=0) {
-															   $q->where('teves_payroll_employee_logs.employee_logs_id', '<>', $employee_logs_id);
-															}
-														})
-														/*->where('employee_logs_id', '<>',  $employee_logs_id )	*/										
-													)],
+				  'employee_idx'      		=> ['required'],
 				  'attendance_date'    		=> ['required',Rule::unique('teves_payroll_employee_logs')->where( 
 													fn ($query) =>$query
 														->where('employee_idx', $employee_idx)
 														->where('attendance_date', $attendance_date)
-														->where('log_type', '<>',  $log_type )
+														->where('log_type',   $log_type )
 														->where(function ($q) use($employee_logs_id) {
 															if ($employee_logs_id!=0) {
 															   $q->where('teves_payroll_employee_logs.employee_logs_id', '<>', $employee_logs_id);
 															}
-														})
-														/*->where('employee_logs_id', '<>',  $employee_logs_id )	*/										
+														})								
 													)],
 				  'log_in'    	 			=> 'required',
 				  'breaktime_start'   		=> 'required',
@@ -377,9 +370,6 @@ class EmployeeLogsController extends Controller
 			/*Gawing sakto ang na compute na oras. halimbawa nag in sya ng 7:45am pero and dapat na oras nya ay 8am dapat hindi kasama ang 15 minutes sa total hrs*/
 			/*Ma compute din neto and tardiness*/
 
-			
-			
-			
 			/*Compute Total Breaktime Hours*/
 			$total_breaktime_hours = ($break_time_out_string_to_time - $break_time_in_string_to_time) / 3600;
 
@@ -440,6 +430,9 @@ class EmployeeLogsController extends Controller
 			/*Source*/
 			/*https://stackoverflow.com/questions/10532687/time-night-differential-computation-in-php/10534110#10534110*/
 			/*Set Limit for Night Differential*/
+						
+						
+						if($employee_night_diff_pay=='Yes'){
 						
 						define('START_NIGHT_HOUR','22');
 						define('START_NIGHT_MINUTE','00');
@@ -533,47 +526,28 @@ class EmployeeLogsController extends Controller
 			
 			$night_differential_pay = $total_covered_night_diff_hrs * $employee_current_rate * (10/100);
 			/*End to Compute night shift hrs*/
+						}else{
+							
+							$covered_night_diff_hrs = 0;
+							$total_covered_night_diff_hrs = 0;
+							
+							$night_differential_pay = 0;
+							
+						}
 			
 			if($overtime_status=='No'){
 				
 			$total_regular_hours = $total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + $excess_hours_after_shift + $total_undertime_hours);
 			$total_tardiness_hours = $total_tardiness;
-			//echo "$total_regular_hours = $total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + $excess_hours_after_shift);";	
-			//	echo "$total_regular_hours = $total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + $excess_hours_after_shift)";
-				// $attendance_date_N = (date('N', strtotime($attendance_date)));
-				
-				// if($attendance_date_N==0){
-					// $check_rest_day = $restday_sunday;
-				// }
-				// else if($attendance_date_N==1){
-					// $check_rest_day = $restday_monday;
-				// }
-				// else if($attendance_date_N==2){
-					// $check_rest_day = $restday_tuesday;
-				// }
-				// else if($attendance_date_N==3){
-					// $check_rest_day = $restday_wednesday;
-				// }
-				// else if($attendance_date_N==4){
-					// $check_rest_day = $restday_thursday;
-				// }
-				// else if($attendance_date_N==5){
-					// $check_rest_day = $restday_friday;
-				// }
-				// else{
-					// $check_rest_day = $restday_saturday;
-				// }
 				
 				if($check_employee_rest_day == 1){
 					
-					//$log_type = 'RestDayOT';
 					$Regular_pay = 0;
 					$RegularOT_pay = 0;
 					$RestDayOT_pay = ($employee_current_rate * $total_regular_hours) * 1.3;
 					
 				}else{
 					
-					//$log_type = 'Regular';
 					/*Compute by Rate*/
 					/*Computed pay = total regular hours by rate*/
 					$Regular_pay = $employee_current_rate * $total_regular_hours;
@@ -584,17 +558,14 @@ class EmployeeLogsController extends Controller
 				
 			}else{
 			$total_tardiness_hours = 0;
-			$total_regular_hours = $total_hours_from_log_in_and_out - ($total_breaktime_hours);
+			$total_regular_hours = $total_hours_from_log_in_and_out - (0);
 
-					//$log_type = 'RegularOT';
 					/*Soon to have a table for Rate on Overtime - Hard Coded pa to to 0.25*/
 					$Regular_pay = 0;
 					$RegularOT_pay = $employee_current_rate * 1.25 * $total_regular_hours;
 					$RestDayOT_pay = 0;
 					
 			}
-			
-			
 			
 			/*Query Holiday*/
 			/*Holiday Computation from Logs*/
@@ -637,7 +608,6 @@ class EmployeeLogsController extends Controller
 				/*Regular Holiday and Restday Overtime*/
 				else{
 					//2600 = 1000 X 200% + (1000 x 200% )X30%(*0.3)
-
 					$regular_holiday_pay += 1.3 * ( $employee_current_rate * $total_regular_hours ) ;
 
 				}
