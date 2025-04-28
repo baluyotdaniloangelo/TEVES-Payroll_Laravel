@@ -19,8 +19,11 @@ class CutOffModel extends Model
 	
 	protected $fillable = [
         'branch_idx',
+        'cut_off_month',
 		'cut_off_period_start',
 		'cut_off_period_end',
+        'cut_off_gross_salary',
+        'cut_off_net_salary',
 		'reviewed_by',
 		'approved_by',
 		'created_at',
@@ -37,8 +40,11 @@ class CutOffModel extends Model
 	
 	protected static $logAttributes = [
 		'branch_idx',
+        'cut_off_month',
 		'cut_off_period_start',
 		'cut_off_period_end',
+        'cut_off_gross_salary',
+        'cut_off_net_salary',
 		'reviewed_by',
 		'approved_by',
 		'created_at',

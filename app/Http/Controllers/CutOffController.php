@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\User;
-use App\Models\EmployeeModel;
-use App\Models\EmployeeLogsModel;
-use App\Models\HolidayModel;
+use App\Models\CutOffModel;
 use Session;
 use Validator;
 use DataTables;
@@ -15,39 +13,69 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
-class EmployeeRegularLogsController extends Controller
+class CutOffController extends Controller
 {
+	
+	/*Load Employee Interface*/
+	public function cut_off(){
+		
+		if(Session::has('loginID')){
+			
+			$title = 'Cut Off';
+			$data = array();
+			
+			$data = User::where('user_id', '=', Session::get('loginID'))->first();
+			
+			$active_link = 'cut_off';
+			
+			return view("payroll.cut_off", compact('data', 'title', 'active_link'));
+		}
+	} 
 
 	/*Fetch Employee Regular Log List using Datatable*/
-	public function getEmployeeRegularLogsList(Request $request)
+	public function getCutOffList(Request $request)
     {
 
 		if ($request->ajax()) {
 
 		$user_data = User::where('user_id', '=', Session::get('loginID'))->first();
-
+        /*
 		$regular_logs = EmployeeLogsModel::query()
-		->join('teves_employee_table', 'teves_employee_logs.employee_idx', '=', 'teves_employee_table.employee_id')
-		->join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
-		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
-		->where('teves_employee_logs.log_type', 'Regular')
+		->join('teves_payroll_employee_table', 'teves_payroll_employee_logs.employee_idx', '=', 'teves_payroll_employee_table.employee_id')
+		->join('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
+		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
+		->where('teves_payroll_employee_logs.log_type', 'Regular')
 		->select([
-			'teves_employee_logs.*',
+			'teves_payroll_employee_logs.*',
 			'teves_branch_table.branch_name',
-			'teves_department_table.department_name',
-			'teves_employee_table.employee_number',
-			DB::raw("CONCAT(teves_employee_table.employee_last_name, ', ', teves_employee_table.employee_first_name, ' ', IFNULL(teves_employee_table.employee_middle_name,''), ' ', IFNULL(teves_employee_table.employee_extension_name,''), ' ') as employee_full_name"),
-		]);
+			'teves_payroll_department_table.department_name',
+			'teves_payroll_employee_table.employee_number',
+			DB::raw("CONCAT(teves_payroll_employee_table.employee_last_name, ', ', teves_payroll_employee_table.employee_first_name, ' ', IFNULL(teves_payroll_employee_table.employee_middle_name,''), ' ', IFNULL(teves_payroll_employee_table.employee_extension_name,''), ' ') as employee_full_name"),
+		]);*/
+        
+        $data = CutOffModel::query()
+            ->leftJoin('teves_payroll_user_table as prepared_by', 'teves_payroll_cutoff_table.created_by_user_idx', '=', 'prepared_by.user_id')
+            ->leftJoin('teves_payroll_user_table as reviewed_by', 'teves_payroll_cutoff_table.reviewed_by_user_idx', '=', 'reviewed_by.user_id')
+            ->leftJoin('teves_payroll_user_table as approved_by', 'teves_payroll_cutoff_table.approved_by_user_idx', '=', 'approved_by.user_id')
+            ->leftJoin('teves_branch_table as branch_details', 'teves_payroll_cutoff_table.branch_idx', '=', 'branch_details.branch_id')
+            ->select(
+                'teves_payroll_cutoff_table.*',
+                'prepared_by.user_real_name as prepared_by_name',
+                'reviewed_by.user_real_name as reviewed_by_name',
+                'approved_by.user_real_name as approved_by_name',
+                'branch_details.branch_code as branch_code'
+            )
+           ->get();
 	
-		return DataTables::of($regular_logs)
+		return DataTables::of($data)
 				->addIndexColumn()
                 ->addColumn('action', function($row){				
 					$actionBtn = '
 					<div class="dropdown dropdown-action">
 						<a href="#" class="action-icon dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="true"><i class="si si-options-vertical" data-bs-toggle="tooltip" aria-label="si-options-vertical" data-bs-original-title="si-options-vertical"></i></a>
 							<div class="dropdown-menu dropdown-menu-right " data-popper-placement="bottom-end" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);">
-								<a class="dropdown-item" href="#" data-id="'.$row->employee_logs_id.'" id="edit_employee_logs"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
-								<a class="dropdown-item" href="#" data-id="'.$row->employee_logs_id.'" id="delete_employee_logs"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>
+								<a class="dropdown-item" href="#" data-id="'.$row->cutoff_id.'" id="edit_employee_logs"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
+								<a class="dropdown-item" href="#" data-id="'.$row->cutoff_id.'" id="delete_employee_logs"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>
 							</div>
 					</div>';
                     return $actionBtn;
@@ -68,16 +96,16 @@ class EmployeeRegularLogsController extends Controller
 		$user_data = User::where('user_id', '=', Session::get('loginID'))->first();
 
 		$regular_logs = EmployeeLogsModel::query()
-		->join('teves_employee_table', 'teves_employee_logs.employee_idx', '=', 'teves_employee_table.employee_id')
-		->join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
-		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
-		->where('teves_employee_logs.log_type', 'RegularOT')
+		->join('teves_payroll_employee_table', 'teves_payroll_employee_logs.employee_idx', '=', 'teves_payroll_employee_table.employee_id')
+		->join('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
+		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
+		->where('teves_payroll_employee_logs.log_type', 'RegularOT')
 		->select([
-			'teves_employee_logs.*',
+			'teves_payroll_employee_logs.*',
 			'teves_branch_table.branch_name',
-			'teves_department_table.department_name',
-			'teves_employee_table.employee_number',
-			DB::raw("CONCAT(teves_employee_table.employee_last_name, ', ', teves_employee_table.employee_first_name, ' ', IFNULL(teves_employee_table.employee_middle_name,''), ' ', IFNULL(teves_employee_table.employee_extension_name,''), ' ') as employee_full_name"),
+			'teves_payroll_department_table.department_name',
+			'teves_payroll_employee_table.employee_number',
+			DB::raw("CONCAT(teves_payroll_employee_table.employee_last_name, ', ', teves_payroll_employee_table.employee_first_name, ' ', IFNULL(teves_payroll_employee_table.employee_middle_name,''), ' ', IFNULL(teves_payroll_employee_table.employee_extension_name,''), ' ') as employee_full_name"),
 		]);
 	
 		return DataTables::of($regular_logs)
@@ -87,8 +115,8 @@ class EmployeeRegularLogsController extends Controller
 					<div class="dropdown dropdown-action">
 						<a href="#" class="action-icon dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="true"><i class="si si-options-vertical" data-bs-toggle="tooltip" aria-label="si-options-vertical" data-bs-original-title="si-options-vertical"></i></a>
 							<div class="dropdown-menu dropdown-menu-right " data-popper-placement="bottom-end" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);">
-								<a class="dropdown-item" href="#" data-id="'.$row->employee_logs_id.'" id="edit_employee_logs"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
-								<a class="dropdown-item" href="#" data-id="'.$row->employee_logs_id.'" id="delete_employee_logs"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>
+								<a class="dropdown-item" href="#" data-id="'.$row->cutoff_id.'" id="edit_employee_logs"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
+								<a class="dropdown-item" href="#" data-id="'.$row->cutoff_id.'" id="delete_employee_logs"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>
 							</div>
 					</div>';
                     return $actionBtn;
@@ -109,17 +137,17 @@ class EmployeeRegularLogsController extends Controller
 		$user_data = User::where('user_id', '=', Session::get('loginID'))->first();
 
 		$regular_logs = EmployeeLogsModel::query()
-		->join('teves_employee_table', 'teves_employee_logs.employee_idx', '=', 'teves_employee_table.employee_id')
-		->join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
-		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
-		->where('teves_employee_logs.log_type', 'RestDayOT')
-		//->where('teves_employee_logs.employee_logs_id', 1)
+		->join('teves_payroll_employee_table', 'teves_payroll_employee_logs.employee_idx', '=', 'teves_payroll_employee_table.employee_id')
+		->join('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
+		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
+		->where('teves_payroll_employee_logs.log_type', 'RestDayOT')
+		//->where('teves_payroll_employee_logs.cutoff_id', 1)
 		->select([
-			'teves_employee_logs.*',
+			'teves_payroll_employee_logs.*',
 			'teves_branch_table.branch_name',
-			'teves_department_table.department_name',
-			'teves_employee_table.employee_number',
-			DB::raw("CONCAT(teves_employee_table.employee_last_name, ', ', teves_employee_table.employee_first_name, ' ', IFNULL(teves_employee_table.employee_middle_name,''), ' ', IFNULL(teves_employee_table.employee_extension_name,''), ' ') as employee_full_name"),
+			'teves_payroll_department_table.department_name',
+			'teves_payroll_employee_table.employee_number',
+			DB::raw("CONCAT(teves_payroll_employee_table.employee_last_name, ', ', teves_payroll_employee_table.employee_first_name, ' ', IFNULL(teves_payroll_employee_table.employee_middle_name,''), ' ', IFNULL(teves_payroll_employee_table.employee_extension_name,''), ' ') as employee_full_name"),
 		]);
 	
 		return DataTables::of($regular_logs)
@@ -129,8 +157,8 @@ class EmployeeRegularLogsController extends Controller
 					<div class="dropdown dropdown-action">
 						<a href="#" class="action-icon dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="true"><i class="si si-options-vertical" data-bs-toggle="tooltip" aria-label="si-options-vertical" data-bs-original-title="si-options-vertical"></i></a>
 							<div class="dropdown-menu dropdown-menu-right " data-popper-placement="bottom-end" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);">
-								<a class="dropdown-item" href="#" data-id="'.$row->employee_logs_id.'" id="edit_employee_logs"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
-								<a class="dropdown-item" href="#" data-id="'.$row->employee_logs_id.'" id="delete_employee_logs"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>
+								<a class="dropdown-item" href="#" data-id="'.$row->cutoff_id.'" id="edit_employee_logs"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
+								<a class="dropdown-item" href="#" data-id="'.$row->cutoff_id.'" id="delete_employee_logs"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>
 							</div>
 					</div>';
                     return $actionBtn;
@@ -147,28 +175,29 @@ class EmployeeRegularLogsController extends Controller
 
 		$employeelogsID = $request->employeelogsID;
 
-		$data = EmployeeLogsModel::join('teves_employee_table', 'teves_employee_logs.employee_idx', '=', 'teves_employee_table.employee_id')
-					->join('teves_department_table', 'teves_department_table.department_id', '=', 'teves_employee_table.department_idx')
-					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_employee_table.branch_idx')
-					->where('teves_employee_logs.employee_logs_id', $employeelogsID)
+		$data = EmployeeLogsModel::join('teves_payroll_employee_table', 'teves_payroll_employee_logs.employee_idx', '=', 'teves_payroll_employee_table.employee_id')
+					->join('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
+					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
+					->where('teves_payroll_employee_logs.cutoff_id', $employeelogsID)
               		->get([
-					'teves_employee_table.employee_number',
-					'teves_employee_table.employee_last_name',
-					'teves_employee_table.employee_first_name',
-					'teves_employee_table.employee_middle_name',
-					'teves_employee_table.employee_extension_name',
+					'teves_payroll_employee_table.employee_number',
+					'teves_payroll_employee_table.employee_last_name',
+					'teves_payroll_employee_table.employee_first_name',
+					'teves_payroll_employee_table.employee_middle_name',
+					'teves_payroll_employee_table.employee_extension_name',
+					'teves_payroll_employee_table.employee_full_name',
 					'teves_branch_table.branch_id',
 					'teves_branch_table.branch_name',
 					'teves_branch_table.branch_code',
-					'teves_department_table.department_id',
-					'teves_department_table.department_name',
-					'teves_employee_logs.attendance_date',
-					'teves_employee_logs.override_shift',
-					'teves_employee_logs.log_type',
-					'teves_employee_logs.log_in',
-					'teves_employee_logs.log_out',
-					'teves_employee_logs.breaktime_start',
-					'teves_employee_logs.breaktime_end'
+					'teves_payroll_department_table.department_id',
+					'teves_payroll_department_table.department_name',
+					'teves_payroll_employee_logs.attendance_date',
+					'teves_payroll_employee_logs.override_shift',
+					'teves_payroll_employee_logs.log_type',
+					'teves_payroll_employee_logs.log_in',
+					'teves_payroll_employee_logs.log_out',
+					'teves_payroll_employee_logs.breaktime_start',
+					'teves_payroll_employee_logs.breaktime_end'
 					]);
 		return response()->json($data);
 		
@@ -188,48 +217,44 @@ class EmployeeRegularLogsController extends Controller
 			
 			$branch_idx						= $request->branch_idx;
 			$employee_idx 					= $request->employee_idx;
-			$employee_logs_id 				= $request->employee_logs_id;
+			$cutoff_id 				= $request->cutoff_id;
 			$attendance_date 				= $request->attendance_date;
 			$log_in 						= $request->log_in;
 			$breaktime_start 				= $request->breaktime_start;
 			$breaktime_end 					= $request->breaktime_end;
 			$log_out 						= $request->log_out;
 			$override_default_shift 		= $request->override_default_shift;
-			$regular_overtime_status		= $request->regular_overtime_status;
+			$overtime_status				= $request->overtime_status;
 			
-			/*
-			->where(function ($q) use($client_idx) {
-						if ($client_idx) {
-						   $q->where('teves_billing_table.client_idx', $client_idx);
-						}
-						})
-			*/
 			
 			if($branch_idx!=0 && $employee_idx!=0){
 			/*Query Employee Information*/
 			/*jj*/
-			$employee_data = EmployeeModel::where('teves_employee_table.employee_id', $employee_idx)
+			$employee_data = EmployeeModel::where('teves_payroll_employee_table.employee_id', $employee_idx)
 						->get([
-						'teves_employee_table.branch_idx',
-						'teves_employee_table.department_idx',
-						'teves_employee_table.employee_rate',
-						'teves_employee_table.time_in',
-						'teves_employee_table.break_time_in',
-						'teves_employee_table.break_time_out',
-						'teves_employee_table.time_out',
-						'teves_employee_table.total_shift_hours',
-						'teves_employee_table.total_breaktime_hours',
-						'teves_employee_table.restday_monday',
-						'teves_employee_table.restday_tuesday',
-						'teves_employee_table.restday_wednesday',
-						'teves_employee_table.restday_thursday',
-						'teves_employee_table.restday_friday',
-						'teves_employee_table.restday_saturday',
-						'teves_employee_table.restday_sunday',
+						'teves_payroll_employee_table.branch_idx',
+						'teves_payroll_employee_table.department_idx',
+						'teves_payroll_employee_table.employee_rate',
+						'teves_payroll_employee_table.employee_night_diff_pay',
+						'teves_payroll_employee_table.time_in',
+						'teves_payroll_employee_table.break_time_in',
+						'teves_payroll_employee_table.break_time_out',
+						'teves_payroll_employee_table.time_out',
+						'teves_payroll_employee_table.total_shift_hours',
+						'teves_payroll_employee_table.total_breaktime_hours',
+						'teves_payroll_employee_table.restday_monday',
+						'teves_payroll_employee_table.restday_tuesday',
+						'teves_payroll_employee_table.restday_wednesday',
+						'teves_payroll_employee_table.restday_thursday',
+						'teves_payroll_employee_table.restday_friday',
+						'teves_payroll_employee_table.restday_saturday',
+						'teves_payroll_employee_table.restday_sunday',
 						]);
 			
 			$branch_idx 						= $employee_data[0]->branch_idx;
 			$department_idx 					= $employee_data[0]->department_idx;
+			
+			$employee_night_diff_pay 					= $employee_data[0]->employee_night_diff_pay;
 			
 			$restday_monday 					= $employee_data[0]->restday_monday;
 			$restday_tuesday 					= $employee_data[0]->restday_tuesday;
@@ -279,13 +304,10 @@ class EmployeeRegularLogsController extends Controller
 				if($check_employee_rest_day == 1){
 					
 					$log_type = 'RestDayOT';
-					//$Regular_pay = 0;
-					//$RegularOT_pay = 0;
-					//$RestDayOT_pay = ($employee_current_rate * $total_regular_hours) * 1.3;
 					
 				}else{
 					
-					if($regular_overtime_status=='Yes'){
+					if($overtime_status=='Yes'){
 						
 						$log_type = 'RegularOT';
 						
@@ -299,16 +321,21 @@ class EmployeeRegularLogsController extends Controller
 				}
 				/*jj*/
 			
-			if($regular_overtime_status=='Yes'){
+			if($overtime_status=='Yes'){
 				
 				$request->validate([
 				  'branch_idx'				=> ['required'],
 				  'employee_idx'      		=> ['required'],
-				  'attendance_date'    		=> ['required',Rule::unique('teves_employee_logs')->where( 
+				  'attendance_date'    		=> ['required',Rule::unique('teves_payroll_employee_logs')->where( 
 													fn ($query) =>$query
 														->where('employee_idx', $employee_idx)
 														->where('attendance_date', $attendance_date)
-														->where('log_type',  $log_type )											
+														->where('log_type',  $log_type )
+														->where(function ($q) use($cutoff_id) {
+															if ($cutoff_id!=0) {
+															   $q->where('teves_payroll_employee_logs.cutoff_id', '<>', $cutoff_id);
+															}
+														})											
 													)],
 				  'log_in'    				=> 'required',
 				  'breaktime_start'  		=> 'required',
@@ -317,32 +344,20 @@ class EmployeeRegularLogsController extends Controller
 				]);
 				
 			}else{
-				//echo "|$employee_logs_id|";
+				
 				$request->validate([
 				  'branch_idx'				=> ['required'],
-				  'employee_idx'      		=> ['required',Rule::unique('teves_employee_logs')->where( 
+				  'employee_idx'      		=> ['required'],
+				  'attendance_date'    		=> ['required',Rule::unique('teves_payroll_employee_logs')->where( 
 													fn ($query) =>$query
 														->where('employee_idx', $employee_idx)
 														->where('attendance_date', $attendance_date)
-														->where('log_type', '<>',  $log_type )
-														->where(function ($q) use($employee_logs_id) {
-															if ($employee_logs_id!=0) {
-															   $q->where('teves_employee_logs.employee_logs_id', '<>', $employee_logs_id);
+														->where('log_type',   $log_type )
+														->where(function ($q) use($cutoff_id) {
+															if ($cutoff_id!=0) {
+															   $q->where('teves_payroll_employee_logs.cutoff_id', '<>', $cutoff_id);
 															}
-														})
-														/*->where('employee_logs_id', '<>',  $employee_logs_id )	*/										
-													)],
-				  'attendance_date'    		=> ['required',Rule::unique('teves_employee_logs')->where( 
-													fn ($query) =>$query
-														->where('employee_idx', $employee_idx)
-														->where('attendance_date', $attendance_date)
-														->where('log_type', '<>',  $log_type )
-														->where(function ($q) use($employee_logs_id) {
-															if ($employee_logs_id!=0) {
-															   $q->where('teves_employee_logs.employee_logs_id', '<>', $employee_logs_id);
-															}
-														})
-														/*->where('employee_logs_id', '<>',  $employee_logs_id )	*/										
+														})								
 													)],
 				  'log_in'    	 			=> 'required',
 				  'breaktime_start'   		=> 'required',
@@ -367,9 +382,6 @@ class EmployeeRegularLogsController extends Controller
 			/*Gawing sakto ang na compute na oras. halimbawa nag in sya ng 7:45am pero and dapat na oras nya ay 8am dapat hindi kasama ang 15 minutes sa total hrs*/
 			/*Ma compute din neto and tardiness*/
 
-			
-			
-			
 			/*Compute Total Breaktime Hours*/
 			$total_breaktime_hours = ($break_time_out_string_to_time - $break_time_in_string_to_time) / 3600;
 
@@ -379,8 +391,9 @@ class EmployeeRegularLogsController extends Controller
 			$employee_default_breaktime_out_strtotime = strtotime("$attendance_date $employee_default_breaktime_out");
 
 			/*Compute Tardiness*/
-			$tardiness_morning_shift = ($employee_default_time_in_strtotime - $time_in_string_to_time) / 3600;
-			$tardiness_late_afternoon = ($employee_default_breaktime_out_strtotime - $break_time_out_string_to_time) / 3600;
+			 $tardiness_morning_shift = ($employee_default_time_in_strtotime - $time_in_string_to_time) / 3600;
+			//echo "[$tardiness_morning_shift]";
+			 $tardiness_late_afternoon = ($employee_default_breaktime_out_strtotime - $break_time_out_string_to_time) / 3600;
 			/*Tardiness for Morning*/
 			if($tardiness_morning_shift<0){
 				/*Negative Means Late*/
@@ -399,13 +412,13 @@ class EmployeeRegularLogsController extends Controller
 			}
 	
 			/*Get Total Hours for Employee In and Out Logs*/	
-			$total_hours_from_log_in_and_out = ($time_out_string_to_time - $time_in_string_to_time) / 3600;
+			$total_hours_from_log_in_and_out = number_format(($time_out_string_to_time - $time_in_string_to_time) / 3600+0, 2, '.', '');
 
 			if($override_default_shift=='No'){
 				$total_tardiness = abs($tardiness_morning_shift) + abs($tardiness_late_afternoon);
-				$total_excess_hours = $default_timein_to_timein_log_excess + $default_breaktimeout_to_breaktimeout_log_excess;/*Yung Sobra sa 8hrs*/
+				$total_excess_hours = number_format($default_timein_to_timein_log_excess + $default_breaktimeout_to_breaktimeout_log_excess+0, 2, '.', '');/*Yung Sobra sa 8hrs*/
 				/*Compute the Total Undertime*/
-				$undertime_hours = ($time_out_string_to_time - $employee_default_time_out_strtotime) / 3600;
+				 $undertime_hours = ($time_out_string_to_time - $employee_default_time_out_strtotime) / 3600;
 			}
 			else{
 				$total_tardiness = 0;
@@ -429,6 +442,9 @@ class EmployeeRegularLogsController extends Controller
 			/*Source*/
 			/*https://stackoverflow.com/questions/10532687/time-night-differential-computation-in-php/10534110#10534110*/
 			/*Set Limit for Night Differential*/
+						
+						
+						if($employee_night_diff_pay=='Yes'){
 						
 						define('START_NIGHT_HOUR','22');
 						define('START_NIGHT_MINUTE','00');
@@ -518,49 +534,32 @@ class EmployeeRegularLogsController extends Controller
 							}
 							
 			$covered_night_diff_hrs = number_format(($night_shft_hrs)+0, 1, '.', '');
-			$total_covered_night_diff_hrs = number_format(($night_shft_hrs - $night_shift_breaktime)+0, 1, '.', '');
+			$total_covered_night_diff_hrs = number_format(($night_shft_hrs - $night_shift_breaktime)+0, 2, '.', '');
 			
 			$night_differential_pay = $total_covered_night_diff_hrs * $employee_current_rate * (10/100);
 			/*End to Compute night shift hrs*/
+						}else{
+							
+							$covered_night_diff_hrs = 0;
+							$total_covered_night_diff_hrs = 0;
+							
+							$night_differential_pay = 0;
+							
+						}
 			
-			if($regular_overtime_status=='No'){
+			if($overtime_status=='No'){
 				
-			$total_regular_hours = $total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + $excess_hours_after_shift);
+			$total_regular_hours = $total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + $excess_hours_after_shift + $total_undertime_hours);
 			$total_tardiness_hours = $total_tardiness;
-				// $attendance_date_N = (date('N', strtotime($attendance_date)));
-				
-				// if($attendance_date_N==0){
-					// $check_rest_day = $restday_sunday;
-				// }
-				// else if($attendance_date_N==1){
-					// $check_rest_day = $restday_monday;
-				// }
-				// else if($attendance_date_N==2){
-					// $check_rest_day = $restday_tuesday;
-				// }
-				// else if($attendance_date_N==3){
-					// $check_rest_day = $restday_wednesday;
-				// }
-				// else if($attendance_date_N==4){
-					// $check_rest_day = $restday_thursday;
-				// }
-				// else if($attendance_date_N==5){
-					// $check_rest_day = $restday_friday;
-				// }
-				// else{
-					// $check_rest_day = $restday_saturday;
-				// }
 				
 				if($check_employee_rest_day == 1){
 					
-					//$log_type = 'RestDayOT';
 					$Regular_pay = 0;
 					$RegularOT_pay = 0;
 					$RestDayOT_pay = ($employee_current_rate * $total_regular_hours) * 1.3;
 					
 				}else{
 					
-					//$log_type = 'Regular';
 					/*Compute by Rate*/
 					/*Computed pay = total regular hours by rate*/
 					$Regular_pay = $employee_current_rate * $total_regular_hours;
@@ -571,17 +570,14 @@ class EmployeeRegularLogsController extends Controller
 				
 			}else{
 			$total_tardiness_hours = 0;
-			$total_regular_hours = $total_hours_from_log_in_and_out - ($total_breaktime_hours);
+			$total_regular_hours = $total_hours_from_log_in_and_out - (0);
 
-					//$log_type = 'RegularOT';
 					/*Soon to have a table for Rate on Overtime - Hard Coded pa to to 0.25*/
 					$Regular_pay = 0;
 					$RegularOT_pay = $employee_current_rate * 1.25 * $total_regular_hours;
 					$RestDayOT_pay = 0;
 					
 			}
-			
-			
 			
 			/*Query Holiday*/
 			/*Holiday Computation from Logs*/
@@ -624,7 +620,6 @@ class EmployeeRegularLogsController extends Controller
 				/*Regular Holiday and Restday Overtime*/
 				else{
 					//2600 = 1000 X 200% + (1000 x 200% )X30%(*0.3)
-
 					$regular_holiday_pay += 1.3 * ( $employee_current_rate * $total_regular_hours ) ;
 
 				}
@@ -668,8 +663,8 @@ class EmployeeRegularLogsController extends Controller
 			
 			}
 			
-			if($employee_logs_id==0){
-			
+			if($cutoff_id==0){
+
 				$EmployeeRegularLogs = new EmployeeLogsModel();
 			
 				$EmployeeRegularLogs->employee_idx 						= $employee_idx;
@@ -717,7 +712,7 @@ class EmployeeRegularLogsController extends Controller
 			}else{
 			
 				$EmployeeRegularLogs = new EmployeeLogsModel();
-				$EmployeeRegularLogs = EmployeeLogsModel::find($employee_logs_id);
+				$EmployeeRegularLogs = EmployeeLogsModel::find($cutoff_id);
 				
 				$EmployeeRegularLogs->branch_idx 						= $branch_idx;
 				$EmployeeRegularLogs->department_idx 					= $department_idx;

@@ -25,6 +25,11 @@ else if (Request::is('branch')){
 @include('layouts.department_script')
 <?php
 }
+else if (Request::is('cut-off')){
+?>
+@include('layouts.cut_off_script')
+<?php
+}
 else if (Request::is('holiday')){
 ?>
 @include('layouts.holiday_script')
@@ -53,6 +58,11 @@ else if (Request::is('employee-deduction-logs')){
 else if (Request::is('create-payroll')){
 ?>
 @include('layouts.create_payroll_script')
+<?php
+}else if (Request::is('user')){
+?>
+<body class="">
+@include('layouts.user_script')
 <?php
 }
 ?>

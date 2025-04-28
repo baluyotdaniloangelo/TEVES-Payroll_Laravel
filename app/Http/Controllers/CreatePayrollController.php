@@ -274,10 +274,13 @@ class CreatePayrollController extends Controller
         ]
 		);
 
-		
+		$_payroll_start_date=date_create("$start_date");
+        $payroll_month = strtoupper(date_format($_payroll_start_date,"F"));
+
 		/*Saved Cut-off*/
 		$SaveCutOFF = new CutOffModel();
 		$SaveCutOFF->branch_idx 			= $branchID;
+        $SaveCutOFF->cut_off_month       	= $payroll_month;
 		$SaveCutOFF->cut_off_period_start 	= $start_date;
 		$SaveCutOFF->cut_off_period_end 	= $end_date;
 		$SaveCutOFF->created_by_user_idx 	= Session::get('loginID');
@@ -295,7 +298,10 @@ class CreatePayrollController extends Controller
 					'teves_payroll_employee_table.employment_type'
 					]);
 					
-			$result = array();	
+			$result = array();
+
+            $cut_off_gross_salary 					= 0;
+			$cut_off_net_salary 					= 0;
 			
 			foreach ($employee_data as $employee_data_cols){
 					
@@ -468,7 +474,10 @@ class CreatePayrollController extends Controller
 					$SaveEmployeesSalaryPerCutOFF->net_salary 						= $net_salary;
 					$SaveEmployeesSalaryPerCutOFF->created_by_user_idx 				= Session::get('loginID');
 					$result_save_salary = $SaveEmployeesSalaryPerCutOFF->save();
-					
+
+                    $cut_off_gross_salary 					+= $gross_salary;
+			        $cut_off_net_salary 					+= $net_salary;
+
 					$RegularLogsLock = EmployeeLogsModel::where('employee_idx', $employee_id)
 					->where('log_type', 'Regular')
 					->whereBetween('attendance_date', ["$start_date", "$end_date"])
@@ -523,12 +532,17 @@ class CreatePayrollController extends Controller
 						],
 						);	
 						
-			}	
+			}
+                /*Update Cut-off Gross and Net Salary*/
+		        $UpdateCutOFF = new CutOffModel();
+                $UpdateCutOFF = CutOffModel::find($cutoff_idx);
+		        $UpdateCutOFF->cut_off_gross_salary 		= $cut_off_gross_salary;
+		        $UpdateCutOFF->cut_off_net_salary 			= $cut_off_net_salary;
+		        $UpdateCutOFF->update();
 
 				$datatable_data =  DataTables::of($result)
 				->addIndexColumn()
                 ->make(true);	
-				
 				return response()->json(array('data' => $datatable_data, 'cutoff_idx' => @$cutoff_idx), 200);
 				
 	}

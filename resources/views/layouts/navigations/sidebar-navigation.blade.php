@@ -74,6 +74,7 @@
 									<li><a class="<?php if(@$active_link=='employee_attendance_logs'){ echo "active"; }?>" href="{{ route('employee_attendance_logs') }}">Attendance Logs</a></li>
 									<li><a class="<?php if(@$active_link=='employee_deduction_logs'){ echo "active"; }?>" href="{{ route('employee_allowance_logs') }}">Allowance Logs</a></li>
 									<li><a class="<?php if(@$active_link=='employee_deduction_logs'){ echo "active"; }?>" href="{{ route('employee_deduction_logs') }}">Deduction Logs</a></li>
+									<li><a class="<?php if(@$active_link=='cut_off'){ echo "active"; }?>" href="{{ route('CutOff') }}" title="View Saved Payroll, on Every Cut Off, Review and Approved">Cut-Off</a></li>
 									
 								</ul>
 							</li>
@@ -85,6 +86,7 @@
 								<ul>
 								
 									<li><a class="<?php if(@$active_link=='employee'){ echo "active"; }?>" href="{{ route('employee') }}">Employees List</a></li>
+									<li><a class="<?php if(@$active_link=='branch'){ echo "active"; }?>" href="{{ route('branch') }}">Branch</a></li>
 									<li><a class="<?php if(@$active_link=='branch'){ echo "active"; }?>" href="{{ route('branch') }}">Branch</a></li>
 									<li><a class="<?php if(@$active_link=='holiday'){ echo "active"; }?>" href="{{ route('holiday') }}">Holidays</a></li>
 									<li><a class="<?php if(@$active_link=='deduction_type'){ echo "active"; }?>" href="{{ route('deduction_type') }}">Deduction Type</a></li>

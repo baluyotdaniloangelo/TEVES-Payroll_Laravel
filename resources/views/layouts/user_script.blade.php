@@ -12,9 +12,6 @@
 			responsive: true,
 			serverSide: true,
 			stateSave: true,/*Remember Searches*/
-			scrollCollapse: true,
-			scrollY: '500px',
-			// scrollX: '100%',
 			ajax: {
 				url : "{{ route('UserList') }}",
 				method : 'POST',

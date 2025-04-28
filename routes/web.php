@@ -18,6 +18,7 @@ use App\Http\Controllers\DriversLogsController;
 
 use App\Http\Controllers\CreatePayrollController;
 use App\Http\Controllers\PayslipController;
+use App\Http\Controllers\CutOffController;
 
 // use App\Http\Controllers\CAMRSampleExcel;
 
@@ -118,7 +119,6 @@ Route::post('/submit_drivers_logs_information', [DriversLogsController::class,'s
 Route::post('/drivers_logs_info', [DriversLogsController::class, 'drivers_logs_info'])->name('DriversLogsInformation')->middleware('isLoggedIn');
 Route::post('/delete_driver_log_confirmed', [DriversLogsController::class, 'delete_driver_log_confirmed'])->name('DeleteDriversLog')->middleware('isLoggedIn');
 
-
 /*Deduction Type*/
 Route::get('/deduction_type', [DeductionTypeController::class,'DeductionType'])->name('deduction_type')->middleware('isLoggedIn');
 Route::get('deduction_type/list', [DeductionTypeController::class, 'getDeductionTypeList'])->name('getDeductionTypeList')->middleware('isLoggedIn');
@@ -176,6 +176,16 @@ Route::post('/save_generated_payroll', [CreatePayrollController::class,'save_gen
 Route::get('/generate_employees_payroll_draft_pdf', [CreatePayrollController::class,'generate_employees_payroll_draft_pdf'])->name('EmployeesPayrollDrafts')->middleware('isLoggedIn');
 /*PDF - Saved*/
 Route::get('/generate_employees_saved_payroll_pdf', [CreatePayrollController::class,'generate_employees_saved_payroll_pdf'])->name('EmployeesPayrollSaved')->middleware('isLoggedIn');
+
+/*Saved Cut Off Items*/
+Route::get('/cut-off', [CutOffController::class,'cut_off'])->name('CutOff')->middleware('isLoggedIn');
+Route::get('cut-off/list', [CutOffController::class, 'getCutOffList'])->name('getCutOffList')->middleware('isLoggedIn');
+/*Create or Update holiday*/
+//Route::post('/submit_holiday_post', [HolidayController::class,'submit_holiday_post'])->name('SubmitHoliday')->middleware('isLoggedIn');
+/*GET holiday Info*/
+//Route::post('/holiday_info', [HolidayController::class, 'holiday_info'])->name('HolidayInfo')->middleware('isLoggedIn');
+/*Confirm Delete holiday*/
+//Route::post('/delete_holiday_confirmed', [HolidayController::class, 'delete_holiday_confirmed'])->name('DeleteHoliday')->middleware('isLoggedIn');
 
 
 /*Payslip*/

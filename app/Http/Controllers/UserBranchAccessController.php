@@ -5,46 +5,36 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\UserAccountModel;
-use App\Models\UserSiteAccessModel;
-use App\Models\SiteModel;
+use App\Models\UserBranchAccessModel;
+use App\Models\BranchModel;
 use Hash;
 use Session;
 use Validator;
 use DataTables;
 use Illuminate\Support\Facades\Storage;
 
-class UserSiteAccessController extends Controller
+class UserBranchAccessController extends Controller
 {
 
 	/*Fetch Site List using Datatable*/
-	public function getUserSiteAccess(Request $request)
+	public function getUserBranchAccess(Request $request)
     {
 		
 		$userID = $request->UserID;
 		
 		if ($request->ajax()) {
 		
-		$user_site_access_data = SiteModel::leftJoin('user_access_group', function($q) use ($userID)
+		$user_site_access_data = BranchModel::leftJoin('teves_user_branch_access', function($q) use ($userID)
         {
-            $q->on('meter_site.site_id', '=', 'user_access_group.site_idx')
-				->where('user_idx', '=', $userID);
+            $q->on('teves_branch_table.branch_id', '=', 'teves_user_branch_access.branch_idx')
+				->where('teves_user_branch_access.user_idx', '=', $userID);
         })
-			->leftjoin('meter_building_table', 'meter_building_table.site_idx', '=', 'meter_site.site_id')
-			->leftjoin('meter_division_table', 'meter_division_table.division_id', '=', 'meter_site.division_idx')
-			->leftjoin('meter_company_table', 'meter_company_table.company_id', '=', 'meter_site.company_idx')
               		->get([
-					'meter_site.site_id',
-					'user_access_group.user_idx',
-					'user_access_group.site_idx',
-					'meter_building_table.building_code',
-					'meter_building_table.building_description',
-					'meter_company_table.company_name',
-					'meter_division_table.division_code',
-					'meter_building_table.device_ip_range',
-					'meter_building_table.ip_network',
-					'meter_building_table.ip_netmask',
-					'meter_building_table.ip_gateway',
-					'meter_building_table.cut_off'
+					'teves_branch_table.branch_id',
+					'teves_user_branch_access.user_idx',
+					'teves_user_branch_access.branch_idx',
+					'teves_branch_table.branch_code',
+					'teves_branch_table.branch_name'
 					]);
 
 		return DataTables::of($user_site_access_data)
@@ -52,8 +42,8 @@ class UserSiteAccessController extends Controller
                 ->addColumn('action', function($row){
                     
 				     $user_id 			= $row->user_idx;
-					 $site_id 			= $row->site_id;
-					 $access_verified 	= $row->site_idx;
+					 $branch_id 		= $row->branch_id;
+					 $access_verified 	= $row->branch_idx;
 										
 							if($access_verified != NULL){
 								
@@ -65,7 +55,7 @@ class UserSiteAccessController extends Controller
 								
 							}
 					
-					$actionBtn = "<input type='checkbox' name='site_checklist' onclick='enableUpdateUserAccess();' value='".$site_id."' id='CheckboxGroup1_".$site_id."' ".$chk_status."/>";
+					$actionBtn = "<input type='checkbox' name='site_checklist' value='".$branch_id."' id='CheckboxGroup1_".$branch_id."' ".$chk_status."/>";
                     return $actionBtn;
                 })
 				
@@ -85,7 +75,7 @@ class UserSiteAccessController extends Controller
 			@$site_list_arr = explode(",", $site_list_ids);
 
 			/*RESET*/
-			UserSiteAccessModel::where('user_idx', $userID)->delete();
+			UserBranchAccessModel::where('user_idx', $userID)->delete();
 
 			if($site_list_ids!=''){
 				
@@ -96,12 +86,11 @@ class UserSiteAccessController extends Controller
 				
 				/*Re Insert Updated List*/
 			
-				$NewUserSiteAccess = new UserSiteAccessModel();
+				$NewUserSiteAccess = new UserBranchAccessModel();
 				$NewUserSiteAccess->makeHidden(['user_name']);
 				$NewUserSiteAccess->user_idx 				= $userID;
-				$NewUserSiteAccess->site_idx 			= $site_id;
+				$NewUserSiteAccess->branch_idx 				= $site_id;
 				$NewUserSiteAccess->created_by_user_idx 	= Session::get('loginID');
-				$NewUserSiteAccess->access_list_src 		= 'CAMR';
 				$result = $NewUserSiteAccess->save();
 			
 			endforeach; 
