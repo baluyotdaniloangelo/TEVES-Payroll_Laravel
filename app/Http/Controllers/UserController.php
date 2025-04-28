@@ -74,8 +74,8 @@ class UserController extends Controller
 						    <a href="#" class="action-icon dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="true"><i class="si si-options-vertical" data-bs-toggle="tooltip" aria-label="si-options-vertical" data-bs-original-title="si-options-vertical"></i></a>
 							    <div class="dropdown-menu dropdown-menu-right " data-popper-placement="bottom-end" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);">
 								    <a class="dropdown-item" href="#" data-id="'.$row->user_id.'" id="edit_employee_logs" id="UserAccess" onclick="UpdateUserAccess('.$row->user_id.')" ><i class="fa-solid fa-building  m-r-5"></i> Branch Access</a>
-                                    <a class="dropdown-item" href="#" data-id="'.$row->user_id.'" id="edit_employee_logs"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
-								    <a class="dropdown-item" href="#" data-id="'.$row->user_id.'" id="delete_employee_logs"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>
+                                    <a class="dropdown-item" href="#" data-id="'.$row->user_id.'" id="editUser"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
+								    <a class="dropdown-item" href="#" data-id="'.$row->user_id.'" id="deleteUser"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>
 							    </div>
 					    </div>';
 					
@@ -116,7 +116,7 @@ class UserController extends Controller
 	public function user_info(Request $request){
 
 		$UserID = $request->UserID;
-		$data = UserAccountModel::find($UserID, ['user_name','user_real_name','user_type', 'user_job_title', 'user_email_address', 'user_branch_access_type']);
+		$data = UserAccountModel::find($UserID, ['user_name','user_real_name','user_type', 'user_job_title', 'user_email_address', 'user_type', 'user_branch_access_type']);
 		return response()->json($data);
 		
 	}

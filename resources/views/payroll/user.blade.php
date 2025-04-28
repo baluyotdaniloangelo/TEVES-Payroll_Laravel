@@ -59,7 +59,7 @@
 					<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title" id="modal_title_action_holiday">Add User</h5>
+								<h5 class="modal-title" id="modal_title_action_user">Add User</h5>
 								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
 									<span aria-hidden="true">&times;</span>
 								</button>
@@ -140,7 +140,7 @@
 									</div>	
 										
 									<div class="submit-section">
-										<button class="btn btn-primary submit-btn" id="submit_user_details" value="0">Submit</button>
+										<button class="btn btn-primary submit-btn" id="save-user" value="0">Submit</button>
 									</div>
 									
 								</form>

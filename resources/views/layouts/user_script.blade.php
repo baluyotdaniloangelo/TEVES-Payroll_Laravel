@@ -1,7 +1,7 @@
+
    <!-- Page level plugins -->
-   <script src="{{asset('Datatables/2.0.8/js/dataTables.js')}}"></script>
+  <script src="{{asset('Datatables/2.0.8/js/dataTables.js')}}"></script>
    <script src="{{asset('Datatables/responsive/3.0.2/js/dataTables.responsive.js')}}"></script>
-   <script src="{{asset('Datatables/responsive/3.0.2/js/responsive.dataTables.js')}}"></script>
    <script type="text/javascript">
    // $(window).resize(function(){location.reload();});
 	<!--Load Table-->				
@@ -96,8 +96,10 @@
 					$('#user_passwordError').text('');
 					$('#user_typeError').text('');
 
-			document.getElementById('CreateUserform').className = "g-3 needs-validation was-validated";
-			
+			document.getElementById('UserForm').className = "g-3 needs-validation was-validated";
+
+            let userID 				= document.getElementById("save-user").value;
+
 			let user_real_name 		= $("input[name=user_real_name]").val();
 			let user_name 			= $("input[name=user_name]").val();
 			let user_email_address 	= $("input[name=user_email_address_management]").val();
@@ -110,6 +112,7 @@
 				url: "/create_user_post",
 				type:"POST",
 				data:{
+                   userID:userID,
 				  user_real_name:user_real_name,
 				  user_name:user_name,
 				  user_email_address:user_email_address,
@@ -211,28 +214,30 @@
 	function ResetFormUser(){
 			
 			event.preventDefault();
-			$('#CreateUserform')[0].reset();
+			$('#UserForm')[0].reset();
 
-			$('#user_email_address_managementError').html("");
-			document.getElementById('user_email_address_managementError').className = "valid-feedback";
-			document.getElementById('user_email_address_management').className = "form-control";
+			$('#user_email_addressError').html("");
+			document.getElementById('user_email_addressError').className = "valid-feedback";
+			document.getElementById('user_email_address').className = "form-control";
 
-			document.getElementById('CreateUserform').className = "g-3 needs-validation";
+			document.getElementById('UserForm').className = "g-3 needs-validation";
 			
 	}	
 
 	<!--Select Site For Update-->
 	$('body').on('click','#editUser',function(){
 			
-			$('#UpdateUserform')[0].reset();
-			$('#update_user_real_nameError').text('');				  
-			$('#update_user_nameError').text('');
-			$('#update_user_passwordError').text('');
-			$('#update_user_typeError').text('');
-			$('#update_user_job_titleError').text('');
+			//$('#UpdateUserform')[0].reset();
+			//$('#update_user_real_nameError').text('');				  
+			//$('#update_user_nameError').text('');
+			//$('#update_user_passwordError').text('');
+			//$('#update_user_typeError').text('');
+			//$('#update_user_job_titleError').text('');
 					
 			event.preventDefault();
 			let UserID = $(this).data('id');
+
+            $('#modal_title_action_user').html('Edit User');
 			
 			  $.ajax({
 				url: "/user_info",
@@ -245,23 +250,21 @@
 				  console.log(response);
 				  if(response) {
 					
-					document.getElementById("update-user").value = UserID;
-					document.getElementById("update-user").disabled = true;
+					document.getElementById("save-user").value = UserID;
+					document.getElementById("save-user").disabled = true;
 					/*Set Switch Details*/
-					document.getElementById("update_user_real_name").value = response.user_real_name;
-					document.getElementById("update_user_name").value = response.user_name;
-					document.getElementById("update_user_email_address_management").value = response.user_email_address;
-					document.getElementById("update_user_type").value = response.user_type;
-					document.getElementById("update_user_access").value = response.user_access;
-					document.getElementById("update_user_job_title").value = response.user_job_title;
+					document.getElementById("user_real_name").value = response.user_real_name;
+					document.getElementById("user_name").value = response.user_name;
+					document.getElementById("user_email_address").value = response.user_email_address;
+					document.getElementById("user_type").value = response.user_type;
+					document.getElementById("user_access").value = response.user_branch_access_type;
+					document.getElementById("user_job_title").value = response.user_job_title;
 					
-					$('#update_user_email_address_managementError').html("");
-					document.getElementById('update_user_email_address_managementError').className = "valid-feedback";
-					document.getElementById('update_user_email_address_management').className = "form-control";
-
+					$('#user_email_addressError').html("");
+					document.getElementById('user_email_addressError').className = "valid-feedback";
+					document.getElementById('user_email_address').className = "form-control";
 						
-					$('#UpdateUserModal').modal('toggle');	
-					
+					$('#user_details_modal').modal('toggle');	
 				  
 				  }
 				},
@@ -271,27 +274,26 @@
 				}
 			   });		
 	  });
-	  
-	document.getElementById("update_user_real_name").addEventListener('change', doThing_account_management);
-	document.getElementById("update_user_name").addEventListener('change', doThing_account_management);
-	document.getElementById("update_user_email_address_management").addEventListener('change', doThing_account_management);
 
-	document.getElementById("update_user_password").addEventListener('change', doThing_account_management);
-	document.getElementById("update_user_type").addEventListener('change', doThing_account_management);
-	document.getElementById("update_user_access").addEventListener('change', doThing_account_management);
-	document.getElementById("update_user_job_title").addEventListener('change', doThing_account_management);
+    document.getElementById("user_real_name").addEventListener('change', doThing_account_management);
+	document.getElementById("user_name").addEventListener('change', doThing_account_management);
+	document.getElementById("user_email_address").addEventListener('change', doThing_account_management);
+	document.getElementById("user_password").addEventListener('change', doThing_account_management);
+	document.getElementById("user_type").addEventListener('change', doThing_account_management);
+	document.getElementById("user_access").addEventListener('change', doThing_account_management);
+	document.getElementById("user_job_title").addEventListener('change', doThing_account_management);
 	
 	function doThing_account_management(){
 
-			let userID = document.getElementById("update-user").value;
+			let userID = document.getElementById("save-user").value;
 		
-			let user_real_name 		= $("input[name=update_user_real_name]").val();
-			let user_name 			= $("input[name=update_user_name]").val();
-			let user_email_address 	= $("input[name=update_user_email_address_management]").val();
-			let user_password 		= $("input[name=update_user_password]").val();
-			let user_type 			= $("#update_user_type").val();	
-			let user_access 		= $("#update_user_access").val();
-			let user_job_title 		= $("input[name=update_user_job_title]").val();
+			let user_real_name 		= $("input[name=user_real_name]").val();
+			let user_name 			= $("input[name=user_name]").val();
+			let user_email_address 	= $("input[name=user_email_address]").val();
+			let user_password 		= $("input[name=user_password]").val();
+			let user_type 			= $("#user_type").val();	
+			let user_access 		= $("#user_access").val();
+			let user_job_title 		= $("input[name=user_job_title]").val();
 		
 		$.ajax({
 				url: "/user_info",
@@ -307,27 +309,25 @@
 				  
 				  if(user_password!==''){
 						
-						// alert('S1');
-						if(response.user_real_name===user_real_name && response.user_name===user_name && response.user_email_address===user_email_address && response.user_type===user_type && response.user_access===user_access && response.user_job_title===user_job_title){
+						if(response.user_real_name===user_real_name && response.user_name===user_name && response.user_email_address===user_email_address && response.user_type===user_type && response.user_branch_access_type===user_access && response.user_job_title===user_job_title){
 							
-							document.getElementById("update-user").disabled = false;
+							document.getElementById("save-user").disabled = false;
 							
 						}else{
 							
-							document.getElementById("update-user").disabled = false;
+							document.getElementById("save-user").disabled = false;
 							
 						}
 					
 				  }else{
 					  
-					  // alert('S2');
-					  if(response.user_real_name===user_real_name && response.user_name===user_name && response.user_email_address===user_email_address && response.user_type===user_type && response.user_access===user_access && response.user_job_title===user_job_title){
+					  if(response.user_real_name===user_real_name && response.user_name===user_name && response.user_email_address===user_email_address && response.user_type===user_type && response.user_branch_access_type===user_access && response.user_job_title===user_job_title){
 							
-							document.getElementById("update-user").disabled = true;
+							document.getElementById("save-user").disabled = true;
 							
 						}else{
 							
-							document.getElementById("update-user").disabled = false;
+							document.getElementById("save-user").disabled = false;
 							
 						}
 					  
