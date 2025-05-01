@@ -60,7 +60,7 @@
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title" id="modal_title_action_user">Add User</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="ResetFormUser()">
 									<span aria-hidden="true">&times;</span>
 								</button>
 							</div>
@@ -154,31 +154,34 @@
 				
 				
 				<!-- Delete Branch Modal -->
-				<div class="modal custom-modal fade" id="HolidayDeleteModal" role="dialog">
+				<div class="modal custom-modal fade" id="UserDeleteModal"  data-bs-backdrop="static" role="dialog">
 					<div class="modal-dialog modal-dialog-centered">
 						<div class="modal-content">
 							<div class="modal-body">
 								<div class="form-header">
-									<h3>Delete Holiday</h3>
+									<h3>Delete User</h3>
 									<p>Are you sure want to delete?</p>
 								</div>
 								<div class="modal-btn delete-action">
 									<div class="row">
-									<div class="card text-center">
-								<div class="card-header border-bottom-0 pb-0">
-									<span class="ms-auto shadow-lg fs-17"></span>
-								</div>
+									<div class="card">
 								<div class="card-body pt-1">
-									<!--<span class="avatar avatar-xl avatar-rounded me-2 mb-2">
-										<img src="assets/img/avatar/avatar-7.jpg" alt="img">
-									</span>-->
-									<div class="fw-semibold fs-16"><span id="delete_holiday_complete_name"></span></div>
+                                            <div class="card ribbone-card">
+												<div class="arrow-ribbone-left bg-secondary">User</div>
+												<div class="card-body">
+													<h6 class="card-subtitle mb-2 text-dark fw-bold text-end">&nbsp;</h6>
+													<p class="card-text"><b>Name:</b> <span id="user_real_name_info_delete">G-T PETROLEUM PRODUCTS RETAILING</span></p>
+													<p class="card-text"><b>Username:</b> <span id="user_name_info_delete">GT</span></p>
+													<p class="card-text"><b>Usertype:</b> <span id="user_type_info_delete">GT</span></p>
+												</div>
+											</div>
+
 								</div>
 							</div>
 									</div>
 									
 									<div class="row">
-										<button type="submit" class="col-6 btn btn-primary continue-btn" id="deleteHolidayConfirmed">Delete</button>
+										<button type="submit" class="col-6 btn btn-primary continue-btn" id="deleteUserConfirmed">Delete</button>
 										<div class="col-6">
 											<a href="javascript:void(0);" data-bs-dismiss="modal" class="btn btn-primary cancel-btn">Cancel</a>
 										</div>
@@ -209,11 +212,80 @@
 				
 				<!-- Succeful Action End -->
 				
-				
-				
-				
 				</div>
-				
+				<!-- User Access Modal -->
+				<div id="BranchUserAccessModal" class="modal custom-modal fade" data-bs-backdrop="static" role="dialog">
+					<div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="modal_title_branch_department_management"></h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+
+
+									<div class="row">
+									
+										<div class="col-md-4">
+											<div class="card ribbone-card">
+												<div class="arrow-ribbone-left bg-secondary">User Information</div>
+												<div class="card-body">
+													<h6 class="card-subtitle mb-2 text-dark fw-bold text-end">&nbsp;</h6>
+													<p class="card-text"><b>Name:</b> <span id="user_real_name_info_branch_access"></span></p>
+													<p class="card-text"><b>User Name:</b> <span id="user_name_info_branch_access"></span></p>
+													<p class="card-text"><b>User Type:</b> <span id="user_type_info_branch_access"></span></p>
+
+                                                    </div>
+											</div>
+											
+										</div>
+										
+										
+										<div class="col-sm-8">
+										
+											<!--table for department-->
+											<div class="row mb-3">
+											<div class="table-responsive">
+                                            <table class="table table-bordered dataTable" id="UserBranchAccessList" width="100%" cellspacing="0">
+											        <thead>
+												        <tr>
+													        <th class="all"></th>
+													        <th class="all">#</th>
+													        <th class="all">Branch Code</th>
+													        <th class="all">Branch Name</th>
+												        </tr>
+											        </thead>				
+											
+											        <tbody>
+												
+											        </tbody>
+											
+											        <tfoot>
+												        <tr>
+													        <th class="all"></th>
+													        <th class="all">#</th>
+													        <th class="all">Branch Code</th>
+													        <th class="all">Branch Name</th>
+												        </tr>
+											        </tfoot>
+												</table>
+											</div>
+											</div>
+										</div>
+									</div>
+									
+									<!-- -->
+                                    <div class="submit-section">
+										<button class="btn btn-primary submit-btn" id="update-user-branch-access" value="0">Submit</button>
+									</div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- User Access Modal -->								
 				
 				
 			<!-- /Page Wrapper -->

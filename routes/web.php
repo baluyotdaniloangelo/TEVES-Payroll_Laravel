@@ -5,7 +5,7 @@ use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\EmployeeManagementController;
 
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\UserSiteAccessController;
+use App\Http\Controllers\UserBranchAccessController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\HolidayController;
@@ -153,9 +153,9 @@ Route::post('user_list', [UserController::class, 'getUserList'])->name('UserList
 /*Create User*/
 Route::post('/create_user_post', [UserController::class,'create_user_post'])->name('create_user_post')->middleware('isLoggedIn');
 /*View Site Access*/
-Route::get('user_site_access', [UserSiteAccessController::class, 'getUserSiteAccess'])->name('getUserSiteAccess')->middleware('isLoggedIn');
+Route::get('user_branch_access', [UserBranchAccessController::class, 'getUserBranchAccess'])->name('getUserBranchAccess')->middleware('isLoggedIn');
 /*Add Site Access*/
-Route::post('/add_user_access_post', [UserSiteAccessController::class,'add_user_access_post'])->name('add_user_access_post')->middleware('isLoggedIn');
+Route::post('/add_user_access_post', [UserBranchAccessController::class,'add_user_access_post'])->name('add_user_access_post')->middleware('isLoggedIn');
 
 
 /*GET User Info*/

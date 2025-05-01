@@ -87,7 +87,7 @@
 								
 									<li><a class="<?php if(@$active_link=='employee'){ echo "active"; }?>" href="{{ route('employee') }}">Employees List</a></li>
 									<li><a class="<?php if(@$active_link=='branch'){ echo "active"; }?>" href="{{ route('branch') }}">Branch</a></li>
-									<li><a class="<?php if(@$active_link=='branch'){ echo "active"; }?>" href="{{ route('branch') }}">Branch</a></li>
+									<li><a class="<?php if(@$active_link=='user'){ echo "active"; }?>" href="{{ route('user') }}">User</a></li>
 									<li><a class="<?php if(@$active_link=='holiday'){ echo "active"; }?>" href="{{ route('holiday') }}">Holidays</a></li>
 									<li><a class="<?php if(@$active_link=='deduction_type'){ echo "active"; }?>" href="{{ route('deduction_type') }}">Deduction Type</a></li>
 									

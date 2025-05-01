@@ -24,20 +24,20 @@ class UserBranchAccessController extends Controller
 		
 		if ($request->ajax()) {
 		
-		$user_site_access_data = BranchModel::leftJoin('teves_user_branch_access', function($q) use ($userID)
+		$user_branch_access_data = BranchModel::leftJoin('teves_payroll_user_branch_access', function($q) use ($userID)
         {
-            $q->on('teves_branch_table.branch_id', '=', 'teves_user_branch_access.branch_idx')
-				->where('teves_user_branch_access.user_idx', '=', $userID);
+            $q->on('teves_branch_table.branch_id', '=', 'teves_payroll_user_branch_access.branch_idx')
+				->where('teves_payroll_user_branch_access.user_idx', '=', $userID);
         })
               		->get([
 					'teves_branch_table.branch_id',
-					'teves_user_branch_access.user_idx',
-					'teves_user_branch_access.branch_idx',
+					'teves_payroll_user_branch_access.user_idx',
+					'teves_payroll_user_branch_access.branch_idx',
 					'teves_branch_table.branch_code',
 					'teves_branch_table.branch_name'
 					]);
 
-		return DataTables::of($user_site_access_data)
+		return DataTables::of($user_branch_access_data)
 				->addIndexColumn()
                 ->addColumn('action', function($row){
                     
@@ -55,7 +55,7 @@ class UserBranchAccessController extends Controller
 								
 							}
 					
-					$actionBtn = "<input type='checkbox' name='site_checklist' value='".$branch_id."' id='CheckboxGroup1_".$branch_id."' ".$chk_status."/>";
+					$actionBtn = "<input type='checkbox' name='branch_checklist' value='".$branch_id."' id='CheckboxGroup1_".$branch_id."' ".$chk_status."/>";
                     return $actionBtn;
                 })
 				
@@ -69,34 +69,34 @@ class UserBranchAccessController extends Controller
 	public function add_user_access_post(Request $request){
 		
 			$userID = $request->userID;
-			$site_items = $request->site_items;
+			$branch_items = $request->branch_items;
 	
-			$site_list_ids = $site_items;
-			@$site_list_arr = explode(",", $site_list_ids);
+			$branch_list_ids = $branch_items;
+			@$branch_list_arr = explode(",", $branch_list_ids);
 
 			/*RESET*/
 			UserBranchAccessModel::where('user_idx', $userID)->delete();
 
-			if($site_list_ids!=''){
+			if($branch_list_ids!=''){
 				
 			/*LIST OF SITE ID's*/		
-			foreach ($site_list_arr as $site_list_ids_row):
+			foreach ($branch_list_arr as $branch_list_ids_row):
 
-				@$site_id = $site_list_ids_row; 
+				@$branch_id = $branch_list_ids_row; 
 				
 				/*Re Insert Updated List*/
 			
 				$NewUserSiteAccess = new UserBranchAccessModel();
 				$NewUserSiteAccess->makeHidden(['user_name']);
 				$NewUserSiteAccess->user_idx 				= $userID;
-				$NewUserSiteAccess->branch_idx 				= $site_id;
+				$NewUserSiteAccess->branch_idx 				= $branch_id;
 				$NewUserSiteAccess->created_by_user_idx 	= Session::get('loginID');
 				$result = $NewUserSiteAccess->save();
 			
 			endforeach; 
 	
 				if($result){
-					return response()->json(['success'=>'User Site Access Updated!']);
+					return response()->json(['success'=>'updated!']);
 				}
 				else{
 					return response()->json(['success'=>'User Site Access Information']);
@@ -105,7 +105,7 @@ class UserBranchAccessController extends Controller
 			}
 			else{
 				
-				return response()->json(['success'=>'User Site Access Removed!']);
+				return response()->json(['success'=>'removed!']);
 			
 			}
 	
