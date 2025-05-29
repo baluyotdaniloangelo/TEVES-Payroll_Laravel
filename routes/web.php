@@ -20,6 +20,8 @@ use App\Http\Controllers\CreatePayrollController;
 use App\Http\Controllers\PayslipController;
 use App\Http\Controllers\CutOffController;
 
+use App\Http\Controllers\CSVImportController;
+
 // use App\Http\Controllers\CAMRSampleExcel;
 
 use App\Http\Controllers\EmailController;
@@ -34,6 +36,9 @@ use App\Http\Controllers\EmailController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::get('/import-csv', [CSVImportController::class, 'showImportForm'])->name('csv.form');
+Route::post('/import-csv', [CSVImportController::class, 'importCSV'])->name('csv.import');
 
 /*SAMPLE EXCEL*/
 #Route::get('/sample1', [CAMRSampleExcel::class,'sample1'])->name('site')->middleware('isLoggedIn');
@@ -189,4 +194,4 @@ Route::get('cut-off/list', [CutOffController::class, 'getCutOffList'])->name('ge
 
 
 /*Payslip*/
-Route::get('/payslip', [PayslipController::class,'employees_payslip'])->name('payslip')->middleware('isLoggedIn');
+Route::get('/payslip', [PayslipController::class,'print_payslip'])->name('payslip')->middleware('isLoggedIn');

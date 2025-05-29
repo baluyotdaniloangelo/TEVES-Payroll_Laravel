@@ -153,7 +153,7 @@
 			//$total_withholding_tax = 0;
 			//$total_net_amount = 0;
 			//$total_amount_due = 0;
-			var_dump($result);
+			//var_dump($result);
 			?>
 		@foreach ($result as $result_data_cols)
 			<?php

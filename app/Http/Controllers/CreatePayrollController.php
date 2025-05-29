@@ -776,21 +776,44 @@ class CreatePayrollController extends Controller
 					'teves_payroll_employee_salary_per_cut_off.net_salary'
 					]);
 					
-		$cut_off_information = CutOffModel::find($cutoff_idx, ['branch_idx','cut_off_period_start','cut_off_period_end']);	
+        $cut_off_information = CutOffModel::query()
+            ->leftJoin('teves_payroll_user_table as prepared_by', 'teves_payroll_cutoff_table.created_by_user_idx', '=', 'prepared_by.user_id')
+            ->leftJoin('teves_payroll_user_table as reviewed_by', 'teves_payroll_cutoff_table.reviewed_by_user_idx', '=', 'reviewed_by.user_id')
+            ->leftJoin('teves_payroll_user_table as approved_by', 'teves_payroll_cutoff_table.approved_by_user_idx', '=', 'approved_by.user_id')
+            ->leftJoin('teves_branch_table as branch_details', 'teves_payroll_cutoff_table.branch_idx', '=', 'branch_details.branch_id')
+            ->where('teves_payroll_cutoff_table.cutoff_id', $cutoff_idx)
+            ->select(
+                'teves_payroll_cutoff_table.*',
+                'prepared_by.user_real_name as prepared_by_name',
+                'prepared_by.user_job_title as prepared_by_position',
+                'reviewed_by.user_real_name as reviewed_by_name',
+                'reviewed_by.user_job_title as reviewed_by_position',
+                'approved_by.user_real_name as approved_by_name',
+                'approved_by.user_job_title as approved_by_position',
+                'branch_details.branch_code as branch_code'
+            )
+           ->get();
+
+        $branchID	= $cut_off_information[0]->branch_idx;
+		$start_date	= $cut_off_information[0]->cut_off_period_start;
+		$end_date	= $cut_off_information[0]->cut_off_period_end;
+
+		$prepared_by_name	    = $cut_off_information[0]->prepared_by_name;
+        $prepared_by_position	= $cut_off_information[0]->prepared_by_position;
+		$reviewed_by_name	    = $cut_off_information[0]->reviewed_by_name;
+		$reviewed_by_position	= $cut_off_information[0]->reviewed_by_position;
+		$approved_by_name	    = $cut_off_information[0]->approved_by_name;
+		$approved_by_position	= $cut_off_information[0]->approved_by_position;
+		$branch_code	        = $cut_off_information[0]->branch_code;
 		
-		$branchID	= $cut_off_information->branch_idx;
-		$start_date	= $cut_off_information->cut_off_period_start;
-		$end_date	= $cut_off_information->cut_off_period_end;
-
-
 		$company_information = CompanyDetailsModel::find(1, ['sss_number','pagibig_number','philhealth']);
 		$branch_information = BranchModel::find($branchID, ['branch_code','branch_name','branch_tin','branch_address','branch_contact_number','branch_owner','branch_owner_title','branch_logo']);
 
 		/*USER INFO*/
 		$user_data = User::where('user_id', '=', Session::get('loginID'))->first();
-		
+
 		$title = "Employee's Weekly Payroll";
-        $pdf = PDF::loadView('printables.employees_saved_payroll_pdf', compact('title', 'result', 'user_data', 'branch_information','start_date','end_date', 'company_information'));
+        $pdf = PDF::loadView('printables.employees_saved_payroll_pdf', compact('title', 'result', 'user_data', 'branch_information','start_date','end_date','prepared_by_name','prepared_by_position','reviewed_by_name','reviewed_by_position','approved_by_name','approved_by_position', 'company_information', 'cutoff_idx'));
 		/*Download Directly*/
         //return $pdf->download($client_data['client_name'].".pdf");
 		/*Stream for Saving/Printing*/

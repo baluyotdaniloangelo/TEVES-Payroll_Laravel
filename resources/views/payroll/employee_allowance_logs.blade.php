@@ -120,14 +120,15 @@
 											<div class="input-block mb-3">
 												<label class="col-form-label">Allowance Type <span class="text-danger">*</span></label>
 												<select class="form-select form-control" name="allowance_type" id="allowance_type">
-												<!--travel, meals, transportation, supplies, training, Healthcare,Miscellaneous expenses -->
-													<option value="Allowance">Travel</option>
+													<option value="Refund">Refund</option>
+													<option value="Cash_Incentives">Cash Incentives</option>
+													<!--<option value="Allowance">Travel</option>
 													<option value="Meals">Meal</option>
 													<option value="Transportation">Transportation</option>
 													<option value="Supplies">Supplies</option>
 													<option value="Training">Training</option>
 													<option value="Healthcare">Healthcare</option>
-													<option value="Miscellaneous" selected>Miscellaneous</option>
+													<option value="Miscellaneous" selected>Miscellaneous</option>-->
 												</select>	
 											</div>
 										</div>

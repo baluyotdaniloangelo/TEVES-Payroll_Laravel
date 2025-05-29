@@ -6,173 +6,125 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>{{ $title }}</title>
 	<style>
-		body {
-			font-family: "Open Sans", sans-serif;
-		}
-		.data_thead {
-			background-color: #000000;
-			color: #fff;
-		}
-		.data_th {
-			padding: 5px;
-			font-size: 12px;
-		}
-		.data_tr {
-			padding: 5px;
-		} 	
-		.td_colon:before{
-			content:":";
-			font-weight:bold;
-			text-align:center;
-			color:black;
-			position:relative;
-			left:-5px;
-		}
+		table {
+      border-collapse: collapse;
+      width: 310px;
+      font-family: Arial, sans-serif;
+    }
+    th, td {
+      border: 1px solid #000;
+      padding: 5px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .center {
+      text-align: center;
+    }
+    .bold {
+      font-weight: bold;
+    }
+      .zoom-table {
+    transform: scale(0.5); /* Adjust zoom level */
+    transform-origin: top left; /* Set the zoom anchor */
+  }
 </style>
+
 </head>
 <body>
     
-	<table class="" width="100%" cellspacing="0" cellpadding="1">
-		
-			<?php
-				$_purchase_order_date=date_create($purchase_order_data[0]['purchase_order_date']);
-				$purchase_order_date = strtoupper(date_format($_purchase_order_date,"M/d/Y"));
-				
-				$logo = $branch_header['branch_logo'];
-			?>
-			
-		<tr>
-			<td nowrap style="horizontal-align:top;text-align:left;" align="center" colspan="1" rowspan="4" width="10%">
-				<img src="{{public_path('client_logo/')}}<?=$logo;?>" style="width:112px;">
-			</td>
-			<td colspan="7" width="40%" style="horizontal-align:center;text-align:left;"><b style="font-size:18px;"><?=$branch_header['branch_name'];?></b></td>
-			<td colspan="2" nowrap align="left" width="50%" style="font-size:12px; background-color: yellowgreen; text-align:center; font-weight:bold; color:#000; border-top-left-radius:30px;border-bottom-left-radius:30px;"><b>{{ $title }}</b></td>
-		</tr>
-		
-		<tr>
-			<td colspan="3"  width="40%" style="horizontal-align:center;text-align:left;">
-			<div style="font-size:10px;"><?=$branch_header['branch_address'];?></div>
-			</td>
-			<td colspan="3" align="left" width="20%" style="font-size:12px; font-weight:bold; color:red;"><b>CONTROL NO.</b></td>
-			<td colspan="3" align="left" width="30%" style="font-size:12px; color:red; border-bottom:solid 1px gray;" class="td_colon">{{ $purchase_order_data[0]['purchase_order_control_number'] }}</td>
-		</tr>		
-		
-		<tr>
-			<td colspan="3"  width="40%" style="horizontal-align:center;text-align:left;">
-			<div style="font-size:10px;">VAT REG. TIN : <?=$branch_header['branch_tin'];?></div>
-			</td>
-			<td colspan="3" align="left" width="20%" style="font-size:12px; font-weight:bold;;"><b>DATE</b></td>
-			<td colspan="3" align="left" width="30%" style="font-size:12px; border-bottom:solid 1px gray;" class="td_colon"><?=$purchase_order_date;?></td>
-		</tr>
-		
-		<tr>
-			<td colspan="3"  width="40%" style="horizontal-align:center;text-align:left;">
-			<div style="font-size:10px;"><?=$branch_header['branch_owner'];?> - <?=$branch_header['branch_owner_title'];?></div>
-			</td>
-			<td colspan="3" align="left" width="25%" style="font-size:12px; font-weight:bold;"><b>SALES ORDER NO.</b></td>
-			<td colspan="3" align="left" width="25%" style="font-size:12px; border-bottom:solid 1px gray;" class="td_colon">{{ $purchase_order_data[0]['purchase_order_sales_order_number'] }}</td>
-		</tr>
-		
-		<tr>
-			<td colspan="4"  width="50%" style="horizontal-align:center;text-align:left;"></td>
-			<td colspan="3" align="left" width="25%" style="font-size:12px; font-weight:bold;"><b>COLLECTION RECEIPT NO.</b></td>
-			<td colspan="3" align="left" width="25%" style="font-size:12px; border-bottom:solid 1px gray;" class="td_colon">{{ $purchase_order_data[0]['purchase_order_collection_receipt_no'] }}</td>
-		</tr>
-		
-		<tr>
-			<td colspan="4"  width="50%" style="horizontal-align:center;text-align:left;"></td>
-			<td colspan="3" align="left" width="25%" style="font-size:12px; font-weight:bold;"><b>SALES INVOICE NO.</b></td>
-			<td colspan="3" align="left" width="25%" style="font-size:12px; border-bottom:solid 1px gray;" class="td_colon">{{ $purchase_order_data[0]['purchase_order_official_receipt_no'] }}</td>
-		</tr>
+	<?php
+    $data = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape', 'Honeydew','newfruit']; // Example data
 
-		<tr>
-			<td colspan="4"  width="50%" style="horizontal-align:center;text-align:left;"></td>
-			<td colspan="3" align="left" width="25%" style="font-size:12px; font-weight:bold;"><b>DELIVERY RECEIPT NO.</b></td>
-			<td colspan="3" align="left" width="25%" style="font-size:12px; border-bottom:solid 1px gray;" class="td_colon">{{ $purchase_order_data[0]['purchase_order_delivery_receipt_no'] }}</td>
-		</tr>
-		
+echo "<table border='1' class='zoom-table'>";
+$no = 1;
+for ($i = 0; $i < count($payrolls); $i++) {
+    if ($i % 2 == 0) echo "<tr>"; // Start a new row every two items
+    echo "<td>";
+    ?>
+    <table>
+  
+  <tr align="">
+    <th colspan="2" style="text-align:center; background-color:pink;">PAYSLIP</th>
+  </tr>
+  
+  <tr><td><strong>NAME:</strong></td><td>{{ $payrolls[$i]->employee_full_name }}</td></tr>
+  <tr><td><strong>POSITION:</strong></td><td>Forecourt Attendant</td></tr>
+  <tr><td><strong>PERIOD COVERED:</strong></td><td>May 3–9, 2025</td></tr>
+  <tr><td><strong>TOTAL WORKING DAYS:</strong></td><td>0</td></tr>
+  
+  <tr>
+    <th colspan="2">&nbsp;</th>
+  </tr>
+  
+  <tr>
+    <th style="text-align:center; background-color:white;">EARNINGS</th>
+    <th style="text-align:center; background-color:white;">DEDUCTION/S</th>
+  </tr>
+  
+  <tr>
+    <td>
+		<table>
+			<tr><td style="text-align:center; background-color:yellowgreen;">Description</td><td style="text-align:center; background-color:yellowgreen;">Amount</td></tr>
+			<tr><td>Basic Pay</td><td>0.00</td></tr>
+			<tr><td>Overtime & Duty</td><td></td></tr>
+			<tr><td>Day-off Pay</td><td></td></tr>
+			<tr><td>Special Holiday</td><td></td></tr>
+			<tr><td>Regular Holiday</td><td></td></tr>
+			<tr><td>Night Differential</td><td>-</td></tr>
+			<tr><td>Refund</td><td></td></tr>
+			<tr><td>Cash Incentives</td><td>(500.00)</td></tr>
+			<tr><td>Cash Incentives</td><td>(500.00)</td></tr>
 		</table>
+	</td>
+    <td>
+		<table>
+			<tr><td style="text-align:center; background-color:skyblue;">Description</td><td style="text-align:center; background-color:skyblue;">Amount</td></tr>
+			<tr><td>SSS Contribution</td><td></td></tr>
+			<tr><td>Philhealth</td><td></td></tr>
+			<tr><td>Pag-ibig</td><td></td></tr>
+			<tr><td>Accounts Receivable</td><td>(109.20)</td></tr>
+			<tr><td>Debit Memo</td><td></td></tr>
+			<tr><td>Late</td><td></td></tr>
+			<tr><td>Prev. Pay</td><td>(73.21)</td></tr>
+			<tr><td>Groceries</td><td></td></tr>
+			<tr><td>Softdrinks</td><td></td></tr>
+		</table>
+	</td>
+  </tr>
+  <tr>
+    <th style="text-align:left; background-color:white;">TOTAL EARNINGS:</th>
+    <th style="text-align:left; background-color:white;">TOTAL DEDUCTIONS:</th>
+  </tr>
+  <tr>
+    <th style="text-align:left; background-color:white;">NET PAY:</th>
+    <th style="text-align:left; background-color:white;">0.00</th>
+  </tr>
+  <tr>
+    <td style="text-align:left; background-color:white; border-bottom:0px;">Received by:</td>
+	<td style="text-align:left; background-color:white; border-bottom:0px solid;">Date:</td>
+  </tr>
+  <tr>
+    <td style="text-align:center; background-color:white; border-top:0px;">___________________________________<br>Signature over Printed Name</td>
+	<td style="text-align:center; background-color:white; border-bottom:1px solid; border-top:0px solid;">___________________________________<br>MM/DD/YYYY</td>
+  </tr>
+</table>
+    <?php
+    echo "</td>";
+    if ($i % 2 == 1) echo "</tr>"; // Close the row after two items
 
-		<br>
-		<table class="" width="100%" cellspacing="0" cellpadding="1" >	
-		
-		<tr>
-			<td colspan="4" align="left" width='20%' style="font-size:12px; font-weight:bold;">SUPPLIER</td>
-			<td colspan="6" align="left" width='80%' style="font-size:12px; border-bottom:1px solid #000;" class="td_colon">{{ $purchase_order_data[0]['supplier_name'] }}</td>			
-		</tr>
-		
-		<tr>
-			<td colspan="4" align="left" style="font-size:12px; font-weight:bold;">TIN</td>
-			<td colspan="6" align="left" style="font-size:12px; border-bottom:1px solid #000;" class="td_colon">{{ $purchase_order_data[0]['supplier_tin'] }}</td>			
-		</tr>
-		
-		<tr>
-			<td colspan="4" align="left" style="font-size:12px; font-weight:bold;">ADDRESS</td>
-			<td colspan="6" align="left" style="font-size:12px; border-bottom:1px solid #000; " class="td_colon">{{ $purchase_order_data[0]['supplier_address'] }}</td>			
-		</tr>
 
-		</table>
-		<br>
-		<table class="" width="100%" cellspacing="0" cellpadding="1" >	
-		<tr style="font-size:12px;border:0 solid #000;">
-			<td colspan="10" align="center" style="border-top:0px solid #000; border-left:0px solid #000; border-right:0px solid #000; font-weight:bold; background-color: #c6e0b4; height:25px !important;">PAYMENT DETAILS</td>			
-		</tr>		
-		<tr style="font-size:12px;border:0 solid #000;">
-			<td colspan="10" nowrap align="center" style="border:0px solid gray; background-color: #c6e0b4; font-weight:bold; height:5px !important; "></td>
-		</tr> 
-		<tr style="font-size:12px;border:0 solid #000;">
-			<td colspan="3" align="center" style="border-top:0px solid #000; border-left:0px solid gray; border-right:0px solid #000; border-bottom:0px solid #000; font-weight:bold; height:25px !important; background-color: #c6e0b4;">BANK</td>
-			<td colspan="2" align="center" style="border-top:0px solid #000; border-left:1px solid gray; border-right:0px solid #000; border-bottom:0px solid #000; font-weight:bold; background-color: #c6e0b4;">DATE OF PAYMENT</td>
-			<td colspan="3" align="center" style="border-top:0px solid #000; border-left:1px solid gray; border-right:0px solid #000; border-bottom:0px solid #000; font-weight:bold; background-color: #c6e0b4;">REFERENCE NO.</td>
-			<td colspan="2" align="center" style="border-top:0px solid #000; border-left:1px solid gray; border-right:0px solid #000; border-bottom:0px solid #000; font-weight:bold; background-color: #c6e0b4;">AMOUNT</td>			
-		</tr> 
-		<tr style="font-size:12px;border:0 solid #000;">
-			<td colspan="10" nowrap align="center" style="border:0px solid gray; background-color: #c6e0b4; font-weight:bold; height:5px !important; "></td>
-		</tr>
-			<?php 
-			$no_p = 1;
-			?>
-			
-			@foreach ($purchase_payment_component as $purchase_payment_component_cols)
-					
-			<tr style="font-size:12px;border:0 solid #000;">
-			<td colspan="3" align="center" style="border-top:0px solid #000; border-left:0px solid #000; border-right:0px solid #000; border-bottom:0px solid #000;height:25px !important;">{{$purchase_payment_component_cols->purchase_order_bank}}</td>
-				<?php
-				$_purchase_order_date_of_payment=date_create($purchase_payment_component_cols['purchase_order_date_of_payment']);
-				$purchase_order_date_of_payment = strtoupper(date_format($_purchase_order_date_of_payment,"M/d/Y"));
-				?>
-			<td colspan="2" align="center" style="border-top:0px solid #000; border-left:0px solid #000; border-right:0px solid #000; border-bottom:0px solid #000;"><?=$purchase_order_date_of_payment;?></td>
-			<td colspan="3" align="center" style="border-top:0px solid #000; border-left:0px solid #000; border-right:0px solid #000; border-bottom:0px solid #000;">{{$purchase_payment_component_cols->purchase_order_reference_no}}</td>
-			<td colspan="2" align="right" style="border-top:0px solid #000; border-left:0px solid #000; border-right:0px solid #000; border-bottom:0px solid #000;">	
-			<?=number_format($purchase_payment_component_cols['purchase_order_payment_amount'],4);?>
-			</td>			
-			</tr>
-			<?php 
-			$no_p++; 
-			?>
-			
-			@endforeach
+    // Insert a page break every 4 payslips
+    if ($no % 4 == 0 && ($i + 1) < count($payrolls)) {
+        echo "</table><div class='page-break'></div><table border='1' class='zoom-table'>";
+    }
+}
+if (count($payrolls) % 2 != 0) echo "<td>SSSSS</td></tr>"; // If odd number of items, add an empty cell
+echo "</table>";
 
-		<tr>
-			<td colspan="10" style="height:5.66px !important;"></td>
-		</tr>
-		
-		</table>
-		
-		<table class="" width="100%" cellspacing="0" cellpadding="1" > 	  	
-			
-		<tr style="font-size:12px;">
-			<td colspan="10" align="left" style="border-top:1px solid gray;border-right:1px solid gray;  border-left:1px solid gray; border-bottom:0px solid #000; font-style: italic; height:25px !important;">&nbsp;Prepared by:</td>	
-				
-		</tr>
-		<tr style="font-size:12px;">
-			<td colspan="10" align="center" style="border-bottom:1px solid gray;border-right:1px solid gray;  border-left:1px solid gray;">&nbsp;{{$user_data->user_real_name}}<br></td>	
-				
-		</tr>
-		<tr style="font-size:12px;font-style: italic;">
-			<td colspan="10" style="">This is a system-generated. No Signature is Required.</td>
-		</tr>
-		</table>
+
+    ?>
 		
 </body>
 </html>

@@ -43,7 +43,9 @@
 				<img src="{{public_path('client_logo/')}}<?=$logo;?>" style="width:150px;">
 			</td>
 			<td colspan="6" width="30%" style="horizontal-align:center; text-align:left; font-weight: bold;"><b style="font-size:30px;"><?=$branch_information['branch_name'];?></b></td>
-			<td colspan="3" rowspan="4"  align="center" style="font-size:30px; background-color: pink; text-align:center; font-weight:bold; color:#000; width:30px"><b><?php echo strtoupper($title); ?></b></td>
+			<td colspan="3" rowspan="4"  align="center" style="font-size:30px; background-color: pink; text-align:center; font-weight:bold; color:#000; width:30px"><b><?php echo strtoupper($title); ?></b>
+                
+            </td>
 		</tr>
 		
 		<tr>
@@ -143,6 +145,21 @@
 		</table>
 		
 		<table class="" width="100%" cellspacing="0" cellpadding="1" style="table-layout:fixed;">
+
+        <tr class="data_tr" style="font-size:12px;" >
+				<td align="left" colspan="14">&nbsp;</td>
+		</tr>
+        <!--
+        <tr class="data_tr" style="font-size:12px;" >
+				<td align="left" colspan="14">
+                <b>Note:</b>
+                <i>The employee's weekly salary is under review. Please check the salary details for each employee below. Once done, click your name in the review section to confirm that you have read and verified each employee's salary.</i>
+                </td>
+		</tr>
+        -->
+        <tr class="data_tr" style="font-size:12px;" >
+				<td align="left" colspan="14">&nbsp;</td>
+		</tr>
 	
 		<tr style="font-size:12px;border:0 solid #000;">
 			<td align="center" style="border:1px solid; padding-top:5px; padding-bottom:5px;" width="5%">Item</td>
@@ -201,7 +218,7 @@
 			<td align="right">Total:</td>
 			<td align="right"><span style="font-family: DejaVu Sans; sans-serif;">&#8369;</span></td>
 			<td align="right" style="border-bottom: 3px double #000000">
-			<?=$grand_total_net_salary;?></td>
+			<?=number_format($grand_total_net_salary,2);?></td>
 		</tr>
 		
 		<tr>
@@ -220,14 +237,7 @@
 		</table>
 		
 		<table width="100%">
-		<tr class="data_tr" style="font-size:12px;" >
-				<td align="left" colspan="4">PREPARED BY:</td>
-				<td align="center" colspan="1" style=""></td>				
-				<td align="left" colspan="4">REVIEWED BY:</td>
-				<td align="center" colspan="1" style=""></td>				
-				<td align="left" colspan="4">APPROVED BY:</td>
-				<td align="center" colspan="1" style=""></td>
-		</tr>
+		
 		
 		<tr>
 			<td colspan="15" style="height:5.66px !important;"></td>
@@ -239,29 +249,46 @@
 		<tr>
 			<td colspan="15" style="height:5.66px !important;"></td>
 		</tr>
+
+		<tr class="data_tr" style="font-size:12px;" >
+				<td align="left" colspan="4">PREPARED BY:</td>
+				<td align="center" colspan="1" style=""></td>				
+				<td align="left" colspan="4">REVIEWED BY:</td>
+				<td align="center" colspan="1" style=""></td>				
+				<td align="left" colspan="4">APPROVED BY:</td>
+				<td align="center" colspan="1" style=""></td>
+		</tr>
+
+		<tr>
+			<td colspan="15" style="height:5.66px !important;"></td>
+		</tr>	
+		<tr>
+			<td colspan="15" style="height:5.66px !important;"></td>
+		</tr>
 		
+		<tr>
+			<td colspan="15" style="height:5.66px !important;"></td>
+		</tr>
+
 		<tr class="data_tr" style="font-size:12px;">
-				<td align="center" colspan="3" style="border-bottom:1px solid #000;">{{$user_data->user_real_name}}</td>
+				<td align="center" colspan="3" style="border-bottom:1px solid #000;">{{$prepared_by_name}}</td>
 				<td align="center" colspan="2" style=""></td>		
-				<td align="center" colspan="3" style="border-bottom:1px solid #000;">{{$user_data->user_real_name}}</td>
+				<td align="center" colspan="3" style="border-bottom:1px solid #000;">{{$reviewed_by_name}}</td>
 				<td align="center" colspan="2" style=""></td>
-				<td align="center" colspan="3" style="border-bottom:1px solid #000;">{{$user_data->user_real_name}}</td>
+				<td align="center" colspan="3" style="border-bottom:1px solid #000;">{{$approved_by_name}}</td>
 				<td align="center" colspan="2" style=""></td>
 		</tr>
 		
 		<tr class="data_tr" style="font-size:12px;">
 				
-				<td align="center" colspan="3" style=" ">{{$user_data->user_job_title}}</td>
+				<td align="center" colspan="3" style=" ">{{$prepared_by_position}}</td>
 				<td align="left" colspan="2"></td>
-				<td align="center" colspan="3" style=" ">{{$user_data->user_job_title}}</td>
+				<td align="center" colspan="3" style=" ">{{$reviewed_by_position}}</td>
 				<td align="left" colspan="2"></td>
-				<td align="center" colspan="3" style=" ">{{$user_data->user_job_title}}</td>
+				<td align="center" colspan="3" style=" ">{{$approved_by_position}}</td>
 				<td align="left" colspan="2"></td>
 		</tr>
-		
-		
-		
-		</table>
-		
+        </table>
+       
 </body>
 </html>
