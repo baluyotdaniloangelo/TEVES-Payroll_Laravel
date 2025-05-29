@@ -418,11 +418,11 @@ class EmployeeLogsController extends Controller
 			if($undertime_hours<0){
 				/*Negative Means Undertime*/
 				$total_undertime_hours = abs($undertime_hours);
-				$excess_hours_after_shift = 0;
+				//$excess_hours_after_shift = 0;
 			}else{
 				
 				$total_undertime_hours =0;
-				$excess_hours_after_shift = abs($undertime_hours);
+				//$excess_hours_after_shift = abs($undertime_hours);
 			}
 
 			/*Start to Compute night shift hrs*/
@@ -536,7 +536,15 @@ class EmployeeLogsController extends Controller
 						}
 			
 			if($overtime_status=='No'){
-				
+
+           // echo $total_hours_from_log_in_and_out;
+            if($total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + 0 + $total_undertime_hours)t>=8){
+                echo $excess_hours_after_shift = $total_hours_from_log_in_and_out-8;
+            }
+            else{
+                 $excess_hours_after_shift = 0;
+            }
+
 			$total_regular_hours = $total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + $excess_hours_after_shift + $total_undertime_hours);
 			$total_tardiness_hours = $total_tardiness;
 				
@@ -559,15 +567,9 @@ class EmployeeLogsController extends Controller
 			}else{
 			$total_tardiness_hours = 0;
 
-            echo $total_hours_from_log_in_and_out;
-            if($total_hours_from_log_in_and_out>=8){
-                echo $excess_of_8_hrs = $total_hours_from_log_in_and_out-8;
-            }
-            else{
-                 $excess_of_8_hrs = 0;
-            }
+            
 
-			$total_regular_hours = $total_hours_from_log_in_and_out - ($excess_of_8_hrs);
+			$total_regular_hours = $total_hours_from_log_in_and_out - (0);
 
 					/*Soon to have a table for Rate on Overtime - Hard Coded pa to to 0.25*/
 					$Regular_pay = 0;
