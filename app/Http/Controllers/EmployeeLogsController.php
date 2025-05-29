@@ -560,7 +560,7 @@ class EmployeeLogsController extends Controller
 			$total_tardiness_hours = 0;
 
             if($total_hours_from_log_in_and_out>=8){
-                $excess_of_8_hrs = $total_hours_from_log_in_and_out-8;
+                echo $excess_of_8_hrs = $total_hours_from_log_in_and_out-8;
             }
             else{
                  $excess_of_8_hrs = 0;
