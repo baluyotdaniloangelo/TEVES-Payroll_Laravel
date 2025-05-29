@@ -410,7 +410,7 @@ class EmployeeLogsController extends Controller
 			}
 			else{
 				$total_tardiness = 0;
-				$total_excess_hours = 0;/*Yung Sobra sa 8hrs*/
+				$total_excess_hours = number_format($default_timein_to_timein_log_excess + $default_breaktimeout_to_breaktimeout_log_excess+0, 2, '.', '');/*Yung Sobra sa 8hrs*/
 				/*Compute the Total Undertime*/
 				$undertime_hours = 0;
 			}

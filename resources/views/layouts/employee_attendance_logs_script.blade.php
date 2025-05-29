@@ -262,7 +262,6 @@
 			event.preventDefault();
 			
 					/*Reset Warnings*/
-					$('#employee_id_regular_logsError').text('');
 					$('#attendance_dateError').text('');	
 					$('#breaktime_endError').text('');		
 
@@ -571,9 +570,9 @@
 			document.getElementById('attendance_dateError').className = "valid-feedback";
 			document.getElementById('attendance_date').className = "form-control";
 			
-			$('#employee_id_regular_logsError').text('');	
-			document.getElementById('employee_id_regular_logsError').className = "valid-feedback";
-			document.getElementById('employee_id_regular_logs').className = "form-control";
+			//$('#employee_id_regular_logsError').text('');	
+			//document.getElementById('employee_id_regular_logsError').className = "valid-feedback";
+			//document.getElementById('employee_id_regular_logs').className = "form-control";
 			
 			$("#department_list_regular_logs span").remove();
 			$("#employee_list_logs span").remove();
