@@ -540,7 +540,7 @@ class EmployeeLogsController extends Controller
            // echo $total_hours_from_log_in_and_out;
 
            if($total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + 0 + $total_undertime_hours)>=8){
-                echo $excess_hours_after_shift = ($total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + $excess_hours_after_shift + $total_undertime_hours) )-8;
+                echo $excess_hours_after_shift = ($total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + 0 + $total_undertime_hours) )-8;
             }
             else{
                  $excess_hours_after_shift = 0;
