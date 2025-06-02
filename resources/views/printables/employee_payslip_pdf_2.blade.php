@@ -6,7 +6,7 @@
     <style>
         @page {
             size: legal portrait;
-            margin: 10mm;
+            /*margin: 10mm;*/
         }
 
         body {
@@ -25,9 +25,9 @@
             width: 47%;
             display: inline-block;
             vertical-align: top;
-            margin: 1%;
+            /*margin: 1%;*/
             border: 1px solid #000;
-            padding: 5px;
+            /*padding: 5px;*/
             box-sizing: border-box;
             page-break-inside: avoid;
         }
