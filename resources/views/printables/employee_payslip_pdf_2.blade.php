@@ -27,7 +27,7 @@
             vertical-align: top;
             /*margin: 1%;*/
             border: 1px solid #000;
-            /*padding: 5px;*/
+            padding: 5px;
             box-sizing: border-box;
             page-break-inside: avoid;
         }
