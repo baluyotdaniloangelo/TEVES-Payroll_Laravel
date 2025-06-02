@@ -126,7 +126,7 @@ class PayslipController extends Controller
 		/*Download Directly*/
         //return $pdf->download($client_data['client_name'].".pdf");
 		/*Stream for Saving/Printing*/
-		$pdf->setPaper('legal', 'portrait');/*Set to Landscape*/
+		//$pdf->setPaper('legal', 'portrait');/*Set to Landscape*/
 		return $pdf->stream($branch_information['branch_code']."_Payslip.pdf");	
 		//return view("printables.employee_payslip_pdf_2", compact('title', 'user_data', 'branch_information','start_date','end_date','prepared_by_name','prepared_by_position','reviewed_by_name','reviewed_by_position','approved_by_name','approved_by_position', 'company_information', 'cutoff_idx', 'payrolls'));
 	}
