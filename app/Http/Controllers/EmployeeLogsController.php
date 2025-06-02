@@ -537,14 +537,12 @@ class EmployeeLogsController extends Controller
 			
 			if($overtime_status=='No'){
 
-           // echo $total_hours_from_log_in_and_out;
-
-           if($total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + 0 + $total_undertime_hours)>=8){
-                echo $excess_hours_after_shift = ($total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + 0 + $total_undertime_hours) )-8;
-            }
-            else{
-                 $excess_hours_after_shift = 0;
-            }
+                if($total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + 0 + $total_undertime_hours)>=8){
+                     $excess_hours_after_shift = ($total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + 0 + $total_undertime_hours) )-8;
+                }
+                else{
+                     $excess_hours_after_shift = 0;
+                }
 
 			$total_regular_hours = $total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + $excess_hours_after_shift + $total_undertime_hours);
 			$total_tardiness_hours = $total_tardiness;
