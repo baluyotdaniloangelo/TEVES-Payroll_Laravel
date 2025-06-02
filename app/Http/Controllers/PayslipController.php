@@ -122,13 +122,13 @@ class PayslipController extends Controller
 		$user_data = User::where('user_id', '=', Session::get('loginID'))->first();
 
 		$title = "Employee's Weekly Payroll";
-        //$pdf = PDF::loadView('printables.employee_payslip_pdf_2', compact('title', 'user_data', 'branch_information','start_date','end_date','prepared_by_name','prepared_by_position','reviewed_by_name','reviewed_by_position','approved_by_name','approved_by_position', 'company_information', 'cutoff_idx', 'payrolls'));
+        $pdf = PDF::loadView('printables.employee_payslip_pdf_2', compact('title', 'user_data', 'branch_information','start_date','end_date','prepared_by_name','prepared_by_position','reviewed_by_name','reviewed_by_position','approved_by_name','approved_by_position', 'company_information', 'cutoff_idx', 'payrolls'));
 		/*Download Directly*/
         //return $pdf->download($client_data['client_name'].".pdf");
 		/*Stream for Saving/Printing*/
-		//$pdf->setPaper('legal', 'portrait');/*Set to Landscape*/
-		//return $pdf->stream($branch_information['branch_code']."_Payslip.pdf");	
-		return view("printables.employee_payslip_pdf_2", compact('title', 'user_data', 'branch_information','start_date','end_date','prepared_by_name','prepared_by_position','reviewed_by_name','reviewed_by_position','approved_by_name','approved_by_position', 'company_information', 'cutoff_idx', 'payrolls'));
+		$pdf->setPaper('legal', 'portrait');/*Set to Landscape*/
+		return $pdf->stream($branch_information['branch_code']."_Payslip.pdf");	
+		//return view("printables.employee_payslip_pdf_2", compact('title', 'user_data', 'branch_information','start_date','end_date','prepared_by_name','prepared_by_position','reviewed_by_name','reviewed_by_position','approved_by_name','approved_by_position', 'company_information', 'cutoff_idx', 'payrolls'));
 	}
 
 

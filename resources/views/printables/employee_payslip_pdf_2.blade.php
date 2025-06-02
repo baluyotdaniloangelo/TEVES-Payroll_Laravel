@@ -80,7 +80,7 @@ for ($i = 0; $i < $total; $i++) {
       <tr><td><strong>POSITION:</strong></td><td>{{ $payrolls[$i]->employee_position }}</td></tr>
       <tr><td><strong>PERIOD COVERED:</strong></td><td>{{ $payrolls[$i]->period_covered }}</td></tr>
       <tr><td><strong>WORKING DAYS:</strong></td><td>{{ $payrolls[$i]->working_days }}</td></tr>
-      <tr><th colspan="2">EARNINGS | DEDUCTIONS</th></tr>
+      <tr><th>EARNINGS</th><th>DEDUCTIONS</th></tr>
       <tr>
         <td>
           <table>
