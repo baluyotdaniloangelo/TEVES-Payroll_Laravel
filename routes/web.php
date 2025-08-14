@@ -96,10 +96,10 @@ Route::post('/delete_holiday_confirmed', [HolidayController::class, 'delete_holi
 
 /*01/03/2025*/
 Route::get('/employee-attendance-logs', [EmployeeLogsController::class,'employee_attendance_logs'])->name('employee_attendance_logs')->middleware('isLoggedIn');
+Route::post('/employee-item-select', [EmployeeManagementController::class,'getEmployeeList_for_item_selection'])->name('getEmployeeList_for_selection')->middleware('isLoggedIn');
+
 Route::post('/branch-item-select', [BranchController::class,'getBranchList_for_item_selection'])->name('getBranchList_for_selection')->middleware('isLoggedIn');
 Route::post('/department-item-select', [DepartmentController::class,'getDepartmentList_for_item_selection'])->name('getDepartmentList_for_selection')->middleware('isLoggedIn');
-Route::post('/employee-item-select', [EmployeeManagementController::class,'getEmployeeList_for_item_selection'])->name('getEmployeeList_for_selection')->middleware('isLoggedIn');
-Route::post('/drivers-item-select', [EmployeeManagementController::class,'getDriversList_for_item_selection'])->name('getDriversList_for_item_selection')->middleware('isLoggedIn');
 /*Regular Logs - January 18, 2024*/
 Route::get('employee-regular-logs/list', [EmployeeLogsController::class, 'getEmployeeRegularLogsList'])->name('getEmployeeRegularLogsList')->middleware('isLoggedIn');
 Route::post('/submit_employee_regular_logs_information', [EmployeeLogsController::class,'submit_employee_regular_logs_information'])->name('submit_employee_regular_logs_information')->middleware('isLoggedIn');
@@ -112,6 +112,7 @@ Route::post('/employee_log_info', [EmployeeLogsController::class, 'employee_log_
 /*Confirm Delete Employee Log*/
 Route::post('/delete_employee_log_confirmed', [EmployeeLogsController::class, 'delete_employee_log_confirmed'])->name('DeleteEmployeeLog')->middleware('isLoggedIn');
 
+
 /*Leave - March 25, 2025*/
 Route::get('employee-leave-logs/list', [EmployeeLeaveLogsController::class, 'getEmployeeLeaveLogsList'])->name('getEmployeeLeaveLogsList')->middleware('isLoggedIn');
 Route::post('/submit_employee_leave_logs_information', [EmployeeLeaveLogsController::class,'submit_employee_leave_logs_information'])->name('submit_employee_leave_logs_information')->middleware('isLoggedIn');
@@ -119,6 +120,8 @@ Route::post('/employee_leave_logs_info', [EmployeeLeaveLogsController::class, 'e
 Route::post('/delete_employee_leave_log_confirmed', [EmployeeLeaveLogsController::class, 'delete_employee_leave_log_confirmed'])->name('DeleteEmployeeLeaveLog')->middleware('isLoggedIn');
 
 /*Drivers Logs*/
+Route::get('/drivers-attendance-logs', [DriversLogsController::class,'drivers_attendance_logs'])->name('drivers_attendance_logs')->middleware('isLoggedIn');
+Route::post('/drivers-item-select', [EmployeeManagementController::class,'getDriversList_for_item_selection'])->name('getDriversList_for_item_selection')->middleware('isLoggedIn');
 Route::get('drivers-logs/list', [DriversLogsController::class, 'getDriversLogsList'])->name('getDriversLogsList')->middleware('isLoggedIn');
 Route::post('/submit_drivers_logs_information', [DriversLogsController::class,'submit_drivers_logs_information'])->name('submit_drivers_logs_information')->middleware('isLoggedIn');
 Route::post('/drivers_logs_info', [DriversLogsController::class, 'drivers_logs_info'])->name('DriversLogsInformation')->middleware('isLoggedIn');

@@ -18,7 +18,21 @@ use Carbon\CarbonPeriod;
 class DriversLogsController extends Controller
 {
 	
-
+	/*Load Employee Interface*/
+	public function drivers_attendance_logs(){
+		
+		if(Session::has('loginID')){
+			
+			$title = 'Drivers Logs';
+			$data = array();
+			
+			$data = User::where('user_id', '=', Session::get('loginID'))->first();
+			
+			$active_link = 'drivers_attendance_logs';
+			
+			return view("payroll.drivers_attendance_logs_main", compact('data', 'title', 'active_link'));
+		}
+	} 
 
 	/*Fetch Employee Regular Log List using Datatable*/
 	public function getDriversLogsList(Request $request)

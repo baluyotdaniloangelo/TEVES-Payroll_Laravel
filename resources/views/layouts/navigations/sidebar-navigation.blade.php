@@ -71,7 +71,8 @@
 								@$active_link=='employee_allowance_logs' ||
 								@$active_link=='employee_deduction_logs'){ echo "noti-dot"; }?> "><i class="la la-user"></i> <span> Payroll Items</span> <span class="menu-arrow"></span></a>
 								<ul>
-									<li><a class="<?php if(@$active_link=='employee_attendance_logs'){ echo "active"; }?>" href="{{ route('employee_attendance_logs') }}">Attendance Logs</a></li>
+									<li><a class="<?php if(@$active_link=='employee_attendance_logs'){ echo "active"; }?>" href="{{ route('employee_attendance_logs') }}">Employee Attendance Logs</a></li>
+									<li><a class="<?php if(@$active_link=='drivers_attendance_logs'){ echo "active"; }?>" href="{{ route('drivers_attendance_logs') }}">Drivers Attendance Logs</a></li>
 									<li><a class="<?php if(@$active_link=='employee_deduction_logs'){ echo "active"; }?>" href="{{ route('employee_allowance_logs') }}">Allowance Logs</a></li>
 									<li><a class="<?php if(@$active_link=='employee_deduction_logs'){ echo "active"; }?>" href="{{ route('employee_deduction_logs') }}">Deduction Logs</a></li>
 									<li><a class="<?php if(@$active_link=='cut_off'){ echo "active"; }?>" href="{{ route('CutOff') }}" title="View Saved Payroll, on Every Cut Off, Review and Approved">Cut-Off</a></li>

@@ -1,4 +1,98 @@
+<!-- Page level plugins -->
+<script src="{{asset('Datatables/2.0.8/js/dataTables.js')}}"></script>
+<script src="{{asset('Datatables/responsive/3.0.2/js/dataTables.responsive.js')}}"></script>
+
 <script type="text/javascript">
+/*Load Branch*/
+	LoadBranch();
+	function LoadBranch() {		
+
+		$("#branch_list_logs option").remove();
+		$('<option style="display: none;"></option>').appendTo('#branch_list_logs');
+		
+		$("#leave_branch_list_logs option").remove();
+		$('<option style="display: none;"></option>').appendTo('#leave_branch_list_logs');
+		
+		$("#drivers_branch_list_logs option").remove();
+		$('<option style="display: none;"></option>').appendTo('#drivers_branch_list_logs');
+			
+			  $.ajax({
+				url: "{{ route('getBranchList_for_selection') }}",
+				type:"POST",
+				data:{
+				  _token: "{{ csrf_token() }}"
+				},
+				success:function(response){						
+				  console.log(response);
+				  if(response!='') {			  
+						var len = response.length;
+						for(var i=0; i<len; i++){
+							var branch_id = response[i].branch_id;						
+							var branch_name = response[i].branch_name;				
+							var branch_code = response[i].branch_code;
+							$('#branch_list_logs option:last').after(""+
+							"<option label='"+branch_code+" - "+branch_name+"' data-id='"+branch_id+"' value='"+branch_code+" - "+branch_name+"'>" +
+							"");	
+							
+							$('#leave_branch_list_logs option:last').after(""+
+							"<option label='"+branch_code+" - "+branch_name+"' data-id='"+branch_id+"' value='"+branch_code+" - "+branch_name+"'>" +
+							"");	
+							
+							$('#drivers_branch_list_logs option:last').after(""+
+							"<option label='"+branch_code+" - "+branch_name+"' data-id='"+branch_id+"' value='"+branch_code+" - "+branch_name+"'>" +
+							"");	
+					}			
+				  }else{
+							/*No Result Found or Error*/	
+				  }
+				},
+				error: function(error) {
+				 console.log(error);	 
+				}
+			   });
+	}
+		
+	/*Get List of Employee After Selecting Branch*/
+	function LoadEmployee() {		
+	
+	/*Clear Employee Value*/
+	
+		var branchID 		= $('#branch_list_logs option[value="' + $('#branch_idx').val() + '"]').attr('data-id');
+		
+		$("#employee_list_logs option").remove();
+		$('<option style="display: none;"></option>').appendTo('#employee_list_logs');
+
+			  $.ajax({
+				url: "{{ route('getEmployeeList_for_selection') }}",
+				type:"POST",
+				data:{
+				  branchID:branchID,
+				  _token: "{{ csrf_token() }}"
+				},
+				success:function(response){						
+				  console.log(response);
+				  if(response!='') {			  
+						var len = response.length;
+						for(var i=0; i<len; i++){
+
+							var employee_id = response[i].employee_id;	
+							var employee_full_name = response[i].employee_full_name;				
+							// var employee_rate = response[i].employee_rate;
+							$('#employee_list_logs option:last').after(""+
+							"<option label='"+employee_full_name+"' data-id='"+employee_id+"' value='"+employee_full_name+"'>" +
+							"");	
+							
+					}			
+				  }else{
+							/*No Result Found or Error*/	
+				  }
+				},
+				error: function(error) {
+				 console.log(error);	 
+				}
+			   });
+	}	
+
 	<!--Load Table for Leave Logs-->
 	$(function () {
 				var EmployeeList = $('#DriversLogsListDatatable').DataTable({
@@ -23,7 +117,6 @@
 							{data: 'plate_number', className: "text-left"},
 							{data: 'loading_terminal', className: "text-left"},
 							{data: 'destination', className: "text-left"}
-							
 					]
 				});
 		autoAdjustColumns(EmployeeList);

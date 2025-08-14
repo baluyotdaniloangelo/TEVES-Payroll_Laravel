@@ -39,11 +39,17 @@ else if (Request::is('holiday')){
 @include('layouts.deduction_type_script')
 <?php
 }
+else if (Request::is('drivers-attendance-logs')){
+?>
+@include('layouts.drivers_attendance_logs_script')
+@include('layouts.employee_attendance_import_logs_script')
+<?php
+}
 else if (Request::is('employee-attendance-logs')){
 ?>
 @include('layouts.employee_attendance_logs_script')
 @include('layouts.employee_attendance_leaves_script')
-@include('layouts.drivers_attendance_logs_script')
+@include('layouts.employee_attendance_import_logs_script')
 <?php
 }
 else if (Request::is('employee-deduction-logs')){

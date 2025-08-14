@@ -70,6 +70,9 @@ class PayslipController extends Controller
                 'employee_salary_tb.night_differential_pay_total AS night_differential_pay',
                 'employee_salary_tb.regular_holiday_pay_total AS regular_holiday_pay',
                 'employee_salary_tb.special_holiday_pay_total AS special_holiday_pay',
+                'employee_salary_tb.deduction_amount_total AS deduction_amount_total',
+                'employee_salary_tb.gross_salary AS gross_salary',
+                'employee_salary_tb.net_salary AS net_salary',
                 \DB::raw("(SELECT SUM(allowance_amount) FROM teves_payroll_employee_allowance_logs WHERE allowance_type = 'Cash_Incentives' AND employee_idx = employee_info_tb.employee_id AND cutoff_idx = teves_payroll_cutoff_table.cutoff_id) AS cash_incentives"),
                 \DB::raw("(SELECT SUM(allowance_amount) FROM teves_payroll_employee_allowance_logs WHERE allowance_type = 'Refund' AND employee_idx = employee_info_tb.employee_id AND cutoff_idx = teves_payroll_cutoff_table.cutoff_id) AS refund"),
                 \DB::raw("(SELECT SUM(deduction_amount) FROM teves_payroll_employee_deduction_logs WHERE deduction_idx = 1 AND employee_idx = employee_info_tb.employee_id AND cutoff_idx = teves_payroll_cutoff_table.cutoff_id) AS sss_deduction"),
@@ -121,7 +124,7 @@ class PayslipController extends Controller
 		/*USER INFO*/
 		$user_data = User::where('user_id', '=', Session::get('loginID'))->first();
 
-		$title = "Employee's Weekly Payroll";
+		$title = "Employee's Payslip";
         $pdf = PDF::loadView('printables.employee_payslip_pdf_2', compact('title', 'user_data', 'branch_information','start_date','end_date','prepared_by_name','prepared_by_position','reviewed_by_name','reviewed_by_position','approved_by_name','approved_by_position', 'company_information', 'cutoff_idx', 'payrolls'));
 		/*Download Directly*/
         //return $pdf->download($client_data['client_name'].".pdf");

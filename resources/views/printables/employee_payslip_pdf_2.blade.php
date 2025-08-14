@@ -77,7 +77,11 @@ for ($i = 0; $i < $total; $i++) {
             <tr><td><strong>POSITION:</strong></td><td>{{ $payrolls[$i]->employee_position }}</td></tr>
             <tr><td><strong>PERIOD COVERED:</strong></td><td>{{ $payrolls[$i]->period_covered }}</td></tr>
             <tr><td><strong>WORKING DAYS:</strong></td><td>{{ $payrolls[$i]->working_days }}</td></tr>
-            <tr><th>EARNINGS</th><th>DEDUCTIONS</th></tr>
+        </table>
+        <br>
+        <table>
+
+            <tr><th width='50%' style="text-align:center;">EARNINGS</th><th width='50%' style="text-align:center;">DEDUCTIONS</th></tr>
             <tr>
                 <td>
                     <table>
@@ -91,6 +95,9 @@ for ($i = 0; $i < $total; $i++) {
                         <tr><td>Refund</td><td style="text-align:right;">{{ $payrolls[$i]->refund }}</td></tr>
                         <tr><td>Cash Incentives</td><td style="text-align:right;">{{ $payrolls[$i]->cash_incentives }}</td></tr>
                     </table>
+                    <?php
+
+                    ?>
                 </td>
                 <td>
                     <table>
@@ -107,12 +114,12 @@ for ($i = 0; $i < $total; $i++) {
                 </td>
             </tr>
             <tr>
-                <th>Total Earnings:</th>
-                <th>Total Deductions:</th>
+                <th>Total Earnings:&nbsp;<span style="font-family: DejaVu Sans; sans-serif; text-align:center">&#8369;&nbsp;{{ $payrolls[$i]->gross_salary }}</span></th>
+                <th>Total Deductions:&nbsp;<span style="font-family: DejaVu Sans; sans-serif; text-align:center">&#8369;&nbsp;{{ $payrolls[$i]->deduction_amount_total }}</span></th>
             </tr>
             <tr>
-                <th>NET PAY:</th>
-                <th>0.00</th>
+                <th colspan="2" style="text-align:center;">NET PAY:&nbsp;<span style="font-family: DejaVu Sans; sans-serif; text-align:center">&#8369;&nbsp;{{ $payrolls[$i]->net_salary }}</span></th>
+               
             </tr>
             <tr>
                 <td style="border-bottom:0;">Received by:</td>

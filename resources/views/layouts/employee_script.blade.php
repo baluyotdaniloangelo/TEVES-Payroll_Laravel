@@ -197,9 +197,9 @@
 					
 					ResetEmployeeForm();
 					
-					$('#branch_idxError').text('');
-					document.getElementById('branch_idxError').className = "invalid-tooltip";	
-					document.getElementById('branch_idx').className = "form-control";
+					//$('#branch_idxError').text('');
+					//document.getElementById('branch_idxError').className = "invalid-tooltip";	
+					//document.getElementById('branch_idx').className = "form-control";
 					
 					$('#department_idxError').text('');
 					document.getElementById('department_idxError').className = "invalid-tooltip";	
@@ -233,7 +233,7 @@
 					document.getElementById('employee_numberError').className = "invalid-feedback";
 				  
 				}else if(error.responseJSON.errors.employee_number=="validation.unique"){
-				
+			
 					$('#employee_numberError').html("Employee ID already Exist");
 					document.getElementById('employee_numberError').className = "invalid-feedback";
 				

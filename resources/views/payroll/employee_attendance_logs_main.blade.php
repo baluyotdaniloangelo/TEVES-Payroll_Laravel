@@ -34,14 +34,16 @@
 											<li class="nav-item" role="presentation"><a class="nav-link" href="#solid-tab2" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">Regular Overtime</a></li>
 											<li class="nav-item" role="presentation"><a class="nav-link" href="#solid-tab3" data-bs-toggle="tab" aria-selected="true" role="tab">Restday Overtime</a></li>
 											<li class="nav-item" role="presentation"><a class="nav-link" href="#solid-tab4" data-bs-toggle="tab" aria-selected="true" role="tab">Leaves</a></li>
-											<li class="nav-item" role="presentation"><a class="nav-link" href="#solid-tab5" data-bs-toggle="tab" aria-selected="true" role="tab">Driver's Logs</a></li>
+										    <li class="nav-item" role="presentation"><a class="nav-link" href="#solid-tab5" data-bs-toggle="tab" aria-selected="true" role="tab">Import</a></li>
 										</ul>
 										<div class="tab-content">
 											<div class="tab-pane active show" id="solid-tab1" role="tabpanel">
 													
 													<div class="row align-items-center mb-3">
 														<div class="col-auto float-end ms-auto">
-															<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#employee_regular_logs_details_modal"><i class="fa-solid fa-plus"></i> Add Attendance Logs</a>
+															<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#employee_regular_logs_details_modal" style="margin-left: 5px;"><i class="fa-solid fa-plus"></i> Add Attendance Logs</a>
+                                                            &nbsp;
+                                                            <a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#employee_import_logs_modal" style="margin-left: 5px;"><i class="fa-solid fa-plus"></i> Import Logs</a>
 														</div>
 													</div>
 													
@@ -182,44 +184,53 @@
 													</div>
 												
 											</div>
-											<div class="tab-pane" id="solid-tab5" role="tabpanel">
+
+                                            <div class="tab-pane" id="solid-tab5" role="tabpanel">
 													
 													<div class="row align-items-center mb-3">
 														<div class="col-auto float-end ms-auto">
-															<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#drivers_logs_details_modal" onclick="ResetDriversLogsForm()"><i class="fa-solid fa-plus"></i> Add Driver's Logs</a>
+															<!--<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#employee_leave_logs_details_modal"><i class="fa-solid fa-plus"></i> Add Leaves</a>-->
 														</div>
 													</div>
-																										
-													<div class="table-responsive">
-													<table class="table dataTable display nowrap cell-border" id="DriversLogsListDatatable" width="100%" cellspacing="0">
-																<thead>
-																	<tr>
-																		<th class="all">#</th>
-																		<th class="all">Date</th>
-																		<th class="all" title="Employee Number">Employee Number</th>
-																		<th class="all" title="Employee Name">Employee Name</th>
-								
-																		<th class="all" title="Volume">Volume</th>
-																		<th class="all" title="Rate">Rate(P/L)</th>
-																		<th class="all" title="Gross Amount">Gross Amount</th>
-																		<th class="all" title="Trip Pay">Trip Pay</th>
-																		
-																		<th class="all">Action</th>
-																		
-																		<th class="none">Plate Number</th>
-																		<th class="none">Loading Terminal</th>
-																		<th class="none">Destination</th>
-																		
-																	</tr>
-																</thead>				
-																
-																<tbody>
-																	
-																</tbody>
-													</table>
-													</div>
-												
+
+													<form id="csv-form" enctype="multipart/form-data">
+                                                    @csrf								
+													    <label class="custom-file-container__custom-file">
+										                    <input type="file"  name="csv_file" id="csv_file" accept=".csv" required>
+                                                            <span class="valid-feedback" id="feedback" title="Required"></span>
+									                    </label>
+											      
+                                                    <div class="row">
+									                <table id="csv-table" border="1" style="width:100%; margin-top: 20px; display:none;">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>#</th>
+                                                                <th>Employee ID</th>
+                                                                <th>Name</th>
+                                                                <th>Date</th>
+                                                                <th>Log Type</th>
+                                                                <th>Time In</th>
+                                                                <th>Breaktime Start</th>
+                                                                <th>Breaktime End</th>
+                                                                <th>Time Out</th>
+                                                                <th>OT In</th>
+                                                                <th>OT Out</th>
+                                                                <th>Total Hours</th>
+                                                                <th>Night Differential Hours</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody></tbody>
+                                                    </table>
+									            </div>
+
+												<div class="submit-section">
+										            <button class="btn btn-primary submit-btn" id="submit_logs_view" value="0">View</button>
+                                                    <button class="btn btn-primary submit-btn" id="submit_logs_import" value="0">Import</button>
+									            </div>
 											</div>
+											  </form>
+
+
 										</div>
 									</div>
 									
@@ -236,8 +247,6 @@
 				@include('payroll.employee_attendance_logs_form')
 				<!-- Leave Logs -->
 				@include('payroll.employee_attendance_logs_leave')
-				<!-- Driver's Logs -->
-				@include('payroll.drivers_attendance_logs')
 				
 				<!-- Forms -->
 				
