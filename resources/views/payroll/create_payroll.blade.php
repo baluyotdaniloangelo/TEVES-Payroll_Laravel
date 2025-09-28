@@ -97,10 +97,11 @@
 																		<th class="all">Daily Rate</th>
 																		<th class="">Number of Days Work</th>
 																		<th class="">Number of Days Leave</th>
-																		<th class="all">Basic Pay</th>
+																		<th class="all">Regular Pay</th>
+																		<th class="all">Regular OT Pay</th>
+																		<th class="all">Restday Pay</th>
+																		<th class="all">Restday OT Pay</th>
 																		<th class="all">Night Differential Pay</th>
-																		<th class="all">OT Pay</th>
-																		<th class="all">Day Off Pay</th>
 																		<th class="all">Special Holiday</th>
 																		<th class="all">Regular Holiday</th>
 																		<th class="all">Allowance</th>

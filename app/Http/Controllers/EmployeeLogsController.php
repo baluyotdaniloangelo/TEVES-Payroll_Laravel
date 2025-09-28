@@ -42,16 +42,25 @@ class EmployeeLogsController extends Controller
 
 		$user_data = User::where('user_id', '=', Session::get('loginID'))->first();
 
-		$regular_logs = EmployeeLogsModel::query()
-		->join('teves_payroll_employee_table', 'teves_payroll_employee_logs.employee_idx', '=', 'teves_payroll_employee_table.employee_id')
+		$regular_logs = EmployeeLogsModel::join('teves_payroll_employee_table', 'teves_payroll_employee_logs.employee_idx', '=', 'teves_payroll_employee_table.employee_id')
 		->join('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
 		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
 		->where('teves_payroll_employee_logs.log_type', 'Regular')
 		->select([
-			'teves_payroll_employee_logs.*',
-			'teves_branch_table.branch_name',
-			'teves_payroll_department_table.department_name',
-			'teves_payroll_employee_table.employee_number',
+			'teves_payroll_employee_logs.attendance_date as attendance_date',
+			'teves_payroll_employee_logs.total_regular_hours as total_regular_hours',
+			'teves_payroll_employee_logs.total_night_differential_hours as total_night_differential_hours',
+			'teves_payroll_employee_logs.log_in as log_in',
+			'teves_payroll_employee_logs.log_out as log_out',
+			'teves_payroll_employee_logs.breaktime_start as breaktime_start',
+			'teves_payroll_employee_logs.breaktime_end as breaktime_end',
+			'teves_payroll_employee_logs.regular_pay as regular_pay',
+			'teves_payroll_employee_logs.night_differential_pay as night_differential_pay',
+			'teves_payroll_employee_logs.regular_holiday_pay as regular_holiday_pay',
+			'teves_payroll_employee_logs.special_holiday_pay as special_holiday_pay',
+			'teves_branch_table.branch_name as branch_name',
+			'teves_payroll_department_table.department_name as department_name',
+			'teves_payroll_employee_table.employee_number as employee_number',
 			DB::raw("CONCAT(teves_payroll_employee_table.employee_last_name, ', ', teves_payroll_employee_table.employee_first_name, ' ', IFNULL(teves_payroll_employee_table.employee_middle_name,''), ' ', IFNULL(teves_payroll_employee_table.employee_extension_name,''), ' ') as employee_full_name"),
 		]);
 	
@@ -71,12 +80,26 @@ class EmployeeLogsController extends Controller
                 })
 					
 				->rawColumns(['action'])
+                /*SEARCH FILTER*/
+                ->filterColumn('employee_number', function($query, $keyword) {
+                    $query->where('teves_payroll_employee_table.employee_number', 'like', "%{$keyword}%");
+                })
+                ->filterColumn('employee_full_name', function($query, $keyword) {
+                    $query->whereRaw("CONCAT(teves_payroll_employee_table.employee_last_name, ', ', teves_payroll_employee_table.employee_first_name, ' ', IFNULL(teves_payroll_employee_table.employee_middle_name,''), ' ', IFNULL(teves_payroll_employee_table.employee_extension_name,'')) like ?", ["%{$keyword}%"]);
+                })
+                ->filterColumn('branch_name', function($query, $keyword) {
+                    $query->where('teves_branch_table.branch_name', 'like', "%{$keyword}%");
+                })
+                ->filterColumn('department_name', function($query, $keyword) {
+                    $query->where('teves_payroll_department_table.department_name', 'like', "%{$keyword}%");
+                })
+                /*SEARCH FILTER*/
                 ->make(true);
 		}
     }
 	
 	/*Fetch Employee Regular Overtime Log List using Datatable*/
-	public function getEmployeeRegularOTLogsList(Request $request)
+	public function getEmployeeOvertimeLogsList(Request $request)
     {
 
 		if ($request->ajax()) {
@@ -87,9 +110,43 @@ class EmployeeLogsController extends Controller
 		->join('teves_payroll_employee_table', 'teves_payroll_employee_logs.employee_idx', '=', 'teves_payroll_employee_table.employee_id')
 		->join('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
 		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
-		->where('teves_payroll_employee_logs.log_type', 'RegularOT')
+		//->whereIn('teves_payroll_employee_logs.log_type', 'RegularOT')
+        ->whereIn('teves_payroll_employee_logs.log_type', ['RegularOT', 'RestDayOT']) 
 		->select([
-			'teves_payroll_employee_logs.*',
+             DB::raw("
+                CASE 
+                    WHEN log_type = 'RegularOT' THEN 'Regular Overtime'
+                    WHEN log_type = 'RestDayOT' THEN 'Rest Day Overtime'
+                    ELSE log_type
+                END as log_type
+             "),
+			'teves_payroll_employee_logs.attendance_date as attendance_date',
+            DB::raw("
+            CASE 
+                WHEN teves_payroll_employee_logs.log_type = 'RegularOT' 
+                    THEN teves_payroll_employee_logs.total_regular_hours
+                WHEN teves_payroll_employee_logs.log_type = 'RestDayOT' 
+                    THEN teves_payroll_employee_logs.total_restday_overtime_hours
+                ELSE 0
+            END as total_overtime_hours
+            "),
+			'teves_payroll_employee_logs.total_night_differential_hours as total_night_differential_hours',
+			'teves_payroll_employee_logs.log_in as log_in',
+			'teves_payroll_employee_logs.log_out as log_out',
+			'teves_payroll_employee_logs.breaktime_start as breaktime_start',
+			'teves_payroll_employee_logs.breaktime_end as breaktime_end',
+			DB::raw("
+            CASE 
+                WHEN teves_payroll_employee_logs.log_type = 'RegularOT' 
+                    THEN teves_payroll_employee_logs.regular_overtime_pay
+                WHEN teves_payroll_employee_logs.log_type = 'RestDayOT' 
+                    THEN teves_payroll_employee_logs.restday_overtime_pay
+                ELSE 0
+            END as overtime_pay
+            "),
+			'teves_payroll_employee_logs.night_differential_pay as night_differential_pay',
+			'teves_payroll_employee_logs.regular_holiday_pay as regular_holiday_pay',
+			'teves_payroll_employee_logs.special_holiday_pay as special_holiday_pay',
 			'teves_branch_table.branch_name',
 			'teves_payroll_department_table.department_name',
 			'teves_payroll_employee_table.employee_number',
@@ -117,7 +174,7 @@ class EmployeeLogsController extends Controller
     }
 
 	/*Fetch Employee Restday Log List using Datatable*/
-	public function getEmployeeRestDayOTLogsList(Request $request)
+	public function getEmployeeRestDayLogsList(Request $request)
     {
 
 		if ($request->ajax()) {
@@ -131,9 +188,19 @@ class EmployeeLogsController extends Controller
 		->where('teves_payroll_employee_logs.log_type', 'RestDayOT')
 		//->where('teves_payroll_employee_logs.employee_logs_id', 1)
 		->select([
-			'teves_payroll_employee_logs.*',
-			'teves_branch_table.branch_name',
-			'teves_payroll_department_table.department_name',
+			'teves_payroll_employee_logs.attendance_date as attendance_date',
+			'teves_payroll_employee_logs.total_restday_hours as total_restday_hours',
+			'teves_payroll_employee_logs.total_night_differential_hours as total_night_differential_hours',
+			'teves_payroll_employee_logs.log_in as log_in',
+			'teves_payroll_employee_logs.log_out as log_out',
+			'teves_payroll_employee_logs.breaktime_start as breaktime_start',
+			'teves_payroll_employee_logs.breaktime_end as breaktime_end',
+			'teves_payroll_employee_logs.restday_pay as restday_pay',
+			'teves_payroll_employee_logs.night_differential_pay as night_differential_pay',
+			'teves_payroll_employee_logs.regular_holiday_pay as regular_holiday_pay',
+			'teves_payroll_employee_logs.special_holiday_pay as special_holiday_pay',
+			'teves_branch_table.branch_name as branch_name',
+			'teves_payroll_department_table.department_name as department_name',
 			'teves_payroll_employee_table.employee_number',
 			DB::raw("CONCAT(teves_payroll_employee_table.employee_last_name, ', ', teves_payroll_employee_table.employee_first_name, ' ', IFNULL(teves_payroll_employee_table.employee_middle_name,''), ' ', IFNULL(teves_payroll_employee_table.employee_extension_name,''), ' ') as employee_full_name"),
 		]);

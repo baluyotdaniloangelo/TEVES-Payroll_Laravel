@@ -10,6 +10,9 @@ use App\Models\EmployeeModel;
 use App\Models\EmployeeLogsModel;
 use App\Models\HolidayModel;
 
+use App\Helpers\EmployeeLogsHelper;
+
+use DataTables;
 class CSVImportController extends Controller
 {
     // Show the CSV upload form
@@ -41,452 +44,467 @@ class CSVImportController extends Controller
             $no = 1;
 
             $data = [];
-            foreach ($csv as $row) {
+foreach ($csv as $row) {
+    // CSV Data
+    $employee_number  = $row['employee_no'];
+    $attendance_date  = $row['log_date'];
+    $log_in           = strtotime($row['time_in']);
+    $break_start      = strtotime($row['breaktime_start']);
+    $break_end        = strtotime($row['breaktime_end']);
+    $log_out          = strtotime($row['time_out']);
+    $time_in_ot       = !empty($row['time_in_ot']) ? strtotime($row['time_in_ot']) : null;
+    $time_out_ot      = !empty($row['time_out_ot']) ? strtotime($row['time_out_ot']) : null;
 
-            $employee_number = $row['employee_no'];
+    // Employee Info
+    $employee = EmployeeModel::where('teves_payroll_employee_table.employee_number', $employee_number)->first();
 
-            //$branch_idx						= $request->branch_idx;
-			//$employee_idx 					= $request->employee_idx;
-			//$employee_logs_id 				= $request->employee_logs_id;
-			
+    $employee_idx           = $employee->employee_id;
+    $branch_idx 			= $employee->branch_idx;
+	$department_idx 		= $employee->department_idx;
 
-			/*jj*/
-			$employee_data = EmployeeModel::where('teves_payroll_employee_table.employee_number', $employee_number)
-						->get([
-						'teves_payroll_employee_table.branch_idx',
-						'teves_payroll_employee_table.employee_full_name',
-						'teves_payroll_employee_table.department_idx',
-						'teves_payroll_employee_table.employee_rate',
-						'teves_payroll_employee_table.employee_night_diff_pay',
-						'teves_payroll_employee_table.time_in',
-						'teves_payroll_employee_table.break_time_in',
-						'teves_payroll_employee_table.break_time_out',
-						'teves_payroll_employee_table.time_out',
-						'teves_payroll_employee_table.total_shift_hours',
-						'teves_payroll_employee_table.total_breaktime_hours',
-						'teves_payroll_employee_table.restday_monday',
-						'teves_payroll_employee_table.restday_tuesday',
-						'teves_payroll_employee_table.restday_wednesday',
-						'teves_payroll_employee_table.restday_thursday',
-						'teves_payroll_employee_table.restday_friday',
-						'teves_payroll_employee_table.restday_saturday',
-						'teves_payroll_employee_table.restday_sunday',
-						]);
+    $attendance_date_fmt = date('Y-m-d', strtotime($attendance_date)); 
 
-            $attendance_date 				= $request->attendance_date;
+    $employee_full_name     = $employee->employee_full_name;
+    $default_in  = strtotime($attendance_date_fmt . " " . $employee->time_in);
+    $default_out = strtotime($attendance_date_fmt . " " . $employee->time_out);
+    $break_in     = strtotime($employee->break_time_in);
+    $break_out    = strtotime($employee->break_time_out);
+    $default_hours = $employee->total_shift_hours - $employee->total_breaktime_hours;
 
-			$log_in 						= $row['time_in'];
-			$breaktime_start 				= $row['breaktime_start'];
-			$breaktime_end 					= $row['breaktime_end'];
-			$log_out 						= $row['time_out'];
-			$override_default_shift 		= 0;
+    // Hourly rate (assuming daily rate / 8 hours)
+    $hourly_rate = $employee->employee_rate;
+    $daily_rate  = $hourly_rate * $default_hours;
+    $nd_rate     = $hourly_rate * 0.10; // 10% night diff
 
-            if($row['time_in_ot']!='' && $row['time_out_ot']!=''){
-                $overtime_status				= 'Yes';
-            }else{
-                $overtime_status				= 'No';
-            }
-			
-            $employee_full_name                 = $employee_data[0]->employee_full_name;
-			$branch_idx 						= $employee_data[0]->branch_idx;
-			$department_idx 					= $employee_data[0]->department_idx;
-			
-			$employee_night_diff_pay 			= $employee_data[0]->employee_night_diff_pay;
-			
-			$restday_monday 					= $employee_data[0]->restday_monday;
-			$restday_tuesday 					= $employee_data[0]->restday_tuesday;
-			$restday_wednesday 					= $employee_data[0]->restday_wednesday;
-			$restday_thursday 					= $employee_data[0]->restday_thursday;
-			$restday_friday 					= $employee_data[0]->restday_friday;
-			$restday_saturday 					= $employee_data[0]->restday_saturday;
-			$restday_sunday 					= $employee_data[0]->restday_sunday;
-			
-			$employee_default_time_in 			= $employee_data[0]->time_in;
-			$employee_default_time_out 			= $employee_data[0]->time_out;
-			$employee_default_breaktime_in 		= $employee_data[0]->break_time_in;
-			$employee_default_breaktime_out 	= $employee_data[0]->break_time_out;
-			
-			
-			$total_default_shift_hours			= $employee_data[0]->total_shift_hours;
-			$total_default_breaktime_hours 		= $employee_data[0]->total_breaktime_hours;
-			
-			$employee_current_rate = $employee_data[0]->employee_rate;
-			
-			$total_default_working_hours		= $total_default_shift_hours - $total_default_breaktime_hours;			
-			
-				$attendance_date_Number = (date('N', strtotime($attendance_date)));
-				
-				if($attendance_date_Number==0){
-					$check_employee_rest_day = $restday_sunday;
-				}
-				else if($attendance_date_Number==1){
-					$check_employee_rest_day = $restday_monday;
-				}
-				else if($attendance_date_Number==2){
-					$check_employee_rest_day = $restday_tuesday;
-				}
-				else if($attendance_date_Number==3){
-					$check_employee_rest_day = $restday_wednesday;
-				}
-				else if($attendance_date_Number==4){
-					$check_employee_rest_day = $restday_thursday;
-				}
-				else if($attendance_date_Number==5){
-					$check_employee_rest_day = $restday_friday;
-				}
-				else{
-					$check_employee_rest_day = $restday_saturday;
-				}
-				
-				if($check_employee_rest_day == 1){
-					
-					$log_type = 'RestDayOT';
-                    $log_type_import = 'Restday';
-					
-				}else{
-					
-					if($overtime_status=='Yes'){
-						
-						$log_type = 'RegularOT';
-                        $log_type_import = 'Regular';
-						
-					}else{
-						
-						$log_type = 'Regular';
-                        $log_type_import = 'Regular';
-						
-					}
-					
-				}
-				/*jj*/
-			/*1st 4 Hours - morning shift*/
-			$time_in_string_to_time = strtotime($log_in);
-			$break_time_in_string_to_time = strtotime($breaktime_start);
+    // Compute tardiness & undertime
+    $tardiness = max(0, ($log_in - $default_in) / 60); // minutes late
+    $undertime = max(0, ($default_out - $log_out) / 60); // minutes early out
 
-			/*2nd 4 Hours - late afternoon*/
-			$time_out_string_to_time = strtotime($log_out);
-			$break_time_out_string_to_time = strtotime($breaktime_end);
+    // Compute regular worked hours (excluding breaks)
+    $total_hours_from_log_in_and_out = (($log_out - $log_in)) / 3600;
+    $worked_hours = (($log_out - $log_in) - ($break_end - $break_start)) / 3600;
+    $regular_hours = min($worked_hours, $default_hours);
 
-			$morning_shift_total_hours = ($break_time_in_string_to_time - $time_in_string_to_time) / 3600;
-			$late_afternoon_total_hours = ($break_time_out_string_to_time - $time_out_string_to_time) / 3600;
+    // Compute overtime
+    $regular_overtime_hours = 0;
+    if ($time_in_ot && $time_out_ot) {
+        $regular_overtime_hours = ($time_out_ot - $time_in_ot) / 3600;
+    }
 
-			/*Gawing sakto ang na compute na oras. halimbawa nag in sya ng 7:45am pero and dapat na oras nya ay 8am dapat hindi kasama ang 15 minutes sa total hrs*/
-			/*Ma compute din neto and tardiness*/
+    // Check restday
+    $day_num = (int) date('N', strtotime($attendance_date));
+    switch ($day_num) {
+        case 1: $restday = $employee->restday_monday; break;
+        case 2: $restday = $employee->restday_tuesday; break;
+        case 3: $restday = $employee->restday_wednesday; break;
+        case 4: $restday = $employee->restday_thursday; break;
+        case 5: $restday = $employee->restday_friday; break;
+        case 6: $restday = $employee->restday_saturday; break;
+        case 7: $restday = $employee->restday_sunday; break;
+        default: $restday = 0;
+    }
 
-			/*Compute Total Breaktime Hours*/
-			$total_breaktime_hours = ($break_time_out_string_to_time - $break_time_in_string_to_time) / 3600;
+    $log_type = $restday ? 'RestDay' : 'Regular';
 
-			/*Convert Default Employee Shift to String to Time*/
-			$employee_default_time_in_strtotime = strtotime("$attendance_date $employee_default_time_in");
-			$employee_default_time_out_strtotime = strtotime("$attendance_date $employee_default_time_out");
-			$employee_default_breaktime_out_strtotime = strtotime("$attendance_date $employee_default_breaktime_out");
+    // Night differential window
+    $night_start = strtotime(date('Y-m-d 22:00:00', strtotime($attendance_date)));
+    $night_end   = strtotime(date('Y-m-d 06:00:00', strtotime($attendance_date . ' +1 day')));
 
-			/*Compute Tardiness*/
-			 $tardiness_morning_shift = ($employee_default_time_in_strtotime - $time_in_string_to_time) / 3600;
-			//echo "[$tardiness_morning_shift]";
-			 $tardiness_late_afternoon = ($employee_default_breaktime_out_strtotime - $break_time_out_string_to_time) / 3600;
-			/*Tardiness for Morning*/
-			if($tardiness_morning_shift<0){
-				/*Negative Means Late*/
-				$default_timein_to_timein_log_excess = 0;
-			}else{
-				/*Positive Means Not Late or Arrived Earlier than the Default Time In, Less the Excess*/
-				$default_timein_to_timein_log_excess = $tardiness_morning_shift;/*To Less on the Total Working Hours*/
-			}
-			/*Tardiness for Afternoon*/
-			if($tardiness_late_afternoon<0){
-				/*Negative Means Late*/
-				$default_breaktimeout_to_breaktimeout_log_excess = 0;
-			}else{
-				/*Positive Means Not Late or Arrived Earlier than the Default Time In, Less the Excess*/
-				$default_breaktimeout_to_breaktimeout_log_excess = $tardiness_late_afternoon;/*To Less on the Total Working Hours*/
-			}
-	
-			/*Get Total Hours for Employee In and Out Logs*/	
-			$total_hours_from_log_in_and_out = number_format(($time_out_string_to_time - $time_in_string_to_time) / 3600+0, 2, '.', '');
+    $night_diff_hours = 0;
+    // Regular shift overlap
+    $night_diff_hours += max(0, (min($log_out, $night_end) - max($log_in, $night_start)) / 3600);
+    // Overtime overlap
+    if ($time_in_ot && $time_out_ot) {
+        $night_diff_hours += max(0, (min($time_out_ot, $night_end) - max($time_in_ot, $night_start)) / 3600);
+    }
 
-			if($override_default_shift=='No'){
-				$total_tardiness = abs($tardiness_morning_shift) + abs($tardiness_late_afternoon);
-				$total_excess_hours = number_format($default_timein_to_timein_log_excess + $default_breaktimeout_to_breaktimeout_log_excess+0, 2, '.', '');/*Yung Sobra sa 8hrs*/
-				/*Compute the Total Undertime*/
-				 $undertime_hours = ($time_out_string_to_time - $employee_default_time_out_strtotime) / 3600;
-			}
-			else{
-				$total_tardiness = 0;
-				$total_excess_hours = 0;/*Yung Sobra sa 8hrs*/
-				/*Compute the Total Undertime*/
-				$undertime_hours = 0;
-			}
-		
-			if($undertime_hours<0){
-				/*Negative Means Undertime*/
-				$total_undertime_hours = abs($undertime_hours);
-				//$excess_hours_after_shift = 0;
-			}else{
-				
-				$total_undertime_hours =0;
-				//$excess_hours_after_shift = abs($undertime_hours);
-			}
+    // === PAY COMPUTATION ===
+    
 
-			/*Start to Compute night shift hrs*/
-			/*Compute The Covered Night Shift Hours*/
-			/*Source*/
-			/*https://stackoverflow.com/questions/10532687/time-night-differential-computation-in-php/10534110#10534110*/
-			/*Set Limit for Night Differential*/
-						
-						
-						if($employee_night_diff_pay=='Yes'){
-						
-						define('START_NIGHT_HOUR','22');
-						define('START_NIGHT_MINUTE','00');
-						define('START_NIGHT_SECOND','00');
-						define('END_NIGHT_HOUR','06');
-						define('END_NIGHT_MINUTE','00');
-						define('END_NIGHT_SECOND','00');
+    if ($restday) {
 
-						$night_start_work = strtotime($log_in);
-						$night_end_work = strtotime($log_out);						
-							
-							$default_start_of_night_diff = mktime(START_NIGHT_HOUR,START_NIGHT_MINUTE,START_NIGHT_SECOND,date('m',$night_start_work),date('d',$night_start_work),date('Y',$night_start_work));
-							
-							/*Comparison of Day*/
-							$day1 = date('d',$night_start_work);
-							$day2 = date('d',$night_end_work);
-							
-							if($day1!=$day2){
-								//echo "startDAY<br>";
-								$default_end_of_night_diff   = mktime(END_NIGHT_HOUR,END_NIGHT_MINUTE,END_NIGHT_SECOND,date('m',$night_start_work),date('d',$night_start_work) + 1,date('Y',$night_start_work));
-							}
-							else{
-								//echo "endDAY<br>";
-								$default_end_of_night_diff   = mktime(END_NIGHT_HOUR,END_NIGHT_MINUTE,END_NIGHT_SECOND,date('m',$night_end_work),date('d',$night_end_work) ,date('Y',$night_end_work));
-							}
-						
-							if($night_start_work >= $default_start_of_night_diff && $night_start_work <= $default_end_of_night_diff)
-							{
-								if($night_end_work >= $default_end_of_night_diff) 
-								{
-									//echo "NS7<br>";
-									$night_shft_hrs = ($default_end_of_night_diff - $night_start_work) / 3600;
-									//echo "NS6<br>";
-									$night_shift_breaktime = 0;
-								}
-								else
-								{
-									//echo "NS5<br>";
-									$night_shft_hrs = ($night_end_work - $night_start_work) / 3600;
-									$night_shift_breaktime = 0;
-								}
-							}
-							elseif($night_end_work >= $default_start_of_night_diff && $night_end_work <= $default_end_of_night_diff)
-							{
-								if($night_start_work <= $default_start_of_night_diff)
-								{
-									$night_shft_hrs = ($night_end_work - $default_start_of_night_diff) / 3600;
-									$night_shift_breaktime = $total_breaktime_hours;
-									//echo "NS4<br>";
-								}
-								else
-								{
-									$night_shft_hrs = ($night_end_work - $night_start_work) / 3600;
-									//echo "NS3<br>";
-									$night_shift_breaktime = 0;
-								}
-							}
-							else
-							{
-								if($night_start_work < $default_start_of_night_diff && $night_end_work > $default_end_of_night_diff)
-								{
-									
-									if(($default_end_of_night_diff - $night_start_work) / 3600 < 0 ){
-										//echo "NS1.1<br>";
-										 $night_shft_hrs = 0;
-										 $night_shift_breaktime = 0;
-									}else{
-										//echo "NS2.1<br>";
-										$night_shft_hrs = ($default_end_of_night_diff - $night_start_work) / 3600;
-										$night_shift_breaktime = $total_breaktime_hours;
-									}
-									
-								}
-								else
-								{	
-									if( (($night_start_work - $default_end_of_night_diff) / 3600) < 0 ){
-										//echo "NS1.2<br>";
-										 $night_shft_hrs = ($night_end_work - $night_start_work - 0) / 3600;
-										 $night_shift_breaktime = $total_breaktime_hours;
-									}else{
-										//echo "NS2.2<br>";
-										$night_shft_hrs = ($night_start_work - $default_end_of_night_diff) / 3600;
-										$night_shift_breaktime = 0;
-									}
-									
-								}
-							}
-							
-			$covered_night_diff_hrs = number_format(($night_shft_hrs)+0, 1, '.', '');
-			$total_covered_night_diff_hrs = number_format(($night_shft_hrs - $night_shift_breaktime)+0, 2, '.', '');
-			
-			$night_differential_pay = $total_covered_night_diff_hrs * $employee_current_rate * (10/100);
-			/*End to Compute night shift hrs*/
-						}else{
-							
-							$covered_night_diff_hrs = 0;
-							$total_covered_night_diff_hrs = 0;
-							
-							$night_differential_pay = 0;
-							
-						}
-			
-			if($overtime_status=='No'){
+        // Example: Rest day premium 130%
+        /*Hours*/
+        $restday_hours = $regular_hours;
+        $restday_overtime_hours = $regular_overtime_hours;
 
-                if($total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + 0 + $total_undertime_hours)>=8){
-                     $excess_hours_after_shift = ($total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + 0 + $total_undertime_hours) )-8;
+        /*Pay*/
+        /*Regular*/
+        $regular_pay = 0;
+        $regular_overtime_pay = 0;
+        /*Restday*/
+        $restday_pay = $restday_hours * $hourly_rate * 1.30;
+        $restday_overtime_pay = $restday_overtime_hours * $hourly_rate * 1.69; // rest day OT rate (130% * 1.3 OT)
+
+    } else {
+
+        /*Hours*/
+        $restday_hours = 0;
+        $restday_overtime_hours = 0;
+
+        /*Pay*/
+        /*Regular*/
+        $regular_pay = $regular_hours * $hourly_rate;
+        $regular_overtime_pay = $regular_overtime_hours * $hourly_rate * 1.25; // regular OT
+        /*Restday*/
+        $restday_pay = 0;
+        $restday_overtime_pay = 0; // rest day OT rate (130% * 1.3 OT)
+
+    }
+
+    $night_diff_pay = $night_diff_hours * $nd_rate;
+
+
+	/*Query Holiday*/
+	// Handle Holidays
+    $Regular_holiday_pay   = 0;
+    $Special_non_working_holiday_pay   = 0;
+
+    $attendance_date_holiday  = date('Y-m-d', strtotime($row['log_date']));
+
+    $holidays = HolidayModel::where('holiday_date', $attendance_date_holiday)->get();
+    $holiday_type = null;
+    $holiday_multiplier = 1;
+
+    if ($holidays->count() > 0) {
+        foreach ($holidays as $holiday) {
+            if ($holiday->holiday_type == 'Regular Holiday') {
+                if ($holiday_type == 'Regular Holiday') {
+                    // 2 regular holidays same day
+                    $holiday_multiplier = 3; 
+                } else {
+                    $holiday_multiplier = 2;
+                    $holiday_type = 'Regular Holiday';
                 }
-                else{
-                     $excess_hours_after_shift = 0;
+            } elseif ($holiday->holiday_type == 'Special Non-Working Holiday') {
+                if ($holiday_type != 'Regular Holiday') {
+                    $holiday_multiplier = 0.3;
+                    $holiday_type = 'Special Non-Working Holiday';
+                }
+            }
+        }
+
+        if ($holiday_type == 'Regular Holiday') {
+            if ($regular_hours == 0 && $regular_overtime_hours == 0) {
+                // No work, still paid daily rate (200% if double regular holiday)
+                $Regular_holiday_pay = $daily_rate * ($holiday_multiplier == 3 ? 2 : 1);
+                $Regular_holiday_pay_ot = 0;
+            } else {
+                $Regular_holiday_pay = $regular_hours * $hourly_rate * $holiday_multiplier;
+                $Regular_holiday_pay_ot = 0;
+                if ($regular_overtime_hours > 0) {
+                    $Regular_holiday_pay += 0;
+                    $Regular_holiday_pay_ot = $regular_overtime_hours * $hourly_rate * ($holiday_multiplier + 0.6);
+                }
+            }
+        } elseif ($holiday_type == 'Special Non-Working Holiday') {
+            if ($regular_hours > 0) {
+                $Special_non_working_holiday_pay = $regular_hours * $hourly_rate * 0.3;
+                $Special_non_working_holiday_pay_ot = 0;
+                if ($regular_overtime_hours > 0) {
+                    $Special_non_working_holiday_pay += 0;
+                    $Special_non_working_holiday_pay_ot = $regular_overtime_hours * $hourly_rate * 0.69;
+                }
+            }
+        }
+    }
+
+
+    // Save into $data
+    $data[] = [
+        'employee_full_name'                =>$employee_full_name,
+        'employee_no'                       => $employee_number,
+        'log_date'                          => $attendance_date,
+        'log_type'                          => $log_type,
+        'time_in'                           => $row['time_in'],
+        'time_out'                          => $row['time_out'],
+        'breaktime_start'                   => $row['breaktime_start'],
+        'breaktime_end'                     => $row['breaktime_end'],
+        'time_in_ot'                        => $row['time_in_ot'],
+        'time_out_ot'                       => $row['time_out_ot'],
+        'tardiness_mins'                    => round($tardiness, 2),
+        'undertime_mins'                    => round($undertime, 2),
+        'regular_hours'                     => round($regular_hours, 2),
+        'regular_overtime_hours'            => round($regular_overtime_hours, 2),
+        'restday_hours'                     => round($restday_hours, 2),
+        'restday_overtime_hours'            => round($restday_overtime_hours, 2),
+        'night_diff_hours'                  => round($night_diff_hours, 2),
+        'regular_pay'                       => round($regular_pay, 2),
+        'regular_overtime_pay'              => round($regular_overtime_pay, 2),
+        'restday_pay'                       => round($restday_pay, 2),
+        'restday_overtime_pay'              => round($restday_overtime_pay, 2),
+        'night_diff_pay'                    => round($night_diff_pay, 2),
+        'regular_holiday_pay'               => round($Regular_holiday_pay, 2),
+        'special_non_working_holiday_pay'   => round($Special_non_working_holiday_pay, 2),
+    ];
+
+
+            if($log_type=='Regular'){
+
+                /*Import Log Regular Working Hours*/
+                    EmployeeLogsHelper::saveEmployeeRegularLogs([
+                        'employee_idx'                      => $employee_idx,
+                        'branch_idx'                        => $branch_idx,
+                        'department_idx'                    => $department_idx,
+                        'employee_current_rate'             => $hourly_rate,
+                        'attendance_date'                   => date('Y-m-d', strtotime($attendance_date)),
+                        'override_default_shift'            => 'Yes',
+                        'log_in'                            => date('Y-m-d H:i:s', strtotime($row['time_in'])),
+                        'breaktime_start'                   => date('Y-m-d H:i:s', strtotime($row['breaktime_start'])),
+                        'breaktime_end'                     => date('Y-m-d H:i:s', strtotime($row['breaktime_end'])),
+                        'log_out'                           => date('Y-m-d H:i:s', strtotime($row['time_out'])),
+                        'total_hours_from_log_in_and_out'   => $total_hours_from_log_in_and_out,
+                        'total_regular_hours'               => round($regular_hours, 2),
+                        'total_regular_overtime_hours'      => 0,
+                        'total_restday_hours'               => 0,
+                        'total_restday_overtime_hours'      => 0,
+                        'total_breaktime_hours'             => 0,
+                        'total_tardiness_hours'             => round($tardiness),
+                        'total_undertime_hours'             => round($undertime),
+                        'total_covered_night_diff_hrs'      => round($night_diff_hours, 2),
+                        'regular_pay'                       => round($regular_pay, 2),
+                        'regular_overtime_pay'              => 0,
+                        'restday_pay'                       => 0,
+                        'restday_overtime_pay'              => 0,
+                        'night_differential_pay'            => round($night_diff_pay, 2),
+                        'regular_holiday_pay'               => round($Regular_holiday_pay, 2),
+                        'special_holiday_pay'               => round($Special_non_working_holiday_pay, 2),
+                        'log_type'                          => 'Regular',
+                    ]);
+
+                if($regular_overtime_hours > 0){
+                    EmployeeLogsHelper::saveEmployeeRegularLogs([
+                        'employee_idx'                      => $employee_idx,
+                        'branch_idx'                        => $branch_idx,
+                        'department_idx'                    => $department_idx,
+                        'employee_current_rate'             => $hourly_rate,
+                        'attendance_date'                   => date('Y-m-d', strtotime($attendance_date)),
+                        'override_default_shift'            => 'Yes',
+                        'log_in'                            => date('Y-m-d H:i:s', strtotime($row['time_in'])),
+                        'breaktime_start'                   => date('Y-m-d H:i:s', strtotime($row['breaktime_start'])),
+                        'breaktime_end'                     => date('Y-m-d H:i:s', strtotime($row['breaktime_end'])),
+                        'log_out'                           => date('Y-m-d H:i:s', strtotime($row['time_out'])),
+                        'total_hours_from_log_in_and_out'   => round($regular_overtime_hours, 2),
+                        'total_regular_hours'               => 0,
+                        'total_regular_overtime_hours'      => round($regular_overtime_hours, 2),
+                        'total_restday_hours'               => 0,
+                        'total_restday_overtime_hours'      => 0,
+                        'total_breaktime_hours'             => 0,
+                        'total_tardiness_hours'             => 0,
+                        'total_undertime_hours'             => 0,
+                        'total_covered_night_diff_hrs'      => round($night_diff_hours, 2),
+                        'regular_pay'                       => 0,
+                        'regular_overtime_pay'              => round($regular_overtime_pay, 2),
+                        'restday_pay'                       => 0,
+                        'restday_overtime_pay'              => 0,
+                        'night_differential_pay'            => round($night_diff_pay, 2),
+                        'regular_holiday_pay'               => round($Regular_holiday_pay, 2),
+                        'special_holiday_pay'               => round($Special_non_working_holiday_pay, 2),
+                        'log_type'                          => 'RegularOT',
+                    ]);
                 }
 
-			$total_regular_hours = $total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + $excess_hours_after_shift + $total_undertime_hours);
-			$total_tardiness_hours = $total_tardiness;
-				
-				if($check_employee_rest_day == 1){
-					
-					$Regular_pay = 0;
-					$RegularOT_pay = 0;
-					$RestDayOT_pay = ($employee_current_rate * $total_regular_hours) * 1.3;
-					
-				}else{
-					
-					/*Compute by Rate*/
-					/*Computed pay = total regular hours by rate*/
-					$Regular_pay = $employee_current_rate * $total_regular_hours;
-					$RegularOT_pay = 0;
-					$RestDayOT_pay = 0;
-					
-				}
-
-			$ot_hours	 = (0);
-
-			}else{
-                //echo "ddddd";
-			$total_tardiness_hours = 0;
-
-			$total_regular_hours = $total_hours_from_log_in_and_out - (0);
-            echo $ot_hours	 = $total_regular_hours - (0);
-
-					/*Soon to have a table for Rate on Overtime - Hard Coded pa to to 0.25*/
-					$Regular_pay = 0;
-					$RegularOT_pay = $employee_current_rate * 1.25 * $total_regular_hours;
-					$RestDayOT_pay = 0;
-					
-			}
-			
-			/*Query Holiday*/
-			/*Holiday Computation from Logs*/
-			$holiday_data_for_regular = HolidayModel::where('holiday_date', $attendance_date)
-						->where('holiday_type', 'Regular Holiday')
-						->get([
-						'holiday_id',
-						'holiday_description',
-						'holiday_date',
-						'holiday_type'
-						]);
-			
-			$holiday_data_for_special_non_working = HolidayModel::where('holiday_date', $attendance_date)
-						->where('holiday_type', 'Special Non-Working Holiday')
-						->get([
-						'holiday_id',
-						'holiday_description',
-						'holiday_date',
-						'holiday_type'
-						]);
-						
-			$regular_holiday_pay = 0;
-			$special_holiday_pay = 0;
-			
-			foreach ($holiday_data_for_regular as $holiday_data_for_regular_cols){
-				
-				$holiday_id 			= $holiday_data_for_regular_cols->holiday_id;
-				$holiday_description 	= $holiday_data_for_regular_cols->holiday_description;
-				$holiday_date 			= $holiday_data_for_regular_cols->holiday_date;
-				$holiday_type 			= $holiday_data_for_regular_cols->holiday_type;
-				
-				/*Regular Holiday and Regular Working Days*/
-				if($holiday_type=='Regular Holiday' && $log_type=='Regular'){                                          
-					$regular_holiday_pay += $employee_current_rate * $total_default_working_hours;
-				}
-				/*Regular Holiday and Regular Working Days Overtime*/
-				else if($holiday_type=='Regular Holiday' && $log_type=='RegularOT'){
-					$regular_holiday_pay += ((($employee_current_rate * 2) * 1.30) * $total_regular_hours ) - $RegularOT_pay;
-				}
-				/*Regular Holiday and Restday Overtime*/
-				else{
-					//2600 = 1000 X 200% + (1000 x 200% )X30%(*0.3)
-					$regular_holiday_pay += 1.3 * ( $employee_current_rate * $total_regular_hours ) ;
-
-				}
-				
-			}
-			
-			foreach ($holiday_data_for_special_non_working as $holiday_data_for_special_non_working_cols){
-	   
-				$holiday_id 			= $holiday_data_for_special_non_working_cols->holiday_id;
-				$holiday_description 	= $holiday_data_for_special_non_working_cols->holiday_description;
-				$holiday_date 			= $holiday_data_for_special_non_working_cols->holiday_date;
-				$holiday_type 			= $holiday_data_for_special_non_working_cols->holiday_type;
-				
-				/*Special Non-Working Holiday and Regular Working Days Overtime*/
-				if($holiday_type=='Special Non-Working Holiday' && $log_type=='Regular'){
-					
-					$special_holiday_pay = (($employee_current_rate * 0.3)) * ($total_regular_hours);
-					
-				}
-				/*Special Non-Working Holiday and Regular Working Days Overtime*/
-				else if($holiday_type=='Special Non-Working Holiday' && $log_type=='RegularOT'){
-					
-					$special_holiday_pay = (($employee_current_rate * 0.3 * 0.3)) * ($total_regular_hours);
-					
-				}
-				/*Special Non-Working Holiday and Restdays Days Overtime*/
-				else{
-					
-						if(($total_regular_hours)>8){
-						
-							$special_holiday_pay = (($employee_current_rate * 0.5) * 0.3) * ($total_regular_hours);
-		
-						}else{
-						
-							$special_holiday_pay = (($employee_current_rate * 0.5)) * ($total_regular_hours);
-						
-						}
-
-				}
-				
-			
-			}
-                
-                $data[] = [
-                    'item_no' => $no,
-                    'employee_no' => $row['employee_no'],
-                    'employee_full_name' => $employee_full_name,
-                    'log_date' => $row['log_date'],
-                    'log_type' => $log_type_import,
-                    'time_in' => $row['time_in'],
-                    'breaktime_start' => $row['breaktime_start'],
-                    'breaktime_end' => $row['breaktime_end'],
-                    'time_out' => $row['time_out'],
-                    'time_in_ot' => $row['time_in_ot'],
-                    'time_out_ot' => $row['time_out_ot'],
-                    'total_regular_hours' => $total_regular_hours,
-                    'ot_hours' => $ot_hours,
-                    'import_status' => "Success",
-                ];
-                $no++;
             }
+
+
+            else{
+
+            EmployeeLogsHelper::saveEmployeeRegularLogs([
+                        'employee_idx'                      => $employee_idx,
+                        'branch_idx'                        => $branch_idx,
+                        'department_idx'                    => $department_idx,
+                        'employee_current_rate'             => $hourly_rate,
+                        'attendance_date'                   => date('Y-m-d', strtotime($attendance_date)),
+                        'override_default_shift'            => 'Yes',
+                        'log_in'                            => date('Y-m-d H:i:s', strtotime($row['time_in'])),
+                        'breaktime_start'                   => date('Y-m-d H:i:s', strtotime($row['breaktime_start'])),
+                        'breaktime_end'                     => date('Y-m-d H:i:s', strtotime($row['breaktime_end'])),
+                        'log_out'                           => date('Y-m-d H:i:s', strtotime($row['time_out'])),
+                        'total_hours_from_log_in_and_out'   => $total_hours_from_log_in_and_out,
+                        'total_regular_hours'               => 0,
+                        'total_regular_overtime_hours'      => 0,
+                        'total_restday_hours'               => round($restday_hours, 2),
+                        'total_restday_overtime_hours'      => 0,
+                        'total_breaktime_hours'             => 0,
+                        'total_tardiness_hours'             => round($tardiness),
+                        'total_undertime_hours'             => round($undertime),
+                        'total_covered_night_diff_hrs'      => round($night_diff_hours, 2),
+                        'regular_pay'                       => 0,
+                        'regular_overtime_pay'              => 0,
+                        'restday_pay'                       => round($restday_pay, 2),
+                        'restday_overtime_pay'              => 0,
+                        'night_differential_pay'            => round($night_diff_pay, 2),
+                        'regular_holiday_pay'               => round($Regular_holiday_pay, 2),
+                        'special_holiday_pay'               => round($Special_non_working_holiday_pay, 2),
+                        'log_type'                          => 'Restday',
+                    ]);
+
+            if($regular_overtime_hours > 0){
+                    EmployeeLogsHelper::saveEmployeeRegularLogs([
+                        'employee_idx'                      => $employee_idx,
+                        'branch_idx'                        => $branch_idx,
+                        'department_idx'                    => $department_idx,
+                        'employee_current_rate'             => $hourly_rate,
+                        'attendance_date'                   => date('Y-m-d', strtotime($attendance_date)),
+                        'override_default_shift'            => 'Yes',
+                        'log_in'                            => date('Y-m-d H:i:s', strtotime($row['time_in'])),
+                        'breaktime_start'                   => date('Y-m-d H:i:s', strtotime($row['breaktime_start'])),
+                        'breaktime_end'                     => date('Y-m-d H:i:s', strtotime($row['breaktime_end'])),
+                        'log_out'                           => date('Y-m-d H:i:s', strtotime($row['time_out'])),
+                        'total_hours_from_log_in_and_out'   => round($regular_overtime_hours, 2),
+                        'total_regular_hours'               => 0,
+                        'total_regular_overtime_hours'      => 0,
+                        'total_restday_hours'               => 0,
+                        'total_restday_overtime_hours'      => round($restday_overtime_hours, 2),
+                        'total_breaktime_hours'             => 0,
+                        'total_tardiness_hours'             => 0,
+                        'total_undertime_hours'             => 0,
+                        'total_covered_night_diff_hrs'      => round($night_diff_hours, 2),
+                        'regular_pay'                       => 0,
+                        'regular_overtime_pay'              => 0,
+                        'restday_pay'                       => 0,
+                        'restday_overtime_pay'              => round($restday_overtime_pay, 2),
+                        'night_differential_pay'            => round($night_diff_pay, 2),
+                        'regular_holiday_pay'               => round($Regular_holiday_pay, 2),
+                        'special_holiday_pay'               => round($Special_non_working_holiday_pay, 2),
+                        'log_type'                          => 'RestDayOT',
+                    ]);
+
+            }
+            }
+
+
+    $no++;
+            }
+
+            return response()->json([
+                'message' => 'CSV imported successfully',
+                'data' => DataTables::of($data)
+                            ->addIndexColumn()
+                            ->toArray() // Convert DataTables result to array
+            ]);
 
             // Return the parsed data to populate the table
-            return response()->json(['message' => 'CSV imported successfully', 'data' => $data]);
+            //return response()->json(['message' => 'CSV imported successfully', 'data' => $data]);
+
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error processing CSV file: ' . $e->getMessage()], 500);
+        }
+    }
+
+
+    public function viewCSV(Request $request)
+    {
+        // Validate the uploaded file
+        $validator = Validator::make($request->all(), [
+            'csv_file' => 'required|file|mimes:csv,txt|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Invalid file format or size'], 400);
+        }
+
+        // Get the uploaded file
+        $file = $request->file('csv_file');
+
+        // Parse the CSV file using the League CSV package
+        try {
+            $csv = Reader::createFromPath($file->getRealPath(), 'r');
+            $csv->setHeaderOffset(0); // First row is the header
+
+            $no = 1;
+
+            $data = [];
+           foreach ($csv as $row) {
+
+    // CSV Data
+    $employee_number  = $row['employee_no'];
+    $attendance_date  = $row['log_date'];
+    $log_in           = strtotime($row['time_in']);
+    $break_start      = strtotime($row['breaktime_start']);
+    $break_end        = strtotime($row['breaktime_end']);
+    $log_out          = strtotime($row['time_out']);
+    $time_in_ot       = !empty($row['time_in_ot']) ? strtotime($row['time_in_ot']) : null;
+    $time_out_ot      = !empty($row['time_out_ot']) ? strtotime($row['time_out_ot']) : null;
+
+    // Employee Info
+    $employee = EmployeeModel::where('teves_payroll_employee_table.employee_number', $employee_number)->first();
+
+    $default_in   = strtotime($employee->time_in);
+    $default_out  = strtotime($employee->time_out);
+    $break_in     = strtotime($employee->break_time_in);
+    $break_out    = strtotime($employee->break_time_out);
+    $default_hours = $employee->total_shift_hours - $employee->total_breaktime_hours;
+
+    // Compute tardiness & undertime
+    $tardiness = max(0, ($log_in - $default_in) / 60); // minutes late
+    $undertime = max(0, ($default_out - $log_out) / 60); // minutes early out
+
+    // Compute regular worked hours (excluding breaks)
+    $worked_hours = (($log_out - $log_in) - ($break_end - $break_start)) / 3600;
+    $regular_hours = min($worked_hours, $default_hours);
+
+    // Compute overtime
+    $regular_overtime_hours = 0;
+    if ($time_in_ot && $time_out_ot) {
+        $regular_overtime_hours = ($time_out_ot - $time_in_ot) / 3600;
+    }
+
+    // Check restday
+    $day_num = date('N', strtotime($attendance_date));
+    $restday = match($day_num) {
+        1 => $employee->restday_monday,
+        2 => $employee->restday_tuesday,
+        3 => $employee->restday_wednesday,
+        4 => $employee->restday_thursday,
+        5 => $employee->restday_friday,
+        6 => $employee->restday_saturday,
+        7 => $employee->restday_sunday,
+    };
+
+    $log_type = $restday ? 'RestDay' : 'Regular';
+
+    // Compute night differential (10PM–6AM)
+    $night_start = strtotime(date('Y-m-d 22:00:00', strtotime($attendance_date)));
+    $night_end   = strtotime(date('Y-m-d 06:00:00', strtotime($attendance_date . ' +1 day')));
+
+    $night_diff_hours = 0;
+
+    // Regular shift overlap
+    $night_diff_hours += max(0, (min($log_out, $night_end) - max($log_in, $night_start)) / 3600);
+
+    // Overtime overlap
+    if ($time_in_ot && $time_out_ot) {
+        $night_diff_hours += max(0, (min($time_out_ot, $night_end) - max($time_in_ot, $night_start)) / 3600);
+    }
+
+    // Save into $data
+    $data[] = [
+        'employee_no'   => $employee_number,
+        'date'          => $attendance_date,
+        'log_type'      => $log_type,
+        'tardiness_mins'=> round($tardiness),
+        'undertime_mins'=> round($undertime),
+        'regular_hours' => round($regular_hours, 2),
+        'overtime_hours'=> round($regular_overtime_hours, 2),
+        'night_diff'    => round($night_diff_hours, 2),
+    ];
+
+    $no++;
+            }
+
+            return response()->json([
+                'message' => 'CSV imported successfully',
+                'data' => DataTables::of($data)
+                            ->addIndexColumn()
+                            ->toArray() // Convert DataTables result to array
+            ]);
+
+            // Return the parsed data to populate the table
+            //return response()->json(['message' => 'CSV imported successfully', 'data' => $data]);
+
+
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error processing CSV file: ' . $e->getMessage()], 500);
         }

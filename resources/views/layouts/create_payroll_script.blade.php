@@ -229,6 +229,67 @@
 				scrollCollapse: true,
 				scrollY: '500px',
 				scrollx: false,
+
+                /*
+
+                DT_RowIndex
+: 
+14
+allowance_amount_total
+: 
+0
+count_days
+: 
+15
+daily_rate
+: 
+1400
+deduction_amount_total
+: 
+0
+employee_full_name
+: 
+"BALUYOT, DANILO ANGELO RELINGADO "
+employee_number
+: 
+"TEST-EMP"
+employment_type
+: 
+"Regular"
+gross_salary
+: 
+26838.29
+leave_amount_pay_total
+: 
+0
+leave_logs_count
+: 
+0
+net_salary
+: 
+26838.29
+night_differential_pay_total
+: 
+0
+regular_holiday_pay_total
+: 
+4200
+regular_overtime_pay
+: 
+751.04
+regular_pay
+: 
+751.04
+restday_overtime_pay
+: 
+887.25
+restday_pay
+: 
+7280
+special_holiday_pay_total
+: 
+420
+                */
 				"columns": [
 					{data: 'DT_RowIndex', name: 'DT_RowIndex' , orderable: true, searchable: false, className: "text-center"},  
 					{data: 'employee_number', className: "text-left", orderable: false },
@@ -237,10 +298,11 @@
 					{data: 'daily_rate', className: "text-left", orderable: false },	
 					{data: 'count_days', className: "text-left", orderable: false },		
 					{data: 'leave_logs_count', className: "text-left", orderable: false },	
-					{data: 'basic_pay_total', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
+					{data: 'regular_pay', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
+					{data: 'regular_overtime_pay', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
+					{data: 'restday_pay', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
+					{data: 'restday_overtime_pay', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
 					{data: 'night_differential_pay_total', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
-					{data: 'regular_overtime_pay_total', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
-					{data: 'day_off_pay_total', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
 					{data: 'special_holiday_pay_total', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
 					{data: 'regular_holiday_pay_total', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },
 					{data: 'allowance_amount_total', className: "text-right", orderable: false, render: $.fn.dataTable.render.number( ',', '.', 2, '' ) },

@@ -38,7 +38,8 @@ use App\Http\Controllers\EmailController;
 */
 
 Route::get('/import-csv', [CSVImportController::class, 'showImportForm'])->name('csv.form');
-Route::post('/import-csv', [CSVImportController::class, 'importCSV'])->name('csv.import');
+Route::post('/import-csv-post', [CSVImportController::class, 'importCSV'])->name('csv.import');
+Route::post('/view-csv-post', [CSVImportController::class, 'viewCSV'])->name('csv.view');
 
 /*SAMPLE EXCEL*/
 #Route::get('/sample1', [CAMRSampleExcel::class,'sample1'])->name('site')->middleware('isLoggedIn');
@@ -104,9 +105,9 @@ Route::post('/department-item-select', [DepartmentController::class,'getDepartme
 Route::get('employee-regular-logs/list', [EmployeeLogsController::class, 'getEmployeeRegularLogsList'])->name('getEmployeeRegularLogsList')->middleware('isLoggedIn');
 Route::post('/submit_employee_regular_logs_information', [EmployeeLogsController::class,'submit_employee_regular_logs_information'])->name('submit_employee_regular_logs_information')->middleware('isLoggedIn');
 /*Regular OT Logs - Feb 5, 2024*/
-Route::get('employee-regular-ot-logs/list', [EmployeeLogsController::class, 'getEmployeeRegularOTLogsList'])->name('getEmployeeRegularOTLogsList')->middleware('isLoggedIn');
+Route::get('employee-ot-logs/list', [EmployeeLogsController::class, 'getEmployeeOvertimeLogsList'])->name('getEmployeeOvertimeLogsList')->middleware('isLoggedIn');
 /*Restday OT Logs - Feb 5, 2024*/
-Route::get('employee-restday-ot-logs/list', [EmployeeLogsController::class, 'getEmployeeRestDayOTLogsList'])->name('getEmployeeRestDayOTLogsList')->middleware('isLoggedIn');
+Route::get('employee-restday-logs/list', [EmployeeLogsController::class, 'getEmployeeRestDayLogsList'])->name('getEmployeeRestDayLogsList')->middleware('isLoggedIn');
 /*GET Employee Log Info*/
 Route::post('/employee_log_info', [EmployeeLogsController::class, 'employee_log_info'])->name('EmployeeLogsInformation')->middleware('isLoggedIn');
 /*Confirm Delete Employee Log*/
