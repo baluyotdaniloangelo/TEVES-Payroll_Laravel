@@ -87,18 +87,18 @@ $('#csv-form').on('submit', function(e) {
             {data: 'time_out', className: "text-left", orderable: false},
             {data: 'time_in_ot', className: "text-left", orderable: false},
             {data: 'time_out_ot', className: "text-left", orderable: false},
-            {data: 'regular_hours', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 1, ''), orderable: false},
-            {data: 'regular_overtime_hours', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 1, ''), orderable: false},
-            {data: 'restday_hours', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 1, ''), orderable: false},
-            {data: 'restday_overtime_hours', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 1, ''), orderable: false},
-            {data: 'night_diff_hours', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 1, ''), orderable: false},
-            {data: 'regular_pay', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 1, ''), orderable: false},
-            {data: 'regular_overtime_pay', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 1, ''), orderable: false},
-            {data: 'restday_pay', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 1, ''), orderable: false},
-            {data: 'restday_overtime_pay', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 1, ''), orderable: false},
-            {data: 'night_diff_pay', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 1, ''), orderable: false},
-            {data: 'regular_holiday_pay', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 1, ''), orderable: false},
-            {data: 'special_non_working_holiday_pay', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 1, ''), orderable: false}
+            {data: 'regular_hours', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 2, ''), orderable: false},
+            {data: 'regular_overtime_hours', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 2, ''), orderable: false},
+            {data: 'restday_hours', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 2, ''), orderable: false},
+            {data: 'restday_overtime_hours', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 2, ''), orderable: false},
+            {data: 'night_diff_hours', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 2, ''), orderable: false},
+            {data: 'regular_pay', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 2, ''), orderable: false},
+            {data: 'regular_overtime_pay', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 2, ''), orderable: false},
+            {data: 'restday_pay', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 2, ''), orderable: false},
+            {data: 'restday_overtime_pay', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 2, ''), orderable: false},
+            {data: 'night_diff_pay', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 2, ''), orderable: false},
+            {data: 'regular_holiday_pay', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 2, ''), orderable: false},
+            {data: 'special_non_working_holiday_pay', className: "text-right", render: $.fn.dataTable.render.number(',', '.', 2, ''), orderable: false}
         ]
     });
 
