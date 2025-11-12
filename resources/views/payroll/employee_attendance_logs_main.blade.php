@@ -235,18 +235,18 @@
                                                                         <!--Logs Information-->
                                                                         <th class="all">Date</th>
                                                                         <th class="none">Log Type</th>
-                                                                        <th class="">Time In</th>
-                                                                        <th class="">Breaktime Start</th>
-                                                                        <th class="">Breaktime End</th>
-                                                                        <th class="">Time Out</th>
-                                                                        <th class="">OT In</th>
-                                                                        <th class="">OT Out</th>
+                                                                        <th class="none">Time In</th>
+                                                                        <th class="none">Breaktime Start</th>
+                                                                        <th class="none">Breaktime End</th>
+                                                                        <th class="none">Time Out</th>
+                                                                        <th class="none">OT In</th>
+                                                                        <th class="none">OT Out</th>
                                                                         <!--Hours Information-->
-                                                                        <th class="">Regular Hours</th>
-                                                                        <th class="">Regular OTHours</th>
-                                                                        <th class="">Restday Hours</th>
-                                                                        <th class="">Restday OT Hours</th>
-                                                                        <th class="">Night Differential Hours</th>
+                                                                        <th class="all">Regular Hours</th>
+                                                                        <th class="all">Regular OTHours</th>
+                                                                        <th class="all">Restday Hours</th>
+                                                                        <th class="all">Restday OT Hours</th>
+                                                                        <th class="all">Night Differential Hours</th>
                                                                         <!--Pay Information-->
                                                                         <th class="all">Regular Pay</th>
                                                                         <th class="all">Regular OT Pay</th>
