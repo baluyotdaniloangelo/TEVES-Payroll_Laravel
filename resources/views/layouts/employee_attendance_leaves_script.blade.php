@@ -186,7 +186,7 @@
 					/*Set Details*/
 					document.getElementById("leave_branch_idx").value 		= response[0].branch_code+" - "+response[0].branch_name;
 					leave_LoadEmployee();
-					document.getElementById("leave_employee_idx").value 		= response[0].employee_last_name+", "+response[0].employee_first_name+" "+response[0].employee_middle_name+" "+response[0].employee_extension_name;
+					document.getElementById("leave_employee_idx").value 		= response[0].employee_full_name;
 					
 					//document.getElementById("deleteEmployeeLogConfirmed").value = employeeLeavelogsID;
 					
@@ -286,8 +286,8 @@
 			
 			event.preventDefault();
 			$('#EmployeeLeavesLogsForm')[0].reset();
-			
-			$('#modal_title_action_employee').html('Add Employee');
+
+			$('#modal_title_action_employee_leave_logs').html('Add Leave Logs');
 			
 			document.getElementById('EmployeeLeavesLogsForm').className = "g-3 needs-validation";
 			

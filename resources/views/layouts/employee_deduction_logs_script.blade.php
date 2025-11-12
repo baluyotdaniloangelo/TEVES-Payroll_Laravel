@@ -294,12 +294,12 @@
 					/*Set Details*/
 					document.getElementById("branch_idx").value 		= response[0].branch_code+" - "+response[0].branch_name;
 					LoadEmployee();
-					document.getElementById("employee_idx").value 		= response[0].employee_last_name+", "+response[0].employee_first_name+" "+response[0].employee_middle_name+" "+response[0].employee_extension_name;
+					document.getElementById("employee_idx").value 		= response[0].employee_full_name;
 					LoadDeductionType();
 					document.getElementById("deduction_idx").value 		= response[0].deduction_description;
 					document.getElementById("deduction_amount").value 	= response[0].deduction_amount;	
 					
-					$('#modal_title_action_employee_logs').html("Edit Employee's Deduction");
+					$('#modal_title_employee_deduction_logs').html("Edit Employee's Deduction");
 					$('#employee_deduction_logs_details_modal').modal('toggle');					
 				  
 				  }
@@ -391,8 +391,8 @@
 			
 			event.preventDefault();
 			$('#EmployeeDeductionLogsForm')[0].reset();
-			
-			$('#modal_title_action_employee').html("Add Employee's Deduction");
+			alert();
+			$('#modal_title_employee_deduction_logs').html("Add Employee's Deduction");
 			
 			document.getElementById('EmployeeDeductionLogsForm').className = "g-3 needs-validation";
 			

@@ -14,13 +14,7 @@
 									<span class="ms-auto shadow-lg fs-17"></span>
 								</div>
 								<div class="card-body pt-1">
-									<!--
-									<span class="avatar avatar-xl avatar-rounded me-2 mb-2">
-										<img src="assets/img/avatar/avatar-7.jpg" alt="img">
-									</span
 									
-									<div class="fw-semibold fs-16"><span id="delete_employee_log_complete_name"></span></div>
-									-->
 									<p class="mb-2 fs-16">Name:<span id="delete_employee_leave_logs_complete_name"></span></p>
 									<p class="mb-2 fs-16">Date:<span id="delete_employee_leave_logs_date"></span></p>
 									<p class="mb-2 fs-16">Type:<span id="delete_employee_leave_logs_reason"></span></p>
@@ -44,9 +38,9 @@
 					<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title" id="modal_title_action_employee_leave_logs">Add Leaves Log</h5>
+								<h5 class="modal-title" id="modal_title_action_employee_leave_logs">Add Leave Logs</h5>
 								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
+									<span aria-hidden="true" onclick="ResetEmployeeLeavesLogsForm()">&times;</span>
 								</button>
 							</div>
 							<div class="modal-body">
@@ -97,4 +91,3 @@
 						</div>
 					</div>
 				</div>
-				

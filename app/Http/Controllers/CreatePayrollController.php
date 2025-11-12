@@ -318,8 +318,8 @@ class CreatePayrollController extends Controller
 					$employee_id 		= $employee_data_cols->employee_id;
 					$employee_number 	= $employee_data_cols->employee_number;
 					$employee_full_name = $employee_data_cols->employee_full_name;
-					$employee_rate 		= $employee_data_cols->employee_rate;
-					$employment_type 	= $employee_data_cols->employment_type;
+					$employee_rate = $employee_data_cols->employee_rate;
+					$employment_type = $employee_data_cols->employment_type;
 					
 					$daily_rate = $employee_rate * 8;
 					
@@ -328,31 +328,40 @@ class CreatePayrollController extends Controller
 					$regular_logs =  EmployeeLogsModel::where('employee_idx', $employee_id)
 					->whereBetween('attendance_date', ["$start_date", "$end_date"])
 					->where('log_type', 'Regular')
-					->selectRaw('ifnull(sum(basic_pay),0) as basic_pay, count(*) as days_count_regular')
+					->selectRaw('ifnull(sum(regular_pay),0) as regular_pay, count(*) as days_count_regular')
 					->get();
 					
 					$regular_logs_count = $regular_logs[0]['days_count_regular'];
-					$regular_pay_total = $regular_logs[0]['basic_pay'];
+					$regular_pay_total = $regular_logs[0]['regular_pay'];
 					
 					/*Regular Overtime*/
 					$regular_overtime_logs =  EmployeeLogsModel::where('employee_idx', $employee_id)
 					->whereBetween('attendance_date', ["$start_date", "$end_date"])
 					->where('log_type', 'RegularOT')
-					->selectRaw('ifnull(sum(overtime_pay),0) as overtime_pay')
+					->selectRaw('ifnull(sum(regular_overtime_pay),0) as regular_overtime_pay')
 					->get();
 					
-					$regular_overtime_pay_total = $regular_overtime_logs[0]['overtime_pay'];
+					$regular_overtime_pay_total = $regular_overtime_logs[0]['regular_overtime_pay'];
 					
-					/*Restday Overtime Pay*/
+					/*Restday Pay*/
 					$day_off_logs =  EmployeeLogsModel::where('employee_idx', $employee_id)
 					->whereBetween('attendance_date', ["$start_date", "$end_date"])
-					->where('log_type', 'RestDayOT')
-					->selectRaw('ifnull(sum(day_off_pay),0) as day_off_pay, count(*) as days_count_day_off')
+					->where('log_type', 'RestDay')
+					->selectRaw('ifnull(sum(restday_pay),0) as restday_pay, count(*) as days_count_day_off')
 					->get();
 					
 					$day_off_logs_count = $day_off_logs[0]['days_count_day_off'];
-					$day_off_pay_total = $day_off_logs[0]['day_off_pay'];
+					$restday_pay_total = $day_off_logs[0]['restday_pay'];
+
+                    /*Restday Overtime*/
+					$regular_overtime_logs =  EmployeeLogsModel::where('employee_idx', $employee_id)
+					->whereBetween('attendance_date', ["$start_date", "$end_date"])
+					->where('log_type', 'RestDayOT')
+					->selectRaw('ifnull(sum(restday_overtime_pay),0) as restday_overtime_pay')
+					->get();
 					
+					$restday_overtime_pay_total = $regular_overtime_logs[0]['restday_overtime_pay'];
+
 					/*Night Diff Pay*/
 					$night_differential_logs =  EmployeeLogsModel::where('employee_idx', $employee_id)
 					->whereBetween('attendance_date', ["$start_date", "$end_date"])
@@ -438,7 +447,7 @@ class CreatePayrollController extends Controller
 					
 					$basic_pay_total = $regular_pay_total + $leave_amount_pay_total;
 					
-					$gross_salary = $basic_pay_total+$regular_overtime_pay_total+$day_off_pay_total+$night_differential_pay_total+$regular_holiday_pay_total+$special_holiday_pay_total;
+					$gross_salary = $basic_pay_total+$regular_overtime_pay_total+$restday_pay_total+$restday_overtime_pay_total+$night_differential_pay_total+$regular_holiday_pay_total+$special_holiday_pay_total;
 					$net_salary = ($gross_salary + $allowance_amount_total) - $deduction_amount_total; 
 					
 					$result[] = array(
@@ -446,9 +455,10 @@ class CreatePayrollController extends Controller
 					 'employee_full_name'				=> $employee_full_name,
 					 'daily_rate'						=> $daily_rate,
 					 'employment_type'					=> $employment_type,
-					 'basic_pay_total'					=> $basic_pay_total,
-					 'regular_overtime_pay_total'		=> $regular_overtime_pay_total,
-					 'day_off_pay_total'				=> $day_off_pay_total,
+					 'regular_pay'					    => $regular_pay_total,
+					 'regular_overtime_pay'		        => $regular_overtime_pay_total,
+					 'restday_pay'				        => $restday_pay_total,
+					 'restday_overtime_pay'				=> $restday_overtime_pay_total,
 					 'night_differential_pay_total'		=> $night_differential_pay_total,
 					 'regular_holiday_pay_total' 		=> $regular_holiday_pay_total,
 					 'special_holiday_pay_total'		=> $special_holiday_pay_total,
@@ -469,9 +479,10 @@ class CreatePayrollController extends Controller
 					$SaveEmployeesSalaryPerCutOFF->hourly_rate 						= $employee_rate;
 					$SaveEmployeesSalaryPerCutOFF->daily_rate 						= $daily_rate;
 					$SaveEmployeesSalaryPerCutOFF->employment_type 					= $employment_type;
-					$SaveEmployeesSalaryPerCutOFF->basic_pay_total 					= $basic_pay_total;
+					$SaveEmployeesSalaryPerCutOFF->regular_pay_total 			    = $regular_pay_total;
 					$SaveEmployeesSalaryPerCutOFF->regular_overtime_pay_total 		= $regular_overtime_pay_total;
-					$SaveEmployeesSalaryPerCutOFF->day_off_pay_total 				= $day_off_pay_total;
+					$SaveEmployeesSalaryPerCutOFF->restday_pay_total 				= $restday_pay_total;
+					$SaveEmployeesSalaryPerCutOFF->restday_overtime_pay_total 	    = $restday_overtime_pay_total;
 					$SaveEmployeesSalaryPerCutOFF->night_differential_pay_total 	= $night_differential_pay_total;
 					$SaveEmployeesSalaryPerCutOFF->regular_holiday_pay_total 		= $regular_holiday_pay_total;
 					$SaveEmployeesSalaryPerCutOFF->special_holiday_pay_total 		= $special_holiday_pay_total;
@@ -771,9 +782,10 @@ class CreatePayrollController extends Controller
 					'teves_payroll_employee_salary_per_cut_off.hourly_rate',
 					'teves_payroll_employee_salary_per_cut_off.daily_rate',
 					'teves_payroll_employee_salary_per_cut_off.employment_type',
-					'teves_payroll_employee_salary_per_cut_off.basic_pay_total',
+					'teves_payroll_employee_salary_per_cut_off.regular_pay_total',
 					'teves_payroll_employee_salary_per_cut_off.regular_overtime_pay_total',
-					'teves_payroll_employee_salary_per_cut_off.day_off_pay_total',
+					'teves_payroll_employee_salary_per_cut_off.restday_pay_total',
+					'teves_payroll_employee_salary_per_cut_off.restday_overtime_pay_total',
 					'teves_payroll_employee_salary_per_cut_off.night_differential_pay_total',
 					'teves_payroll_employee_salary_per_cut_off.regular_holiday_pay_total',
 					'teves_payroll_employee_salary_per_cut_off.special_holiday_pay_total',
@@ -828,7 +840,7 @@ class CreatePayrollController extends Controller
         //return $pdf->download($client_data['client_name'].".pdf");
 		/*Stream for Saving/Printing*/
 		$pdf->setPaper('legal', 'landscape');/*Set to Landscape*/
-		return $pdf->stream($branch_information['branch_code']."Payroll-Drafts.pdf");	
+		return $pdf->stream($branch_information['branch_code']."Payroll.pdf");	
 		
 	}	
 

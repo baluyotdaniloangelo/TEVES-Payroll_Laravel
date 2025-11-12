@@ -160,63 +160,6 @@
 				</div>
 				
 				
-				<div id="employee_leave_logs_details_modal" class="modal custom-modal fade" data-bs-backdrop="static" role="dialog">
-					<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h5 class="modal-title" id="modal_title_action_employee_leave_logs">Add Leaves Log</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
-							<div class="modal-body">
-								 <form class="g-2 needs-validation" id="EmployeeLeavesLogsForm">
-									
-									<div class="row">
-									
-										<div class="col-sm-6">
-											<div class="input-block mb-3">
-												<label class="col-form-label">Branch <span class="text-danger">*</span></label>
-												<input class="form-control " type="text" list="leave_branch_list_logs" id="leave_branch_idx" name="leave_branch_idx" required autocomplete="off" onchange="leave_LoadEmployee()">
-												<span class="valid-feedback" id="leave_branch_idxError" title="Required"></span>
-												<datalist id="leave_branch_list_logs"><!--List Here--></datalist>	
-											</div>
-										</div>
-										
-										<div class="col-sm-6">
-											<div class="input-block mb-3">
-												<label class="col-form-label">Employee <span class="text-danger">*</span></label>
-												<input class="form-control " type="text" list="leave_employee_list_logs" id="leave_employee_idx" name="leave_employee_idx" required autocomplete="off">
-												<span class="valid-feedback" id="leave_employee_idxError" title="Required"></span>
-												<datalist id="leave_employee_list_logs"><!--List Here--></datalist>	
-											</div>
-										</div>
-										
-										<div class="col-sm-12">
-											<div class="input-block mb-3">
-												<label class="col-form-label">Date <span class="text-danger">*</span></label>
-												<input class="form-control" type="date" id="date_of_leave" name="date_of_leave" required value="<?=date('Y-m-d');?>">
-												<span class="valid-feedback" id="date_of_leaveError" title="Required"></span>
-											</div>
-										</div>
-										
-										<div class="col-sm-12">
-											<div class="input-block mb-3">
-												<label class="col-form-label">Reason <span class="text-danger">*</span></label>
-												<input class="form-control" type="text" id="reason_of_leave" name="reason_of_leave" required>
-												<span class="valid-feedback" id="reason_of_leaveError" title="Required"></span>
-											</div>
-										</div>
-									</div>
-									
-									<div class="submit-section">
-										<button class="btn btn-primary submit-btn" id="submit_leave_details" value="0">Submit</button>
-									</div>
-								</form>
-							</div>
-						</div>
-					</div>
-				</div>
 				
 				
 				

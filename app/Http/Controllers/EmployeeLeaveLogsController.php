@@ -75,7 +75,6 @@ class EmployeeLeaveLogsController extends Controller
 		}
     }
 	
-
 	/*Fetch EmployeeDetails Information*/
 	public function employee_leave_logs_info(Request $request){
 
@@ -91,6 +90,7 @@ class EmployeeLeaveLogsController extends Controller
 					'teves_payroll_employee_table.employee_first_name',
 					'teves_payroll_employee_table.employee_middle_name',
 					'teves_payroll_employee_table.employee_extension_name',
+					'teves_payroll_employee_table.employee_full_name',
 					'teves_branch_table.branch_id',
 					'teves_branch_table.branch_name',
 					'teves_branch_table.branch_code',
@@ -168,9 +168,7 @@ class EmployeeLeaveLogsController extends Controller
 													)],
 				  'reason_of_leave'    	 	=> 'required',
 				]);
-							
-		
-		
+					
 			if($employee_leave_logs_id==0){
 			
 				$EmployeeLeaveLogs = new EmployeeLeaveLogsModel();
@@ -219,7 +217,6 @@ class EmployeeLeaveLogsController extends Controller
 			
 			}
 			
-			
 	}else{
 
 				$request->validate([
@@ -234,4 +231,3 @@ class EmployeeLeaveLogsController extends Controller
 	}
 
 }
-

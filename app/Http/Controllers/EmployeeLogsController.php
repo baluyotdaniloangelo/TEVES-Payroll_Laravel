@@ -47,6 +47,7 @@ class EmployeeLogsController extends Controller
 		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
 		->where('teves_payroll_employee_logs.log_type', 'Regular')
 		->select([
+            'teves_payroll_employee_logs.employee_logs_id',
 			'teves_payroll_employee_logs.attendance_date as attendance_date',
 			'teves_payroll_employee_logs.total_regular_hours as total_regular_hours',
 			'teves_payroll_employee_logs.total_night_differential_hours as total_night_differential_hours',
@@ -124,12 +125,13 @@ class EmployeeLogsController extends Controller
             DB::raw("
             CASE 
                 WHEN teves_payroll_employee_logs.log_type = 'RegularOT' 
-                    THEN teves_payroll_employee_logs.total_regular_hours
+                    THEN teves_payroll_employee_logs.total_regular_overtime_hours
                 WHEN teves_payroll_employee_logs.log_type = 'RestDayOT' 
                     THEN teves_payroll_employee_logs.total_restday_overtime_hours
                 ELSE 0
             END as total_overtime_hours
             "),
+            'teves_payroll_employee_logs.employee_logs_id',
 			'teves_payroll_employee_logs.total_night_differential_hours as total_night_differential_hours',
 			'teves_payroll_employee_logs.log_in as log_in',
 			'teves_payroll_employee_logs.log_out as log_out',
@@ -185,9 +187,10 @@ class EmployeeLogsController extends Controller
 		->join('teves_payroll_employee_table', 'teves_payroll_employee_logs.employee_idx', '=', 'teves_payroll_employee_table.employee_id')
 		->join('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
 		->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
-		->where('teves_payroll_employee_logs.log_type', 'RestDayOT')
+		->where('teves_payroll_employee_logs.log_type', 'Restday')
 		//->where('teves_payroll_employee_logs.employee_logs_id', 1)
 		->select([
+            'teves_payroll_employee_logs.employee_logs_id',
 			'teves_payroll_employee_logs.attendance_date as attendance_date',
 			'teves_payroll_employee_logs.total_restday_hours as total_restday_hours',
 			'teves_payroll_employee_logs.total_night_differential_hours as total_night_differential_hours',
@@ -284,7 +287,7 @@ class EmployeeLogsController extends Controller
 			
 			if($branch_idx!=0 && $employee_idx!=0){
 			/*Query Employee Information*/
-			/*jj*/
+			
 			$employee_data = EmployeeModel::where('teves_payroll_employee_table.employee_id', $employee_idx)
 						->get([
 						'teves_payroll_employee_table.branch_idx',
@@ -309,7 +312,7 @@ class EmployeeLogsController extends Controller
 			$branch_idx 						= $employee_data[0]->branch_idx;
 			$department_idx 					= $employee_data[0]->department_idx;
 			
-			$employee_night_diff_pay 					= $employee_data[0]->employee_night_diff_pay;
+			$employee_night_diff_pay 			= $employee_data[0]->employee_night_diff_pay;
 			
 			$restday_monday 					= $employee_data[0]->restday_monday;
 			$restday_tuesday 					= $employee_data[0]->restday_tuesday;
@@ -358,7 +361,16 @@ class EmployeeLogsController extends Controller
 				
 				if($check_employee_rest_day == 1){
 					
-					$log_type = 'RestDayOT';
+					//$log_type = '';
+                    if($overtime_status=='Yes'){
+						
+						$log_type = 'RestDayOT';
+						
+					}else{
+						
+						$log_type = 'RestDay';
+						
+					}
 					
 				}else{
 					
@@ -611,37 +623,73 @@ class EmployeeLogsController extends Controller
                      $excess_hours_after_shift = 0;
                 }
 
-			$total_regular_hours = $total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + $excess_hours_after_shift + $total_undertime_hours);
-			$total_tardiness_hours = $total_tardiness;
+			    $total_regular_hours = $total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + $excess_hours_after_shift + $total_undertime_hours);
+			    $total_tardiness_hours = $total_tardiness;
 				
-				if($check_employee_rest_day == 1){
-					
+			    if($check_employee_rest_day == 1){
+					 
 					$Regular_pay = 0;
 					$RegularOT_pay = 0;
-					$RestDayOT_pay = ($employee_current_rate * $total_regular_hours) * 1.3;
+					$RestDay_pay = ($employee_current_rate * $total_regular_hours) * 1.3;
+                    $RestDayOT_pay = 0;
 					
 				}else{
-					
+					 
 					/*Compute by Rate*/
 					/*Computed pay = total regular hours by rate*/
 					$Regular_pay = $employee_current_rate * $total_regular_hours;
 					$RegularOT_pay = 0;
+                    $RestDay_pay   = 0;
 					$RestDayOT_pay = 0;
 					
 				}
 				
-			}else{
-			$total_tardiness_hours = 0;
+			}
+            else{
 
-            
-
+            $total_tardiness_hours = 0;
 			$total_regular_hours = $total_hours_from_log_in_and_out - (0);
 
-					/*Soon to have a table for Rate on Overtime - Hard Coded pa to to 0.25*/
-					$Regular_pay = 0;
-					$RegularOT_pay = $employee_current_rate * 1.25 * $total_regular_hours;
-					$RestDayOT_pay = 0;
-					
+             /*Soon to have a table for Rate on Overtime - Hard Coded pa to to 0.25*/
+                    
+		            if($check_employee_rest_day == 1){
+
+                        if($log_type=='RestDayOT'){
+
+                            $Regular_pay = 0;
+					        $RegularOT_pay = 0;
+                            $RestDay_pay   = 0;
+					        $RestDayOT_pay = ($employee_current_rate * $total_regular_hours) * 1.69;
+                            
+                        }else{
+
+                            $Regular_pay = 0;
+					        $RegularOT_pay = 0;
+                            $RestDay_pay = ($employee_current_rate * $total_regular_hours) * 1.3;
+					        $RestDayOT_pay = 0;
+
+                        }
+					   
+                    }else{
+
+                         if($log_type=='RegularOT'){
+
+                            $Regular_pay = 0;
+                            $RegularOT_pay = $employee_current_rate * 1.25 * $total_regular_hours;
+                            $RestDay_pay   = 0;
+					        $RestDayOT_pay = 0;
+                            
+                        }else{
+
+                            $Regular_pay = $employee_current_rate * min($total_regular_hours, 8);
+					        $RegularOT_pay = 0;
+                            $RestDay_pay = 0;
+					        $RestDayOT_pay = 0;
+
+                        }
+
+                    }
+
 			}
 			
 			/*Query Holiday*/
@@ -744,18 +792,34 @@ class EmployeeLogsController extends Controller
 				$EmployeeRegularLogs->log_out 							= $log_out;
 				
 				$EmployeeRegularLogs->total_hours 						= number_format((float)$total_hours_from_log_in_and_out, 2, '.', '');
-				$EmployeeRegularLogs->total_regular_hours 				= number_format((float)$total_regular_hours, 2, '.', '');
+				
+                if($log_type=='Regular'){
+					$EmployeeRegularLogs->total_regular_hours					= number_format((float)$total_regular_hours, 2, '.', '');
+				}
+                else if($log_type=='RegularOT'){
+					$EmployeeRegularLogs->total_regular_overtime_hours			= number_format((float)$total_regular_hours, 2, '.', '');
+				}
+                else if($log_type=='RestDay'){
+					$EmployeeRegularLogs->total_restday_hours			= number_format((float)$total_regular_hours, 2, '.', '');
+				}else{
+					$EmployeeRegularLogs->total_restday_overtime_hours					= number_format((float)$total_regular_hours , 2, '.', '');
+				}
+
 				$EmployeeRegularLogs->total_breaktime_hours 			= number_format((float)$total_breaktime_hours, 2, '.', '');
 				$EmployeeRegularLogs->total_tardiness_hours 			= number_format((float)$total_tardiness_hours, 2, '.', '');
 				$EmployeeRegularLogs->total_undertime_hours 			= number_format((float)$total_undertime_hours,2);
 				$EmployeeRegularLogs->total_night_differential_hours 	= number_format((float)$total_covered_night_diff_hrs, 2, '.', '');
 
 				if($log_type=='Regular'){
-					$EmployeeRegularLogs->basic_pay						= number_format((float)$Regular_pay, 2, '.', '');
-				}else if($log_type=='RegularOT'){
-					$EmployeeRegularLogs->overtime_pay					= number_format((float)$RegularOT_pay, 2, '.', '');
+					$EmployeeRegularLogs->regular_pay					= number_format((float)$Regular_pay, 2, '.', '');
+				}
+                else if($log_type=='RegularOT'){
+					$EmployeeRegularLogs->regular_overtime_pay			= number_format((float)$RegularOT_pay, 2, '.', '');
+				}
+                else if($log_type=='RestDay'){
+					$EmployeeRegularLogs->restday_pay			        = number_format((float)$RestDay_pay, 2, '.', '');
 				}else{
-					$EmployeeRegularLogs->day_off_pay					= number_format((float)$RestDayOT_pay , 2, '.', '');
+					$EmployeeRegularLogs->restday_overtime_pay			= number_format((float)$RestDayOT_pay , 2, '.', '');
 				}
 				
 				$EmployeeRegularLogs->night_differential_pay			= number_format((float)$night_differential_pay, 2, '.', '');
@@ -766,7 +830,7 @@ class EmployeeLogsController extends Controller
 				$EmployeeRegularLogs->created_by_user_idx 		= Session::get('loginID');
 				
 				$result = $EmployeeRegularLogs->save();
-
+               
 				 if($result){
 					 return response()->json(['success'=>'Created']);
 				 }
@@ -790,18 +854,34 @@ class EmployeeLogsController extends Controller
 				$EmployeeRegularLogs->log_out 							= $log_out;
 				
 				$EmployeeRegularLogs->total_hours 						= number_format((float)$total_hours_from_log_in_and_out, 2, '.', '');
-				$EmployeeRegularLogs->total_regular_hours 				= number_format((float)$total_regular_hours, 2, '.', '');
+				
+                if($log_type=='Regular'){
+					$EmployeeRegularLogs->total_regular_hours					= number_format((float)$total_regular_hours, 2, '.', '');
+				}
+                else if($log_type=='RegularOT'){
+					$EmployeeRegularLogs->total_regular_overtime_hours			= number_format((float)$total_regular_hours, 2, '.', '');
+				}
+                else if($log_type=='RestDay'){
+					$EmployeeRegularLogs->total_restday_hours			        = number_format((float)$total_regular_hours, 2, '.', '');
+				}else{
+					$EmployeeRegularLogs->total_restday_overtime_hours			= number_format((float)$total_regular_hours , 2, '.', '');
+				}
+
 				$EmployeeRegularLogs->total_breaktime_hours 			= number_format((float)$total_breaktime_hours, 2, '.', '');
 				$EmployeeRegularLogs->total_tardiness_hours 			= number_format((float)$total_tardiness_hours, 2, '.', '');
 				$EmployeeRegularLogs->total_undertime_hours 			= number_format((float)$total_undertime_hours,2);
 				$EmployeeRegularLogs->total_night_differential_hours 	= number_format((float)$total_covered_night_diff_hrs, 2, '.', '');
 
 				if($log_type=='Regular'){
-					$EmployeeRegularLogs->basic_pay						= number_format((float)$Regular_pay, 2, '.', '');
-				}else if($log_type=='RegularOT'){
-					$EmployeeRegularLogs->overtime_pay					= number_format((float)$RegularOT_pay, 2, '.', '');
+					$EmployeeRegularLogs->regular_pay					= number_format((float)$Regular_pay, 2, '.', '');
+				}
+                else if($log_type=='RegularOT'){
+					$EmployeeRegularLogs->regular_overtime_pay			= number_format((float)$RegularOT_pay, 2, '.', '');
+				}
+                else if($log_type=='RestDay'){
+					$EmployeeRegularLogs->restday_pay			        = number_format((float)$RestDay_pay, 2, '.', '');
 				}else{
-					$EmployeeRegularLogs->day_off_pay					= number_format((float)$RestDayOT_pay , 2, '.', '');
+					$EmployeeRegularLogs->restday_overtime_pay			= number_format((float)$RestDayOT_pay , 2, '.', '');
 				}
 				
 				$EmployeeRegularLogs->night_differential_pay			= number_format((float)$night_differential_pay, 2, '.', '');

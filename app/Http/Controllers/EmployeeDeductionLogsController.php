@@ -90,6 +90,7 @@ class EmployeeDeductionLogsController extends Controller
 					'teves_payroll_employee_table.employee_first_name',
 					'teves_payroll_employee_table.employee_middle_name',
 					'teves_payroll_employee_table.employee_extension_name',
+					'teves_payroll_employee_table.employee_full_name',
 					'teves_branch_table.branch_id',
 					'teves_branch_table.branch_name',
 					'teves_branch_table.branch_code',

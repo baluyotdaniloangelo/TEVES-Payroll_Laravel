@@ -270,7 +270,7 @@
 					/*Set Details*/
 					document.getElementById("branch_idx").value 			= response[0].branch_code+" - "+response[0].branch_name;
 					LoadEmployee();
-					document.getElementById("employee_idx").value 			= response[0].employee_last_name+", "+response[0].employee_first_name+" "+response[0].employee_middle_name+" "+response[0].employee_extension_name;
+					document.getElementById("employee_idx").value 			= response[0].employee_full_name;
 					//LoadAllowanceType();
 					document.getElementById("allowance_type").value 		= response[0].allowance_type;
 					document.getElementById("allowance_description").value 	= response[0].allowance_description;

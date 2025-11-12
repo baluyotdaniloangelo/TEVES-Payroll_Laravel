@@ -71,8 +71,8 @@
 					<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title" id="modal_title_action_employee_logs">Add Deduction</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+								<h5 class="modal-title" id="modal_title_employee_deduction_logs">Add Employee's Deduction</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="ResetEmployeeDeductionLogsForm()">
 									<span aria-hidden="true">&times;</span>
 								</button>
 							</div>

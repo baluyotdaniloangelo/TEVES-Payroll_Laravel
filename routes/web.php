@@ -37,7 +37,7 @@ use App\Http\Controllers\EmailController;
 |
 */
 
-Route::get('/import-csv', [CSVImportController::class, 'showImportForm'])->name('csv.form');
+//Route::get('/import-csv', [CSVImportController::class, 'showImportForm'])->name('csv.form');
 Route::post('/import-csv-post', [CSVImportController::class, 'importCSV'])->name('csv.import');
 Route::post('/view-csv-post', [CSVImportController::class, 'viewCSV'])->name('csv.view');
 

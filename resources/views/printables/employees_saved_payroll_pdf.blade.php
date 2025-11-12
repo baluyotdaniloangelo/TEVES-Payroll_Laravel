@@ -167,8 +167,10 @@
 			<th align="center" style="border:1px solid;">Daily Rate</th>
 			<th align="center" style="border:1px solid;">No. Days Work</th>
 			<th align="center" style="border:1px solid;">No. Days Leave</th>
-			<th align="center" style="border:1px solid;">Basic Pay</th>
-			<th align="center" style="border:1px solid;">OT Pay</th>
+			<th align="center" style="border:1px solid;">Regular Pay</th>
+			<th align="center" style="border:1px solid;">Regular OT Pay</th>
+			<th align="center" style="border:1px solid;">Restday Pay</th>
+			<th align="center" style="border:1px solid;">Restday OT Pay</th>
 			<th align="center" style="border:1px solid; padding-top:5px; padding-bottom:5px;">Night Differential Pay</th>
 			<th align="center" style="border:1px solid;">Day-off Pay</th>
 			<th align="center" style="border:1px solid;">Holiday Pay</th>
@@ -195,8 +197,10 @@
 			<td align="right" style="border:1px solid;"><?=number_format($daily_rate,2);?></td>		
 			<td align="center" style="border:1px solid;"><?=number_format($result_data_cols['count_days'],0);?></td>		
 			<td align="center" style="border:1px solid;"><?=number_format($result_data_cols['leave_logs_count'],0);?></td>		
-			<td align="right" style="border:1px solid;"><?=number_format($result_data_cols['basic_pay_total'],2);?></td>		
+			<td align="right" style="border:1px solid;"><?=number_format($result_data_cols['regular_pay_total'],2);?></td>		
 			<td align="right" style="border:1px solid;"><?=number_format($result_data_cols['regular_overtime_pay_total'],2);?></td>	
+			<td align="right" style="border:1px solid;"><?=number_format($result_data_cols['restday_pay_total'],2);?></td>		
+			<td align="right" style="border:1px solid;"><?=number_format($result_data_cols['restday_overtime_pay_total'],2);?></td>	
 			<td align="right" style="border:1px solid;"><?=number_format($result_data_cols['night_differential_pay_total'],2);?></td>	
 			<td align="right" style="border:1px solid;"><?=number_format($result_data_cols['regular_holiday_pay_total']+$result_data_cols['special_holiday_pay_total'],2);?></td>	
 			<td align="right" style="border:1px solid;"><?=number_format($result_data_cols['day_off_pay_total'],2);?></td>	
@@ -214,7 +218,7 @@
 		@endforeach
 		
 		<tr style="font-size:12px;">
-			<td align="center" colspan="11"></td>
+			<td align="center" colspan="13"></td>
 			<td align="right">Total:</td>
 			<td align="right"><span style="font-family: DejaVu Sans; sans-serif;">&#8369;</span></td>
 			<td align="right" style="border-bottom: 3px double #000000">

@@ -42,8 +42,6 @@
 													<div class="row align-items-center mb-3">
 														<div class="col-auto float-end ms-auto">
 															<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#employee_regular_logs_details_modal" style="margin-left: 5px;"><i class="fa-solid fa-plus"></i> Add Attendance Logs</a>
-                                                            &nbsp;
-                                                            <a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#employee_import_logs_modal" style="margin-left: 5px;"><i class="fa-solid fa-plus"></i> Import Logs</a>
 														</div>
 													</div>
 													
@@ -188,7 +186,17 @@
 													</div>
 												
 											</div>
+                                            <style>
+                                            .progress {
+                                              border-radius: 10px;
+                                              overflow: hidden;
+                                            }
 
+                                            .progress-bar {
+                                              font-weight: 500;
+                                              transition: width 0.3s ease;
+                                            }
+                                            </style>
                                             <div class="tab-pane" id="solid-tab5" role="tabpanel">
 													
 													<div class="row align-items-center mb-3">
@@ -199,11 +207,20 @@
 
 													<form id="csv-form" enctype="multipart/form-data">
                                                     @csrf								
-													    <label class="custom-file-container__custom-file">
-										                    <input type="file"  name="csv_file" id="csv_file" accept=".csv" required>
-                                                            <span class="valid-feedback" id="feedback" title="Required"></span>
-									                    </label>
-											      
+
+                                                    <div class="form-group">
+                                                      <label for="csv_file" class="form-label">Select CSV file</label>
+                                                      <input type="file" name="csv_file" id="csv_file" accept=".csv" class="form-control" required>
+                                                      <div class="mt-2" id="feedback"></div>
+                                                    </div>
+
+                                                    <!-- Spinner -->
+                                                    <div class="text-center mt-3">
+                                                      <div id="loading-spinner" class="spinner-border text-primary" role="status" style="display:none;">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                      </div>
+                                                    </div>
+
                                                     <div class="row">
 									                
                                                     <div class="table-responsive">
@@ -217,19 +234,19 @@
                                                                         <th class="all">Name</th>
                                                                         <!--Logs Information-->
                                                                         <th class="all">Date</th>
-                                                                        <th class="all">Log Type</th>
-                                                                        <th class="all">Time In</th>
-                                                                        <th class="all">Breaktime Start</th>
-                                                                        <th class="all">Breaktime End</th>
-                                                                        <th class="all">Time Out</th>
-                                                                        <th class="all">OT In</th>
-                                                                        <th class="all">OT Out</th>
+                                                                        <th class="none">Log Type</th>
+                                                                        <th class="">Time In</th>
+                                                                        <th class="">Breaktime Start</th>
+                                                                        <th class="">Breaktime End</th>
+                                                                        <th class="">Time Out</th>
+                                                                        <th class="">OT In</th>
+                                                                        <th class="">OT Out</th>
                                                                         <!--Hours Information-->
-                                                                        <th class="all">Regular Hours</th>
-                                                                        <th class="all">Regular OTHours</th>
-                                                                        <th class="all">Restday Hours</th>
-                                                                        <th class="all">Restday OT Hours</th>
-                                                                        <th class="all">Night Differential Hours</th>
+                                                                        <th class="">Regular Hours</th>
+                                                                        <th class="">Regular OTHours</th>
+                                                                        <th class="">Restday Hours</th>
+                                                                        <th class="">Restday OT Hours</th>
+                                                                        <th class="">Night Differential Hours</th>
                                                                         <!--Pay Information-->
                                                                         <th class="all">Regular Pay</th>
                                                                         <th class="all">Regular OT Pay</th>
@@ -252,7 +269,14 @@
 
 
 									            </div>
-
+                                                <div class="col-sm-12">
+											        <p>
+                                                        <strong></strong>
+                                                        <i>
+                                                        After choosing the file, use the View button to review the logs before importing. Once finalized, click the Import button.
+                                                        </i>
+                                                    </p>
+										        </div>
 												<div class="submit-section">
 										            <button class="btn btn-primary submit-btn" id="submit_logs_view" value="0">View</button>
                                                     <button class="btn btn-primary submit-btn" id="submit_logs_import" value="0">Import</button>
@@ -269,7 +293,8 @@
 						</div>
 					</div>
                 </div>
-				
+
+
 				<!-- /Page Content -->
 				
 				<!-- Forms -->
