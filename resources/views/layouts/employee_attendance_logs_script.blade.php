@@ -159,7 +159,8 @@
 							{data: 'night_differential_pay', className: "text-left", searchable: false},
 							{data: 'regular_holiday_pay', className: "text-left", searchable: false},
 							{data: 'special_holiday_pay', className: "text-left", searchable: false},
-							{data: 'action', name: 'action', orderable: false, searchable: false, className: "text-center"},
+							{data: 'attendance_source', name: 'attendance_source', orderable: false, searchable: false},
+                            {data: 'action', name: 'action', orderable: false, searchable: false, className: "text-center"},
 					]
 				});
 		autoAdjustColumns(EmployeeList);
@@ -202,7 +203,8 @@
 							{data: 'night_differential_pay', className: "text-left"},
 							{data: 'regular_holiday_pay', className: "text-left"},
 							{data: 'special_holiday_pay', className: "text-left"},
-							{data: 'action', name: 'action', orderable: false, searchable: false, className: "text-center"},
+							{data: 'attendance_source', name: 'attendance_source', orderable: false, searchable: false},
+                            {data: 'action', name: 'action', orderable: false, searchable: false, className: "text-center"},
 					]
 				});
 		autoAdjustColumns(EmployeeList);
@@ -244,7 +246,8 @@
 							{data: 'night_differential_pay', className: "text-left"},
 							{data: 'regular_holiday_pay', className: "text-left"},
 							{data: 'special_holiday_pay', className: "text-left"},
-							{data: 'action', name: 'action', orderable: false, searchable: false, className: "text-center"},
+							{data: 'attendance_source', name: 'attendance_source', orderable: false, searchable: false},
+                            {data: 'action', name: 'action', orderable: false, searchable: false, className: "text-center"},
 					]
 				});
 		autoAdjustColumns(EmployeeList);

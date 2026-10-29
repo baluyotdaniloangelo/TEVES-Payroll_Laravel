@@ -16,6 +16,7 @@
 									<ul>
 										<li><a href="{{ route('employee') }}">Employees List</a></li>
 										<li><a href="{{ route('employee_attendance_logs') }}">Attendance Logs</a></li>
+                                    <li><a href="{{ route('attendance-import.index') }}">DTR Plotting</a></li>
 									</ul>
 								</li>
 								<li class="menu-title"> 
@@ -67,11 +68,12 @@
 								<span>Employees</span>
 							</li>-->
 							<li class="submenu">
-								<a href="#" class="<?php if(@$active_link=='employee_attendance_logs' ||
+								<a href="#" class="<?php if(@$active_link=='attendance_dtr_plotting' || @$active_link=='employee_attendance_logs' ||
 								@$active_link=='employee_allowance_logs' ||
 								@$active_link=='employee_deduction_logs'){ echo "noti-dot"; }?> "><i class="la la-user"></i> <span> Payroll Items</span> <span class="menu-arrow"></span></a>
 								<ul>
 									<li><a class="<?php if(@$active_link=='employee_attendance_logs'){ echo "active"; }?>" href="{{ route('employee_attendance_logs') }}">Employee Attendance Logs</a></li>
+                                    <li><a class="{{ ($active_link ?? '') === 'attendance_dtr_plotting' ? 'active' : '' }}" href="{{ route('attendance-import.index') }}">DTR Plotting</a></li>
 									<li><a class="<?php if(@$active_link=='drivers_attendance_logs'){ echo "active"; }?>" href="{{ route('drivers_attendance_logs') }}">Drivers Attendance Logs</a></li>
 									<li><a class="<?php if(@$active_link=='employee_deduction_logs'){ echo "active"; }?>" href="{{ route('employee_allowance_logs') }}">Allowance Logs</a></li>
 									<li><a class="<?php if(@$active_link=='employee_deduction_logs'){ echo "active"; }?>" href="{{ route('employee_deduction_logs') }}">Deduction Logs</a></li>
@@ -102,6 +104,7 @@
 								<a href="#"><i class="la la-money"></i> <span> Payroll </span> <span class="menu-arrow"></span></a>
 								<ul>
 									<li><a href="{{ route('CreatePayroll') }}"> Create Payroll </a></li>
+                                    <li><a class="{{ ($active_link ?? '') === 'drivers_payroll' ? 'active' : '' }}" href="{{ route('drivers_payroll.index') }}"> Drivers Payroll </a></li>
 									<!--<li><a href="payroll-items.html"> Payroll Items </a></li>-->
 								</ul>
 							</li>

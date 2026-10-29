@@ -10,7 +10,7 @@ use Session;
 use Validator;
 use DataTables;
 
-class holidayController extends Controller
+class HolidayController extends Controller
 {
 	
 	/*Load holiday Interface*/

@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Traits\LogsActivity;
+use App\Support\LogsModelActivity as LogsActivity;
 use Spatie\Activitylog\Contracts\Activity;
 
 use Session;

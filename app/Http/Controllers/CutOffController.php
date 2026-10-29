@@ -63,7 +63,7 @@ class CutOffController extends Controller
                 'prepared_by.user_real_name as prepared_by_name',
                 'reviewed_by.user_real_name as reviewed_by_name',
                 'approved_by.user_real_name as approved_by_name',
-                'branch_details.branch_code as branch_code'
+                'branch_details.branch_code as branch_code',
             )
            ->get();
 	

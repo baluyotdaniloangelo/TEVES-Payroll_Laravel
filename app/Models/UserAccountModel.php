@@ -1,6 +1,6 @@
 <?php
 namespace App\Models;
-use Spatie\Activitylog\Traits\LogsActivity;
+use App\Support\LogsModelActivity as LogsActivity;
 use Spatie\Activitylog\Contracts\Activity;
 use Illuminate\Database\Eloquent\Model;
 

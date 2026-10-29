@@ -246,6 +246,7 @@
 									<li><a href="leaves-employee.html">Leaves (Employee)</a></li>
 									<li><a href="leave-settings.html">Leave Settings</a></li>
 									<li><a href="attendance.html">Attendance (Admin)</a></li>
+                                    <li><a href="{{ route('attendance-import.index') }}" class="{{ ($active_link ?? '') === 'attendance_dtr_plotting' ? 'active' : '' }}">DTR Plotting</a></li>
 									<li><a href="attendance-employee.html">Attendance (Employee)</a></li>
 									<li><a href="departments.html">Departments</a></li>
 									<li><a href="designations.html">Designations</a></li>
@@ -323,6 +324,7 @@
 								<ul>
 									<li><a href="salary.html"> Employee Salary </a></li>
 									<li><a href="salary-view.html"> Payslip </a></li>
+									<li><a href="{{ route('drivers_payroll.index') }}"> Drivers Payroll </a></li>
 									<li><a href="payroll-items.html"> Payroll Items </a></li>
 								</ul>
 							</div>

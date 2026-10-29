@@ -11,6 +11,7 @@
 						<div class="row align-items-center">
 							<div class="col">
 								<h3 class="page-title">Employee Logs</h3>
+                                <a href="{{ route('attendance-import.index') }}" class="btn btn-outline-primary mt-2">DTR Plotting</a>
 								<!--<ul class="breadcrumb">
 									<li class="breadcrumb-item"><a href="admin-dashboard.html">Dashboard</a></li>
 									<li class="breadcrumb-item active">Employee</li>
@@ -65,7 +66,8 @@
 																		<th class="none">Night Differential Pay:</th>
 																		<th class="none">Regular Holiday:</th>
 																		<th class="none">Special (Non-Working) Days:</th>
-																		<th class="all">Action</th>
+																		<th class="all">Source</th>
+<th class="all">Action</th>
 																	</tr>
 																</thead>				
 																
@@ -105,7 +107,8 @@
 																		<th class="none">Night Differential Pay:</th>
 																		<th class="none">Regular Holiday:</th>
 																		<th class="none">Special (Non-Working) Days:</th>
-																		<th class="all">Action</th>
+																		<th class="all">Source</th>
+<th class="all">Action</th>
 																	</tr>
 																</thead>				
 																
@@ -146,7 +149,8 @@
 																		<th class="none">Night Differential Pay:</th>
 																		<th class="none">Regular Holiday:</th>
 																		<th class="none">Special (Non-Working) Days:</th>
-																		<th class="all">Action</th>
+																		<th class="all">Source</th>
+<th class="all">Action</th>
 																	</tr>
 																</thead>				
 																
@@ -205,84 +209,8 @@
 														</div>
 													</div>
 
-													<form id="csv-form" enctype="multipart/form-data">
-                                                    @csrf								
-
-                                                    <div class="form-group">
-                                                      <label for="csv_file" class="form-label">Select CSV file</label>
-                                                      <input type="file" name="csv_file" id="csv_file" accept=".csv" class="form-control" required>
-                                                      <div class="mt-2" id="feedback"></div>
-                                                    </div>
-
-                                                    <!-- Spinner -->
-                                                    <div class="text-center mt-3">
-                                                      <div id="loading-spinner" class="spinner-border text-primary" role="status" style="display:none;">
-                                                        <span class="visually-hidden">Loading...</span>
-                                                      </div>
-                                                    </div>
-
-                                                    <div class="row">
-									                
-                                                    <div class="table-responsive">
-                                                    <div id="total_current_consumption_top"></div>
-													<table class="table dataTable display nowrap cell-border" id="csv-table" width="100%" cellspacing="0">
-																<thead>
-																	<tr>
-                                                                        <th class="all">#</th>
-                                                                        <!--Employee Information-->
-                                                                        <th class="all">Employee ID</th>
-                                                                        <th class="all">Name</th>
-                                                                        <!--Logs Information-->
-                                                                        <th class="all">Date</th>
-                                                                        <th class="none">Log Type</th>
-                                                                        <th class="none">Time In</th>
-                                                                        <th class="none">Breaktime Start</th>
-                                                                        <th class="none">Breaktime End</th>
-                                                                        <th class="none">Time Out</th>
-                                                                        <th class="none">OT In</th>
-                                                                        <th class="none">OT Out</th>
-                                                                        <!--Hours Information-->
-                                                                        <th class="all">Regular Hours</th>
-                                                                        <th class="all">Regular OTHours</th>
-                                                                        <th class="all">Restday Hours</th>
-                                                                        <th class="all">Restday OT Hours</th>
-                                                                        <th class="all">Night Differential Hours</th>
-                                                                        <!--Pay Information-->
-                                                                        <th class="all">Regular Pay</th>
-                                                                        <th class="all">Regular OT Pay</th>
-                                                                        <th class="all">Restday Pay</th>
-                                                                        <th class="all">Restday OT Pay</th>
-                                                                        <th class="all">Night Differential Pay</th>
-                                                                        <!--Holidays Information-->
-                                                                        <th class="all">Regular Holiday Pay</th>
-                                                                        <th class="all">Special Non Working Holiday Pay</th>
-																	</tr>
-																</thead>				
-																
-																<tbody>
-																	
-																</tbody>
-													</table>
-													</div>
-
-
-
-
-									            </div>
-                                                <div class="col-sm-12">
-											        <p>
-                                                        <strong></strong>
-                                                        <i>
-                                                        After choosing the file, use the View button to review the logs before importing. Once finalized, click the Import button.
-                                                        </i>
-                                                    </p>
-										        </div>
-												<div class="submit-section">
-										            <button class="btn btn-primary submit-btn" id="submit_logs_view" value="0">View</button>
-                                                    <button class="btn btn-primary submit-btn" id="submit_logs_import" value="0">Import</button>
-									            </div>
-											</div>
-											  </form>
+													<p>Import original device reports or your existing CSV template. Preview the punches, match employees, and review conflicts before saving.</p>
+<a href="{{ route('attendance-import.index') }}" class="btn btn-primary">Open DTR Plotting</a>
 
 
 										</div>

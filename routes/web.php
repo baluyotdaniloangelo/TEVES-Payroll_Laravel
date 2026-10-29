@@ -15,6 +15,7 @@ use App\Http\Controllers\EmployeeAllowanceLogsController;
 use App\Http\Controllers\EmployeeDeductionLogsController;
 use App\Http\Controllers\EmployeeLeaveLogsController;
 use App\Http\Controllers\DriversLogsController;
+use App\Http\Controllers\DriversPayrollController;
 
 use App\Http\Controllers\CreatePayrollController;
 use App\Http\Controllers\PayslipController;
@@ -38,7 +39,7 @@ use App\Http\Controllers\EmailController;
 */
 
 //Route::get('/import-csv', [CSVImportController::class, 'showImportForm'])->name('csv.form');
-Route::post('/import-csv-post', [CSVImportController::class, 'importCSV'])->name('csv.import');
+Route::post('/import-csv-post', [\App\Http\Controllers\AttendanceImportController::class, 'legacyImport'])->name('csv.import')->middleware('isLoggedIn');
 Route::post('/view-csv-post', [CSVImportController::class, 'viewCSV'])->name('csv.view');
 
 /*SAMPLE EXCEL*/
@@ -124,9 +125,17 @@ Route::post('/delete_employee_leave_log_confirmed', [EmployeeLeaveLogsController
 Route::get('/drivers-attendance-logs', [DriversLogsController::class,'drivers_attendance_logs'])->name('drivers_attendance_logs')->middleware('isLoggedIn');
 Route::post('/drivers-item-select', [EmployeeManagementController::class,'getDriversList_for_item_selection'])->name('getDriversList_for_item_selection')->middleware('isLoggedIn');
 Route::get('drivers-logs/list', [DriversLogsController::class, 'getDriversLogsList'])->name('getDriversLogsList')->middleware('isLoggedIn');
+Route::get('drivers-logs/computation-comparison', [DriversLogsController::class, 'getDriversLogsComputationComparison'])->name('getDriversLogsComputationComparison')->middleware('isLoggedIn');
+Route::post('/drivers-logs/recalculate', [DriversLogsController::class, 'recalculateDriverLog'])->name('RecalculateDriverLog')->middleware('isLoggedIn');
 Route::post('/submit_drivers_logs_information', [DriversLogsController::class,'submit_drivers_logs_information'])->name('submit_drivers_logs_information')->middleware('isLoggedIn');
 Route::post('/drivers_logs_info', [DriversLogsController::class, 'drivers_logs_info'])->name('DriversLogsInformation')->middleware('isLoggedIn');
 Route::post('/delete_driver_log_confirmed', [DriversLogsController::class, 'delete_driver_log_confirmed'])->name('DeleteDriversLog')->middleware('isLoggedIn');
+
+Route::middleware('isLoggedIn')->prefix('drivers-payroll')->name('drivers_payroll.')->group(function () {
+    Route::get('/', [DriversPayrollController::class, 'index'])->name('index');
+    Route::post('/{employee}', [DriversPayrollController::class, 'save'])->whereNumber('employee')->name('save');
+    Route::get('/{employee}/print', [DriversPayrollController::class, 'print'])->whereNumber('employee')->name('print');
+});
 
 /*Deduction Type*/
 Route::get('/deduction_type', [DeductionTypeController::class,'DeductionType'])->name('deduction_type')->middleware('isLoggedIn');
@@ -148,7 +157,7 @@ Route::post('/submit_employee_deduction_logs_information', [EmployeeDeductionLog
 
 /*Allowance Logs*/
 Route::get('/employee-allowance-logs', [EmployeeAllowanceLogsController::class,'employee_allowance_logs'])->name('employee_allowance_logs')->middleware('isLoggedIn');
-Route::post('/allowance-item-select', [AllowanceTypeController::class,'getAllowanceTypeList_for_selection'])->name('getAllowanceTypeList_for_selection')->middleware('isLoggedIn');
+// Allowance options are defined in the form; the old selection controller was never implemented.
 Route::get('employee-allowance-logs/list', [EmployeeAllowanceLogsController::class, 'getEmployeeAllowanceLogsList'])->name('getEmployeeAllowanceLogsList')->middleware('isLoggedIn');
 Route::post('/employee_allowance_info', [EmployeeAllowanceLogsController::class, 'employee_allowance_info'])->name('EmployeeAllowanceLogsInformation')->middleware('isLoggedIn');
 Route::post('/delete_employee_allowance_log_confirmed', [EmployeeAllowanceLogsController::class, 'delete_employee_allowance_log_confirmed'])->name('DeleteEmployeeAllowanceLog')->middleware('isLoggedIn');
@@ -170,7 +179,7 @@ Route::post('/add_user_access_post', [UserBranchAccessController::class,'add_use
 /*GET User Info*/
 Route::post('/user_info', [UserController::class, 'user_info'])->name('user_info')->middleware('isLoggedIn');
 /*Update User*/
-Route::post('/update_user_post', [UserController::class,'update_user_post'])->name('update_user_post')->middleware('isLoggedIn');
+// User creation and editing both use create_user_post; the old update method does not exist.
 /*Confirm Delete Switch*/
 Route::post('/delete_user_confirmed', [UserController::class, 'delete_user_confirmed'])->name('delete_user_confirmed')->middleware('isLoggedIn');
 /*Update User Account*/
@@ -199,3 +208,16 @@ Route::get('cut-off/list', [CutOffController::class, 'getCutOffList'])->name('ge
 
 /*Payslip*/
 Route::get('/payslip', [PayslipController::class,'print_payslip'])->name('payslip')->middleware('isLoggedIn');
+
+// Device report import: authenticated preview, mapping, and explicit per-row review.
+Route::middleware('isLoggedIn')->prefix('attendance-import')->name('attendance-import.')->group(function () {
+    $controller = \App\Http\Controllers\AttendanceImportController::class;
+    Route::get('/', [$controller, 'index'])->name('index');
+    Route::post('/devices', [$controller, 'device'])->name('devices');
+    Route::post('/upload', [$controller, 'upload'])->name('upload');
+    Route::get('/{batch}/preview', [$controller, 'preview'])->name('preview');
+    Route::post('/{batch}/mapping', [$controller, 'mapping'])->name('mapping');
+    Route::post('/{batch}/cutoff', [$controller, 'cutoff'])->name('cutoff');
+    Route::post('/{batch}/rows/{row}', [$controller, 'save'])->whereNumber('row')->name('save');
+    Route::get('/{batch}/source', [$controller, 'source'])->name('source');
+});
