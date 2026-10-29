@@ -8,7 +8,7 @@
     const $ = id => document.getElementById(id);
     const node = (tag, text, cls) => { const el = document.createElement(tag); if (text != null) el.textContent = text; if (cls) el.className = cls; return el; };
     const drafts = new Map(), confirmations = new Map();
-    let batch = null, result = null, groups = [], selected = null, detailId = null, busy = false, activeCutoff = null;
+    let batch = null, result = null, groups = [], selected = null, detailId = null, busy = false, activeCutoff = null, manualMappingOpen = false;
     const policies = [['review', 'Choose break treatment'], ['recorded', 'Recorded / manually entered break'], ['none', 'No break — explicitly confirmed']];
     const types = [['No', 'Regular / rest day'], ['Yes', 'Overtime']];
     const overrides = [['No', 'No — use employee shift'], ['Yes', 'Yes — disregard shift timing']];
@@ -17,6 +17,8 @@
     const cutoffValues = () => ({ cutoff_start: $('dtr-cutoff-start').value, cutoff_end: $('dtr-cutoff-end').value });
     const cutoffPending = () => !!activeCutoff && (cutoffValues().cutoff_start !== activeCutoff.cutoff_start || cutoffValues().cutoff_end !== activeCutoff.cutoff_end);
     const visibleRows = (group = current()) => group ? group.rows.filter(r => !activeCutoff || (r.date >= activeCutoff.cutoff_start && r.date <= activeCutoff.cutoff_end)) : [];
+    const mappingGroups = () => groups.filter(group => visibleRows(group).length);
+    const unmappedGroups = () => mappingGroups().filter(group => !group.employee);
     const person = id => result.employees.find(e => Number(e.id) === Number(id));
     const normalized = text => (text || '').replace(' ', 'T').slice(0, 16);
     const timeOf = text => normalized(text).slice(11, 16);
@@ -94,12 +96,22 @@
             map.get(row.external_id).rows.push(row);
         });
         groups = [...map.values()];
-        if (!groups.some(g => g.id === selected)) selected = groups[0]?.id || null;
+        if (!groups.some(g => g.id === selected)) selected = unmappedGroups()[0]?.id || groups[0]?.id || null;
+    }
+    function updateFlow() {
+        const relevantGroups = mappingGroups(), unmapped = unmappedGroups(), hasUnmapped = unmapped.length > 0;
+        $('dtr-mapping-card').hidden = !hasUnmapped && !manualMappingOpen;
+        $('dtr-logs-card').hidden = hasUnmapped;
+        $('dtr-toggle-mapping').hidden = hasUnmapped || groups.length === 0;
+        $('dtr-toggle-mapping').textContent = manualMappingOpen ? 'Hide mappings' : 'Review mappings';
+        $('dtr-mapping-progress').textContent = hasUnmapped
+            ? (relevantGroups.length - unmapped.length + ' of ' + relevantGroups.length + ' device employee IDs mapped. Map the remaining IDs to continue to the logs.')
+            : 'All device employee IDs are mapped.';
     }
     async function load(id, preserve = false) {
         const data = await api(base + '/' + id + '/preview');
         const same = batch === id; result = data; batch = id;
-        if (!preserve || !same) { drafts.clear(); confirmations.clear(); selected = null; detailId = null; }
+        if (!preserve || !same) { drafts.clear(); confirmations.clear(); selected = null; detailId = null; manualMappingOpen = false; }
         activeCutoff = { cutoff_start: data.batch.cutoff_start || data.batch.period_start, cutoff_end: data.batch.cutoff_end || data.batch.period_end };
         $('dtr-cutoff-start').value = activeCutoff.cutoff_start; $('dtr-cutoff-end').value = activeCutoff.cutoff_end;
         $('dtr-cutoff-end').min = activeCutoff.cutoff_start;
@@ -123,8 +135,13 @@
             form.append('cutoff_start', cutoff.cutoff_start); form.append('cutoff_end', cutoff.cutoff_end);
             const uploaded = await api(base + '/upload', form); await load(uploaded.id);
             $('import-history').add(new Option(result.batch.filename, uploaded.id), 1); $('import-history').value = uploaded.id;
-            message('DTR plotted by employee. Remember the employee mappings, then save the mapped logs to email employees.');
-        } catch (e) { message(e.message, true); } finally { busy = false; event.submitter.disabled = false; }
+            const missingMappings = unmappedGroups().length;
+            message(!groups.length
+                ? 'Upload complete, but no employee IDs were found in the selected cutoff. Check the export and device profile.'
+                : (missingMappings
+                    ? 'Upload complete. Map the ' + missingMappings + ' remaining device employee ID(s) to continue to the logs.'
+                    : 'Upload complete. All employee IDs were already mapped; the logs are ready to view.'));
+        } catch (e) { message(e.message, true); } finally { busy = false; event.submitter.disabled = false; updateSelection(); }
     };
     function selectEmployee(id) { if (busy) return; $('dtr-review-modal').close(); selected = id; detailId = null; render(); }
     $('dtr-export-employee').onchange = () => selectEmployee($('dtr-export-employee').value);
@@ -140,13 +157,21 @@
             confirmations.set(group.id, false);
             // Retain edited times, but refresh the employee and conflict snapshot for all dates.
             await load(batch, true);
-            message('Mapping remembered for device employee ID ' + group.id + '. All pending dates and future uploads use this employee. Unsaved time edits were retained.');
-        } catch (e) { message(e.message, true); } finally { busy = false; $('dtr-save-mapping').disabled = false; }
+            const nextUnmapped = unmappedGroups()[0];
+            if (nextUnmapped) selected = nextUnmapped.id;
+            else manualMappingOpen = false;
+            render();
+            message(nextUnmapped
+                ? 'Mapping saved for device employee ID ' + group.id + '. Choose the next unmapped ID.'
+                : 'All device IDs are now mapped. Opening the attendance logs; saved mappings will be reused for future uploads.');
+        } catch (e) { message(e.message, true); } finally { busy = false; $('dtr-save-mapping').disabled = false; updateSelection(); }
     };
     $('dtr-payroll-employee').onchange = () => { invalidate(); $('dtr-mapping-state').textContent = 'Mapping selection changed. Click Remember mapping before saving DTR.'; updateSelection(); };
+    $('dtr-toggle-mapping').onclick = () => { manualMappingOpen = !manualMappingOpen; updateFlow(); };
     function mappingPending() { const group = current(); return !group || Number($('dtr-payroll-employee').value) !== Number(group.employee); }
     function render() {
-        const group = current(); if (!group) return;
+        const group = current(); updateFlow();
+        if (!group) { $('dtr-send-mapped').disabled = true; return; }
         const index = groups.indexOf(group), employee = person(group.employee);
         $('dtr-export-employee').replaceChildren(); groups.forEach(g => $('dtr-export-employee').add(new Option(g.id + ' — ' + (g.name || 'Unnamed') + (g.employee ? ' · mapped' : ' · unmapped'), g.id)));
         $('dtr-export-employee').value = group.id;
@@ -381,17 +406,21 @@
             const activeBatch = batch;
             await load(activeBatch, true);
             if (groups.some(group => group.id === activeEmployee)) { selected = activeEmployee; render(); }
-            const missing = response.missing_accounts || [], failures = response.email_failures || [];
+            const missingAccounts = response.missing_accounts || [], missingEmails = response.missing_emails || [], failures = response.email_failures || [];
             const details = [
                 (response.queued || 0) + ' new intervals queued',
                 (response.emails_sent || 0) + ' employee emails sent',
                 (response.already_sent || 0) + ' employees already emailed',
                 (response.unmapped || 0) + ' unmapped intervals',
-                missing.length + ' employees missing an Employee account or valid email',
+                missingAccounts.length + ' employees missing a linked Employee account',
+                missingEmails.length + ' employees missing a valid email address',
                 failures.length + ' email failures'
             ].join(' · ');
-            $('dtr-send-result').textContent = details + (missing.length ? '. Add Employee accounts/email for: ' + missing.join(', ') : '') + (failures.length ? '. Email failed for: ' + failures.join(', ') : '');
-            $('dtr-send-result').className = 'mt-2 mb-0 ' + ((missing.length || failures.length || response.unmapped) ? 'text-warning' : 'text-success');
+            $('dtr-send-result').textContent = details
+                + (missingAccounts.length ? '. Create/link Employee accounts for: ' + missingAccounts.join(', ') : '')
+                + (missingEmails.length ? '. Add a valid email in Employee Information or the linked Employee account for: ' + missingEmails.join(', ') : '')
+                + (failures.length ? '. Email failed for: ' + failures.join(', ') : '');
+            $('dtr-send-result').className = 'mt-2 mb-0 ' + ((missingAccounts.length || missingEmails.length || failures.length || response.unmapped) ? 'text-warning' : 'text-success');
         } catch (e) { message(e.message, true); }
         finally { busy = false; lockReview(false); button.textContent = 'Save mapped logs & email employees'; render(); }
     };

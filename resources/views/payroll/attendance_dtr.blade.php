@@ -35,9 +35,10 @@
         </select></div>
     </div></div>
     <section id="import-review" hidden>
-        <div class="card"><div class="card-body">
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"><h4 class="mb-0">2. Employee mapping</h4><a id="import-source" href="#">Download original export</a></div>
-            <p id="import-summary"></p>
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2"><p id="import-summary" class="small text-muted mb-0"></p><a id="import-source" class="btn btn-sm btn-outline-secondary" href="#">Download original export</a></div>
+        <div id="dtr-mapping-card" class="card"><div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"><h4 class="mb-0">Employee mapping</h4></div>
+            <p id="dtr-mapping-progress" class="small text-warning" aria-live="polite"></p>
             <div class="row g-3 align-items-end">
                 <div class="col-md-6"><label for="dtr-export-employee" class="form-label">Employee in export</label><select id="dtr-export-employee" class="form-select"></select></div>
                 <div class="col-md-6 d-flex gap-2"><button id="dtr-prev-employee" type="button" class="btn btn-outline-secondary">Previous employee</button><button id="dtr-next-employee" type="button" class="btn btn-outline-secondary">Next employee</button></div>
@@ -49,14 +50,14 @@
                 <button id="dtr-save-mapping" class="btn btn-primary" type="button">Remember mapping</button>
             </div>
             <p id="dtr-mapping-state" class="mt-2 mb-0 small" aria-live="polite"></p>
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mt-3 pt-3 border-top">
-                <p class="mb-0">After checking the employee mappings, save all mapped device logs and email each employee to complete only missing DTR details. You can return to review or edit them later.</p>
-                <button id="dtr-send-mapped" class="btn btn-primary" type="button" disabled>Save mapped logs &amp; email employees</button>
-            </div>
-            <p id="dtr-send-result" class="mt-2 mb-0" role="status" aria-live="polite"></p>
         </div></div>
-        <div class="card"><div class="card-body">
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2"><h4 id="dtr-employee-heading" class="mb-0">3. Employee DTR</h4><span id="dtr-employee-count" class="small"></span></div>
+        <div id="dtr-logs-card" class="card"><div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div><h4 id="dtr-employee-heading" class="mb-0">Employee DTR</h4><span id="dtr-employee-count" class="small"></span></div>
+                <div class="d-flex flex-wrap gap-2"><button id="dtr-toggle-mapping" class="btn btn-outline-secondary" type="button" hidden>Review mappings</button><button id="dtr-send-mapped" class="btn btn-primary" type="button" disabled>Save mapped logs &amp; email employees</button></div>
+            </div>
+            <p class="mt-2 mb-0">After checking the employee mappings, save all mapped device logs and email each employee to complete only missing DTR details. You can return to review or edit them later.</p>
+            <p id="dtr-send-result" class="mt-2 mb-0" role="status" aria-live="polite"></p>
             <p class="mt-2">Employees will complete missing punches and break details. You can return here anytime to review or edit a queued interval. Blank dates are not counted as absences.</p>
             <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
                 <label class="form-check mb-0"><input type="checkbox" id="dtr-review-complete" class="form-check-input"><span class="form-check-label">Select complete queued intervals to review/edit</span></label>
@@ -76,7 +77,7 @@
         </div></div>
     </section>
     <script id="dtr-device-data" type="application/json">{!! json_encode($devices, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
-    <script src="{{ asset('js/attendance-dtr.js') }}?v=20261029-employee-missing-dtr" defer></script>
+    <script src="{{ asset('js/attendance-dtr.js') }}?v=20261029-mapping-first-flow" defer></script>
     @endif
     <style>
         #attendance-dtr-page .dtr-mapping{display:grid;grid-template-columns:150px 20px minmax(200px,1fr) auto;gap:16px;align-items:center;padding:16px;border:1px solid #e3e5e9;border-radius:8px}
@@ -101,5 +102,6 @@
         #attendance-dtr-page .dtr-row-message{max-width:220px;white-space:normal;font-size:12px}
         @media(max-width:767px){#attendance-dtr-page .dtr-mapping{grid-template-columns:1fr}#attendance-dtr-page .dtr-map-arrow{display:none}#attendance-dtr-page .dtr-review-settings-grid{grid-template-columns:1fr}}
     </style>
+    <style>#attendance-dtr-page [hidden]{display:none!important}</style>
 </div></div>
 @endsection

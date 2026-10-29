@@ -129,17 +129,24 @@ class AttendanceImportService
             $mappings=DB::table('attendance_employee_mappings')->where('device_id',$device->id)->pluck('employee_idx','external_id');
             $employeeIds=$rows->map(fn($row)=>(int)($row->employee_idx?:($mappings[$row->external_id]??0)))->filter()->unique()->values();
             $employees=EmployeeModel::where('branch_idx',$device->branch_idx)->whereIn('employee_id',$employeeIds)->get([
-                'employee_id','employee_full_name','employee_first_name','employee_last_name','employee_number','branch_idx'
+                'employee_id','employee_full_name','employee_first_name','employee_last_name','employee_number','employee_email','branch_idx'
             ])->keyBy('employee_id');
             $accounts=DB::table('teves_payroll_user_table')->whereIn('employee_idx',$employeeIds)->where('user_type','Employee')
                 ->get(['user_id','employee_idx','user_email_address'])->keyBy('employee_idx');
-            $queuedCount=0;$unmapped=0;$missingAccounts=[];$groups=[];$conflicts=[];
+            $queuedCount=0;$unmapped=0;$missingAccounts=[];$missingEmails=[];$groups=[];$conflicts=[];
             foreach($rows as $row){
                 $employeeId=(int)($row->employee_idx?:($mappings[$row->external_id]??0));
                 $employee=$employees->get($employeeId);$account=$accounts->get($employeeId);
                 if(!$employee){$unmapped++;continue;}
-                if(!$account||!filter_var($account->user_email_address,FILTER_VALIDATE_EMAIL)){
+                if(!$account){
                     $missingAccounts[$employeeId]=$employee->employee_number.' — '.($employee->employee_full_name?:trim($employee->employee_first_name.' '.$employee->employee_last_name));
+                    continue;
+                }
+                $email=filter_var(trim((string)$employee->employee_email),FILTER_VALIDATE_EMAIL)
+                    ?trim((string)$employee->employee_email)
+                    :(filter_var(trim((string)$account->user_email_address),FILTER_VALIDATE_EMAIL)?trim((string)$account->user_email_address):null);
+                if(!$email){
+                    $missingEmails[$employeeId]=$employee->employee_number.' — '.($employee->employee_full_name?:trim($employee->employee_first_name.' '.$employee->employee_last_name));
                     continue;
                 }
                 if($row->status==='pending'){
@@ -162,7 +169,7 @@ class AttendanceImportService
                     $queuedCount++;
                 }
                 if(!isset($groups[$employeeId]))$groups[$employeeId]=[
-                    'employee_id'=>$employeeId,'user_id'=>$account->user_id,'email'=>$account->user_email_address,
+                    'employee_id'=>$employeeId,'user_id'=>$account->user_id,'email'=>$email,
                     'name'=>$employee->employee_full_name?:trim($employee->employee_first_name.' '.$employee->employee_last_name),
                 ];
             }
@@ -184,7 +191,7 @@ class AttendanceImportService
                 if($notice->status==='sent'){$alreadySent++;continue;}
                 $notifications[]=$group+['notice_id'=>$notice->id,'cutoff_start'=>$activeBatch->cutoff_start,'cutoff_end'=>$activeBatch->cutoff_end];
             }
-            return ['queued'=>$queuedCount,'unmapped'=>$unmapped,'missing_accounts'=>array_values($missingAccounts),
+            return ['queued'=>$queuedCount,'unmapped'=>$unmapped,'missing_accounts'=>array_values($missingAccounts),'missing_emails'=>array_values($missingEmails),
                 'already_sent'=>$alreadySent,'notifications'=>$notifications];
         });
 
@@ -284,8 +291,11 @@ class AttendanceImportService
                 $target=$same->first()->employee_logs_id;
             }
             $account=DB::table('teves_payroll_user_table')->where('employee_idx',$employee->employee_id)->where('user_type','Employee')->first(['user_id','user_email_address']);
-            abort_unless($account && filter_var($account->user_email_address,FILTER_VALIDATE_EMAIL),422,
-                'Create and link an Employee user account with a valid email before sending this DTR for completion.');
+            $email=filter_var(trim((string)$employee->employee_email),FILTER_VALIDATE_EMAIL)
+                ?trim((string)$employee->employee_email)
+                :(filter_var(trim((string)($account->user_email_address??'')),FILTER_VALIDATE_EMAIL)?trim((string)$account->user_email_address):null);
+            abort_unless($account && $email,422,
+                'Link an Employee user account for portal access and enter a valid email in Employee Information or the linked account.');
             $review=json_decode($row->review,true)?:[];
             $review['admin_proposal']=$proposal;
             $review['conflict_action']=$input['conflict_action']??'keep';
@@ -300,10 +310,14 @@ class AttendanceImportService
             if (!$notice) {
                 DB::table('attendance_employee_review_notifications')->insert([
                     'import_id'=>$batchId,'employee_idx'=>$employee->employee_id,'user_idx'=>$account->user_id,
-                    'recipient_email'=>$account->user_email_address,'status'=>'pending','created_at'=>now(),'updated_at'=>now(),
+                    'recipient_email'=>$email,'status'=>'pending','created_at'=>now(),'updated_at'=>now(),
+                ]);
+            } elseif ($notice->status!=='sent') {
+                DB::table('attendance_employee_review_notifications')->where('id',$notice->id)->update([
+                    'user_idx'=>$account->user_id,'recipient_email'=>$email,'status'=>'pending','failure_message'=>null,'updated_at'=>now(),
                 ]);
             }
-            $notification=['employee_id'=>$employee->employee_id,'user_id'=>$account->user_id,'email'=>$account->user_email_address,
+            $notification=['employee_id'=>$employee->employee_id,'user_id'=>$account->user_id,'email'=>$email,
                 'name'=>$employee->employee_full_name?:trim($employee->employee_first_name.' '.$employee->employee_last_name),
                 'cutoff_start'=>$activeBatch->cutoff_start,'cutoff_end'=>$activeBatch->cutoff_end];
             return ['status'=>'employee_pending','version'=>$row->version+1];

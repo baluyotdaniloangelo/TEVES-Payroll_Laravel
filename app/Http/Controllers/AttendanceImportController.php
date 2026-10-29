@@ -53,7 +53,13 @@ class AttendanceImportController extends Controller
         return response()->json(['id'=>$id]);
     }
 
-    public function preview(string $batch,AttendanceImportService $service) { return response()->json($service->preview($batch)); }
+    public function preview(Request $request,string $batch,AttendanceImportService $service)
+    {
+        if (!$request->expectsJson()) return redirect()->route('attendance-import.index');
+        return response()->json($service->preview($batch))
+            ->header('Cache-Control','private, no-store, no-cache, must-revalidate')
+            ->header('X-Content-Type-Options','nosniff');
+    }
 
     public function cutoff(Request $request,string $batch,AttendanceImportService $service)
     {
