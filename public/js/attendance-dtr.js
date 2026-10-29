@@ -178,6 +178,9 @@
     function statusFor(row) {
         const p = draft(row).proposed;
         if (row.status === 'saved') return 'Saved';
+        if (row.status === 'employee_pending') return 'Awaiting employee';
+        if (row.status === 'employee_submitted') return 'Employee completed — approval needed';
+        if (row.status === 'kept') return 'Existing attendance kept';
         if (row.status === 'skipped') return 'Skipped';
         if (!row.employee_idx) return 'Map employee';
         if (!p.log_in || !p.log_out) return 'Missing punch';
@@ -194,7 +197,7 @@
     function timeCell(row, key, label) {
         const state = draft(row), cell = node('td'), input = node('input', null, 'form-control form-control-sm');
         input.type = 'time'; input.value = timeOf(state.proposed[key]); input.setAttribute('aria-label', label + ' ' + row.date + ' interval ' + row.id);
-        input.disabled = row.status === 'saved' || (key.startsWith('breaktime') && state.proposed.break_policy === 'none');
+        input.disabled = ['saved','employee_submitted','kept'].includes(row.status) || (key.startsWith('breaktime') && state.proposed.break_policy === 'none');
         input.onchange = () => { const date = stampDate(state.proposed[key]) || row.date; change(row, key, input.value ? date + 'T' + input.value : null); };
         cell.append(input);
         if (state.proposed[key] && stampDate(state.proposed[key]) !== row.date) cell.append(node('span', shortDate(stampDate(state.proposed[key])) + ' · next day', 'dtr-next-day'));
@@ -221,7 +224,7 @@
             rows.forEach(row => {
                 const state = draft(row), tr = node('tr'); tr.dataset.row = row.id; if (state.selected) tr.className = 'dtr-row-selected';
                 const selectCell = node('td'), check = node('input', null, 'form-check-input'); check.type = 'checkbox'; check.checked = state.selected;
-                check.setAttribute('aria-label', 'Include ' + date + ' interval ' + row.id); check.disabled = row.status === 'saved' || !row.employee_idx;
+                check.setAttribute('aria-label', 'Include ' + date + ' interval ' + row.id); check.disabled = ['saved','employee_submitted','kept'].includes(row.status) || !row.employee_idx;
                 check.onchange = () => { state.selected = check.checked; invalidate(); tr.classList.toggle('dtr-row-selected', check.checked); updateSelection(); }; selectCell.append(check); tr.append(selectCell);
                 const dateCell = node('td', shortDate(date), 'dtr-date');
                 dateCell.append(node('span', new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short' }) + ' · ' + (state.proposed.overtime_status === 'Yes' ? 'Overtime' : 'Regular / rest day'), 'dtr-day-note'));
@@ -236,8 +239,8 @@
     }
     function updateSelection() {
         const group = current(); if (!group) return;
-        const eligible = visibleRows(group).filter(r => r.status !== 'saved' && r.employee_idx && ready(r));
-        const selectedRows = visibleRows(group).filter(r => r.status !== 'saved' && draft(r).selected);
+        const eligible = visibleRows(group).filter(r => !['saved','employee_pending','employee_submitted','kept'].includes(r.status) && r.employee_idx && ready(r));
+        const selectedRows = visibleRows(group).filter(r => !['saved','employee_submitted','kept'].includes(r.status) && draft(r).selected);
         $('dtr-selection-count').textContent = new Set(selectedRows.map(r => r.date)).size + ' dates / ' + selectedRows.length + ' intervals selected · cutoff ' + activeCutoff.cutoff_start + ' to ' + activeCutoff.cutoff_end;
         $('dtr-review-complete').checked = eligible.length > 0 && eligible.every(r => draft(r).selected);
         $('dtr-review-complete').disabled = cutoffPending() || !group.employee;
@@ -246,13 +249,13 @@
     }
     $('dtr-review-complete').onchange = () => {
         const value = $('dtr-review-complete').checked;
-        visibleRows().forEach(row => { if (row.status !== 'saved' && row.employee_idx && ready(row)) draft(row).selected = value; });
+        visibleRows().forEach(row => { if (!['saved','employee_pending','employee_submitted','kept'].includes(row.status) && row.employee_idx && ready(row)) draft(row).selected = value; });
         invalidate(); renderGrid();
     };
     $('dtr-employee-confirm').onchange = () => { confirmations.set(selected, $('dtr-employee-confirm').checked); updateSelection(); };
     function fullDateField(container, row, key, text) {
         const group = node('div', null, 'col-md-3'), label = node('label', text, 'form-label'), input = node('input', null, 'form-control');
-        input.id = 'dtr-full-' + row.id + '-' + key; label.htmlFor = input.id; input.type = 'datetime-local'; input.value = normalized(draft(row).proposed[key]); input.disabled = row.status === 'saved';
+        input.id = 'dtr-full-' + row.id + '-' + key; label.htmlFor = input.id; input.type = 'datetime-local'; input.value = normalized(draft(row).proposed[key]); input.disabled = ['saved','employee_submitted','kept'].includes(row.status);
         if (key.startsWith('breaktime') && draft(row).proposed.break_policy === 'none') input.disabled = true;
         input.onchange = () => change(row, key, input.value || null); group.append(label, input); container.append(group);
     }
@@ -264,20 +267,24 @@
         panel.append(node('p', 'Raw punches: ' + row.raw.punches.join(', ') + ' · Source: ' + row.raw.sheet + ', row ' + row.raw.row));
         if (row.raw.slots) panel.append(node('p', 'Device slots [In 1, Out 1, In 2, Out 2, OT In, OT Out]: ' + row.raw.slots.map(s => s || '—').join(' / '), 'small'));
         if (row.warnings.length) panel.append(node('p', row.warnings.join(' '), 'text-warning'));
+        if (row.status === 'employee_submitted') {
+            panel.append(node('p', 'Employee submitted this DTR for payroll approval' + (row.employee_submitted_at ? ' on ' + row.employee_submitted_at : '') + '.', 'text-success'));
+            if (row.employee_note) panel.append(node('p', 'Employee note: ' + row.employee_note, 'dtr-conflict'));
+        }
         panel.append(node('p', 'Use explicit dates here for overnight punches. Review break treatment, attendance type, and shift override for this interval.', 'small'));
         const settings = node('div', null, 'dtr-review-settings mt-3'), settingGrid = node('div', null, 'dtr-review-settings-grid');
         settings.append(node('h6', 'Attendance settings'), settingGrid);
         [['break_policy', 'Break treatment', policies], ['overtime_status', 'Attendance type', types], ['override_default_shift', 'Override default shift', overrides]].forEach(([key, labelText, options]) => {
             const group = node('div'), label = node('label', labelText, 'form-label');
             const select = node('select', null, 'form-select'); select.id = 'dtr-review-' + row.id + '-' + key; label.htmlFor = select.id;
-            options.forEach(([value, text]) => select.add(new Option(text, value))); select.value = state.proposed[key]; select.disabled = row.status === 'saved';
+            options.forEach(([value, text]) => select.add(new Option(text, value))); select.value = state.proposed[key]; select.disabled = ['saved','employee_submitted','kept'].includes(row.status);
             select.onchange = () => {
                 state.proposed[key] = select.value; state.dirty = true; state.feedback = ''; invalidate();
                 if (key === 'break_policy') {
                     if (select.value === 'none') { state.proposed.breaktime_start = null; state.proposed.breaktime_end = null; }
                     ['breaktime_start', 'breaktime_end'].forEach(dateKey => {
                         const input = $('dtr-full-' + row.id + '-' + dateKey);
-                        if (input) { input.disabled = row.status === 'saved' || select.value === 'none'; if (select.value === 'none') input.value = ''; }
+                        if (input) { input.disabled = ['saved','employee_submitted','kept'].includes(row.status) || select.value === 'none'; if (select.value === 'none') input.value = ''; }
                     });
                 }
                 updateSelection();
@@ -291,15 +298,29 @@
             const box = node('div', null, 'dtr-conflict mt-3'); box.append(node('strong', 'Existing attendance on this date'));
             row.conflicts.forEach(c => box.append(node('p', c.type + ': ' + c.in + ' → ' + c.out + '; break ' + c.break_start + ' → ' + c.break_end, 'mb-1')));
             const label = node('label', 'For matching attendance type', 'form-label mt-2'), select = node('select', null, 'form-select');
-            select.id = 'dtr-conflict-' + row.id; label.htmlFor = select.id; select.add(new Option('Keep existing attendance', 'keep')); select.add(new Option('Replace after review', 'replace')); select.value = state.conflict_action; select.disabled = row.status === 'saved';
+            select.id = 'dtr-conflict-' + row.id; label.htmlFor = select.id; select.add(new Option('Keep existing attendance', 'keep')); select.add(new Option('Replace after review', 'replace')); select.value = state.conflict_action; select.disabled = ['saved','employee_submitted','kept'].includes(row.status);
             select.onchange = () => { state.conflict_action = select.value; state.dirty = true; invalidate(); updateSelection(); }; box.append(label, select); panel.append(box);
         }
         if (row.status === 'saved') panel.append(node('p', 'Saved to payroll employee ' + (person(row.employee_idx)?.name || row.employee_idx) + '. Use Employee Logs for later corrections.', 'mt-3 text-success'));
-        else {
-            const skip = node('button', 'Skip this interval', 'btn btn-outline-secondary mt-3'); skip.type = 'button';
+        else if (row.status === 'employee_submitted') {
+            const approve = node('button', 'Approve & finalize attendance', 'btn btn-primary mt-3'); approve.type = 'button';
+            approve.onclick = async () => {
+                if (busy) return; approve.disabled = true;
+                try {
+                    const response = await api(base + '/' + batch + '/rows/' + row.id + '/approve', {});
+                    row.status = response.status; row.saved_log_id = response.log_id || null; row.version = response.version || row.version + 1;
+                    state.selected = false; state.dirty = false; state.feedback = response.status === 'saved' ? 'Approved and saved to Employee Logs.' : 'Existing attendance kept.';
+                    const activeEmployee = selected;
+                    detailId = null; $('dtr-review-modal').close(); await load(batch);
+                    if (groups.some(group => group.id === activeEmployee)) selectEmployee(activeEmployee);
+                } catch (e) { message(e.message, true); approve.disabled = false; }
+            }; panel.append(approve);
+        } else {
+            const skipped = row.status === 'skipped';
+            const skip = node('button', skipped ? 'Restore this interval' : 'Skip this interval', 'btn btn-outline-secondary mt-3'); skip.type = 'button';
             skip.onclick = async () => {
                 if (busy) return; skip.disabled = true;
-                try { const response = await api(base + '/' + batch + '/rows/' + row.id, { action: 'skip', version: row.version }); row.status = response.status; row.version++; state.selected = false; state.dirty = false; detailId = null; $('dtr-review-modal').close(); invalidate(); render(); }
+                try { const response = await api(base + '/' + batch + '/rows/' + row.id, { action: skipped ? 'restore' : 'skip', version: row.version }); row.status = response.status; row.version = response.version || row.version + 1; state.selected = false; state.dirty = false; detailId = null; $('dtr-review-modal').close(); invalidate(); render(); }
                 catch (e) { message(e.message, true); } finally { skip.disabled = false; }
             }; panel.append(skip);
         }
@@ -324,9 +345,9 @@
     $('dtr-save-selected').onclick = async () => {
         const group = current(); if (busy || !group) return;
         if (cutoffPending() || !confirmations.get(group.id) || mappingPending()) { message('Apply the cutoff, remember the mapping, and confirm your review before saving.', true); return; }
-        const rows = visibleRows(group).filter(r => r.status !== 'saved' && draft(r).selected);
+        const rows = visibleRows(group).filter(r => !['saved','employee_submitted','kept'].includes(r.status) && draft(r).selected);
         if (!rows.length) return;
-        busy = true; lockReview(true); let saved = 0, kept = 0, failed = 0;
+        busy = true; lockReview(true); let queued = 0, kept = 0, failed = 0, emailFailed = 0;
         try {
             for (const row of rows) {
                 const state = draft(row);
@@ -334,17 +355,17 @@
                     const response = await api(base + '/' + batch + '/rows/' + row.id, { action: 'save', version: row.version, employee_idx: row.employee_idx, confirmed: true,
                         proposed: state.proposed, conflict_hash: row.conflict_hash, conflict_action: state.conflict_action });
                     state.error = false;
-                    if (response.status === 'saved') {
-                        row.status = 'saved'; row.saved_log_id = response.log_id; row.version = response.version || row.version + 1;
-                        state.selected = false; state.dirty = false; state.feedback = 'Saved to Employee Logs.'; saved++;
-                        if (response.conflict_hash) result.rows.filter(r => r.date === row.date && Number(r.employee_idx) === Number(row.employee_idx)).forEach(r => { r.conflict_hash = response.conflict_hash; r.conflicts = response.conflicts; });
+                    if (response.status === 'employee_pending') {
+                        row.status = response.status; row.version = response.version || row.version + 1;
+                        state.selected = false; state.dirty = false; state.feedback = response.email_sent === false ? 'Saved; email failed.' : 'Saved and sent to employee.'; queued++;
+                        if (response.email_sent === false) emailFailed++;
                     } else { state.feedback = 'Existing attendance kept.'; state.selected = false; kept++; }
                 } catch (e) { state.feedback = e.message; state.error = true; failed++; }
-                $('dtr-save-result').textContent = saved + ' saved · ' + kept + ' kept · ' + failed + ' need review';
+                $('dtr-save-result').textContent = queued + ' sent for employee completion · ' + kept + ' existing records kept · ' + failed + ' need review · ' + emailFailed + ' email failures';
             }
         } finally {
             confirmations.set(group.id, false); busy = false; lockReview(false); render();
-            $('dtr-save-result').textContent = saved + ' intervals saved · ' + kept + ' existing records kept · ' + failed + ' need review. Results are shown on each row.';
+            $('dtr-save-result').textContent = queued + ' intervals sent for employee completion · ' + kept + ' existing records kept · ' + failed + ' need review · ' + emailFailed + ' email failures. Final attendance is posted only after payroll approval.';
         }
     };
     window.addEventListener('beforeunload', event => { if (dirty()) { event.preventDefault(); event.returnValue = ''; } });

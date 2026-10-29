@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CAMRAlreadyLoggedIn
 {
@@ -18,6 +19,8 @@ class CAMRAlreadyLoggedIn
     {
 		if(Session()->has('loginID') && (url('/')==$request->url()))
 		{
+			$userType = DB::table('teves_payroll_user_table')->where('user_id', session('loginID'))->value('user_type');
+			if (strcasecmp(trim((string) $userType), 'Employee') === 0) return redirect()->route('my-dtr.index');
 			//return redirect('login')->with('fail', "You Have to Login First");
 			return back();
 		}

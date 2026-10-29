@@ -272,11 +272,15 @@
 						<a href="#" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
 							<span class="user-img"><img src="assets/img/avatar/avatar-27.jpg" alt="User Image">
 							<span class="status online"></span></span>
-							<span>Admin</span>
+							<span>{{ isset($user) ? $user->user_real_name : 'Admin' }}</span>
 						</a>
 						<div class="dropdown-menu">
+							@if(isset($user) && strcasecmp(trim((string)$user->user_type), 'Employee') === 0)
+							<a class="dropdown-item" href="{{ route('my-dtr.index') }}">My DTR</a>
+							@else
 							<a class="dropdown-item" href="profile.html">My Profile</a>
 							<a class="dropdown-item" href="settings.html">Settings</a>
+							@endif
 							<a class="dropdown-item" href="{{ route('logout-user') }}">Logout</a>
 						</div>
 					</li>

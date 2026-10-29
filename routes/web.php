@@ -219,5 +219,11 @@ Route::middleware('isLoggedIn')->prefix('attendance-import')->name('attendance-i
     Route::post('/{batch}/mapping', [$controller, 'mapping'])->name('mapping');
     Route::post('/{batch}/cutoff', [$controller, 'cutoff'])->name('cutoff');
     Route::post('/{batch}/rows/{row}', [$controller, 'save'])->whereNumber('row')->name('save');
+    Route::post('/{batch}/rows/{row}/approve', [$controller, 'approve'])->whereNumber('row')->name('approve');
     Route::get('/{batch}/source', [$controller, 'source'])->name('source');
+});
+
+Route::middleware('isLoggedIn')->prefix('my-dtr')->name('my-dtr.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\EmployeeDtrController::class, 'index'])->name('index');
+    Route::post('/{row}', [\App\Http\Controllers\EmployeeDtrController::class, 'submit'])->whereNumber('row')->name('submit');
 });

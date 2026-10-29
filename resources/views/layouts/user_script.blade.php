@@ -52,6 +52,14 @@
 	});
 
 
+	function syncEmployeeAccountField(){
+		const employeeRole = $('#user_type').val() === 'Employee';
+		$('#employee-account-link').toggle(employeeRole);
+		$('#employee_idx').prop('required', employeeRole);
+		if (!employeeRole) $('#employee_idx').val('');
+		if (employeeRole) $('#user_access').val('BYBRANCH');
+	}
+
 	function ChangeAccessType_Add(){
 
 		let user_type 			= $("#user_type").val();
@@ -63,6 +71,7 @@
 		else{
 			document.getElementById('user_access').value = 'BYSITE';
 		}
+		syncEmployeeAccountField();
 
 	}
 	
@@ -103,6 +112,7 @@
 			let user_type 			= $("#user_type").val();
 			let user_access 		= $("#user_access").val();
 			let user_job_title 		= $("input[name=user_job_title]").val();
+			let employee_idx 		= $('#employee_idx').val();
 			
 			  $.ajax({
 				url: "/create_user_post",
@@ -116,6 +126,7 @@
 				  user_type:user_type,
 				  user_access:user_access,
 				  user_job_title:user_job_title,
+				  employee_idx:employee_idx,
 				  _token: "{{ csrf_token() }}"
 				},
 				success:function(response){
@@ -129,12 +140,14 @@
 					$('#user_typeError').text('');		
 					$('#user_job_titleError').text('');
 					$('#user_email_addressError').text('');
+					$('#employee_idxError').text('');
 					document.getElementById('user_email_address').className = "form-control";
 					
                     $('#modal_success_details').html("User Information successfully "+response.success);
                     $('#success-alert-modal').modal('toggle');	
 				
 					document.getElementById("UserForm").reset();
+					syncEmployeeAccountField();
 				
 					if(user_access=='BYSITE'){
 						UpdateUserAccess(response.user_id);
@@ -196,6 +209,10 @@
 				  document.getElementById('user_passwordError').className = "invalid-feedback";		
 				  
 				  $('#user_typeError').text(error.responseJSON.errors.user_type);
+				  if (error.responseJSON.errors.employee_idx) {
+					$('#employee_idxError').text(error.responseJSON.errors.employee_idx[0]);
+					document.getElementById('employee_idxError').className = 'invalid-feedback d-block';
+				  }
 				  document.getElementById('user_typeError').className = "invalid-feedback";		
 				  
 				  $('#user_job_titleError').text(error.responseJSON.errors.user_job_title);
@@ -249,6 +266,8 @@
 					document.getElementById("user_job_title").value = response.user_job_title;
 					
 					$('#user_email_addressError').html("");
+					$('#employee_idx').val(response.employee_idx || '');
+					syncEmployeeAccountField();
 					document.getElementById('user_email_addressError').className = "valid-feedback";
 					document.getElementById('user_email_address').className = "form-control";
 						
@@ -270,6 +289,7 @@
 	document.getElementById("user_type").addEventListener('change', doThing_account_management);
 	document.getElementById("user_access").addEventListener('change', doThing_account_management);
 	document.getElementById("user_job_title").addEventListener('change', doThing_account_management);
+	document.getElementById("employee_idx").addEventListener('change', doThing_account_management);
 	
 	function doThing_account_management(){
 
@@ -282,6 +302,7 @@
 			let user_type 			= $("#user_type").val();	
 			let user_access 		= $("#user_access").val();
 			let user_job_title 		= $("input[name=user_job_title]").val();
+			let employee_idx 		= $('#employee_idx').val();
 		
 		$.ajax({
 				url: "/user_info",
@@ -297,7 +318,7 @@
 				  
 				  if(user_password!==''){
 						
-						if(response.user_real_name===user_real_name && response.user_name===user_name && response.user_email_address===user_email_address && response.user_type===user_type && response.user_branch_access_type===user_access && response.user_job_title===user_job_title){
+						if(response.user_real_name===user_real_name && response.user_name===user_name && response.user_email_address===user_email_address && response.user_type===user_type && response.user_branch_access_type===user_access && response.user_job_title===user_job_title && String(response.employee_idx || '')===String(employee_idx || '')){
 							
 							document.getElementById("save-user").disabled = false;
 							
@@ -309,7 +330,7 @@
 					
 				  }else{
 					  
-					  if(response.user_real_name===user_real_name && response.user_name===user_name && response.user_email_address===user_email_address && response.user_type===user_type && response.user_branch_access_type===user_access && response.user_job_title===user_job_title){
+					  if(response.user_real_name===user_real_name && response.user_name===user_name && response.user_email_address===user_email_address && response.user_type===user_type && response.user_branch_access_type===user_access && response.user_job_title===user_job_title && String(response.employee_idx || '')===String(employee_idx || '')){
 							
 							document.getElementById("save-user").disabled = true;
 							
@@ -533,6 +554,7 @@
 			
 			event.preventDefault();
 			$('#UserForm')[0].reset();
+			syncEmployeeAccountField();
 
             $('#modal_title_action_user').html('Add User');
 

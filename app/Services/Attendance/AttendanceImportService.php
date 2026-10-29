@@ -5,9 +5,12 @@ namespace App\Services\Attendance;
 use App\Models\EmployeeModel;
 use App\Models\EmployeeLogsModel;
 use App\Models\User;
+use App\Mail\EmployeeDtrReviewMail;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -88,8 +91,8 @@ class AttendanceImportService
                 'period_start'=>$period[0],'period_end'=>$period[1],
                 'cutoff_start'=>$batch->cutoff_start??$period[0],'cutoff_end'=>$batch->cutoff_end??$period[1]],
             'employees'=>$employees,'rows'=>$rows->map(function($row)use($mapping,$employees,$existing){
-                $proposed=json_decode($row->proposed,true);
-                if ($row->review) $proposed=array_merge($proposed,json_decode($row->review,true)['proposal']??[]);
+                $review=$row->review?json_decode($row->review,true):[];
+                $proposed=$review['employee_proposal']??$review['admin_proposal']??array_merge(json_decode($row->proposed,true),$review['proposal']??[]);
                 $mapped=$mapping[$row->external_id]??null;
                 if (!$employees->contains('id',$mapped)) $mapped=null;
                 $employee=$row->employee_idx ?: $mapped;
@@ -99,6 +102,7 @@ class AttendanceImportService
                     'date'=>$row->attendance_date,'raw'=>json_decode($row->raw,true),'proposed'=>$proposed,
                     'warnings'=>json_decode($row->warnings,true),'employee_idx'=>$employee,'mapped_employee_idx'=>$mapped,'status'=>$row->status,
                     'version'=>$row->version,'saved_log_id'=>$row->saved_log_id,
+                    'employee_note'=>$review['employee_note']??null,'employee_submitted_at'=>$review['employee_submitted_at']??null,
                     'conflicts'=>$conflicts->map(fn($l)=>$this->conflictView($l))->all(),'conflict_hash'=>$this->fingerprint($conflicts)];
             })->all()];
     }
@@ -147,7 +151,8 @@ class AttendanceImportService
     public function save(string $batchId,int $rowId,array $input): array
     {
         $batch=$this->batch($batchId); $device=$this->device($batch->device_id);
-        return DB::transaction(function()use($batchId,$rowId,$input,$device) {
+        $notification = null;
+        $result = DB::transaction(function()use($batchId,$rowId,$input,$device,&$notification) {
             $activeBatch=DB::table('attendance_imports')->where('id',$batchId)->lockForUpdate()->first();
             $row=DB::table('attendance_import_rows')->where('id',$rowId)->where('import_id',$batchId)->lockForUpdate()->first();
             abort_unless($row,404);
@@ -156,10 +161,16 @@ class AttendanceImportService
                 throw ValidationException::withMessages(['cutoff'=>'This attendance date is outside the selected cutoff. Apply the desired cutoff and review again.']);
             }
             if ($row->status==='saved') return ['status'=>'saved','log_id'=>$row->saved_log_id,'already_saved'=>true];
+            abort_unless($row->status!=='employee_submitted',409,'This DTR was already submitted by the employee. Review and approve it before making another change.');
             abort_unless((int)$row->version===(int)$input['version'],409,'This row changed. Refresh the preview.');
             if ($input['action']==='skip') {
                 DB::table('attendance_import_rows')->where('id',$rowId)->update(['status'=>'skipped','version'=>$row->version+1,'updated_at'=>now()]);
                 return ['status'=>'skipped'];
+            }
+            if ($input['action']==='restore') {
+                abort_unless($row->status==='skipped',409,'Only a skipped interval can be restored.');
+                DB::table('attendance_import_rows')->where('id',$rowId)->update(['status'=>'pending','version'=>$row->version+1,'updated_at'=>now()]);
+                return ['status'=>'pending','version'=>$row->version+1];
             }
             if (empty($input['confirmed'])) throw ValidationException::withMessages(['confirmed'=>'Review this row and confirm its punches and dates.']);
             $employee=EmployeeModel::where('employee_id',$input['employee_idx'])->where('branch_idx',$device->branch_idx)->lockForUpdate()->first();
@@ -176,23 +187,141 @@ class AttendanceImportService
                 abort_unless($same->count()===1,409,'Multiple existing intervals need manual review in Employee Logs.');
                 $target=$same->first()->employee_logs_id;
             }
-            $request=Request::create('/attendance-import-save','POST',array_merge($proposal,[
+            $account=DB::table('teves_payroll_user_table')->where('employee_idx',$employee->employee_id)->where('user_type','Employee')->first(['user_id','user_email_address']);
+            abort_unless($account && filter_var($account->user_email_address,FILTER_VALIDATE_EMAIL),422,
+                'Create and link an Employee user account with a valid email before sending this DTR for completion.');
+            $review=json_decode($row->review,true)?:[];
+            $review['admin_proposal']=$proposal;
+            $review['conflict_action']=$input['conflict_action']??'keep';
+            $review['conflict_hash']=$input['conflict_hash'];
+            $review['reviewed_by_user_idx']=session('loginID');
+            $review['reviewed_at']=now()->toDateTimeString();
+            DB::table('attendance_import_rows')->where('id',$rowId)->update([
+                'employee_idx'=>$employee->employee_id,'status'=>'employee_pending','version'=>$row->version+1,
+                'review'=>json_encode($review,JSON_THROW_ON_ERROR),'updated_at'=>now(),
+            ]);
+            $notice=DB::table('attendance_employee_review_notifications')->where('import_id',$batchId)->where('employee_idx',$employee->employee_id)->first();
+            if (!$notice) {
+                DB::table('attendance_employee_review_notifications')->insert([
+                    'import_id'=>$batchId,'employee_idx'=>$employee->employee_id,'user_idx'=>$account->user_id,
+                    'recipient_email'=>$account->user_email_address,'status'=>'pending','created_at'=>now(),'updated_at'=>now(),
+                ]);
+            }
+            $notification=['employee_id'=>$employee->employee_id,'user_id'=>$account->user_id,'email'=>$account->user_email_address,
+                'name'=>$employee->employee_full_name?:trim($employee->employee_first_name.' '.$employee->employee_last_name),
+                'cutoff_start'=>$activeBatch->cutoff_start,'cutoff_end'=>$activeBatch->cutoff_end];
+            return ['status'=>'employee_pending','version'=>$row->version+1];
+        });
+        if ($notification && $result['status']==='employee_pending') {
+            $notice=DB::table('attendance_employee_review_notifications')->where('import_id',$batchId)->where('employee_idx',$notification['employee_id'])->first();
+            if ($notice && $notice->status!=='sent') {
+                try {
+                    Mail::to($notice->recipient_email)->send(new EmployeeDtrReviewMail(
+                        $notification['name'], $notification['cutoff_start'], $notification['cutoff_end'], route('my-dtr.index',['batch'=>$batchId])
+                    ));
+                    DB::table('attendance_employee_review_notifications')->where('id',$notice->id)->update(['status'=>'sent','sent_at'=>now(),'failure_message'=>null,'updated_at'=>now()]);
+                    $result['email_sent']=true;
+                } catch (\Throwable $exception) {
+                    Log::warning('Employee DTR review email failed.', ['import_id'=>$batchId,'employee_idx'=>$notification['employee_id'],'user_id'=>$notification['user_id']]);
+                    DB::table('attendance_employee_review_notifications')->where('id',$notice->id)->update(['status'=>'failed','failure_message'=>'Mail transport failed. Review Payroll mail settings and retry.','updated_at'=>now()]);
+                    $result['email_sent']=false;
+                    $result['email_message']='DTR was saved for employee review, but the email could not be sent. Check mail settings and retry by saving a reviewed interval again.';
+                }
+            } else $result['email_sent']=true;
+        }
+        return $result;
+    }
+
+    public function employeeItems(int $employeeId)
+    {
+        return DB::table('attendance_import_rows as r')->join('attendance_imports as i','i.id','=','r.import_id')
+            ->join('attendance_devices as d','d.id','=','i.device_id')->join('teves_branch_table as b','b.branch_id','=','d.branch_idx')
+            ->where('r.employee_idx',$employeeId)->whereIn('r.status',['employee_pending','employee_submitted'])
+            ->orderBy('i.cutoff_start')->orderBy('r.attendance_date')->get([
+                'r.id','r.import_id','r.attendance_date','r.raw','r.proposed','r.review','r.warnings','r.status','r.version',
+                'i.filename','i.cutoff_start','i.cutoff_end','b.branch_code','b.branch_name',
+            ])->map(function($row){
+                $review=json_decode($row->review,true)?:[];
+                $proposal=$review['employee_proposal']??$review['admin_proposal']??json_decode($row->proposed,true);
+                return ['id'=>$row->id,'import_id'=>$row->import_id,'date'=>$row->attendance_date,'raw'=>json_decode($row->raw,true),
+                    'proposal'=>$proposal,'warnings'=>json_decode($row->warnings,true),'status'=>$row->status,'version'=>$row->version,
+                    'filename'=>$row->filename,'cutoff_start'=>$row->cutoff_start,'cutoff_end'=>$row->cutoff_end,
+                    'branch_code'=>$row->branch_code,'branch_name'=>$row->branch_name,'note'=>$review['employee_note']??null];
+            });
+    }
+
+    public function submitEmployeeDtr(int $employeeId,int $rowId,array $input): void
+    {
+        DB::transaction(function()use($employeeId,$rowId,$input){
+            $row=DB::table('attendance_import_rows')->where('id',$rowId)->where('employee_idx',$employeeId)->lockForUpdate()->first();
+            abort_unless($row,404);
+            abort_unless($row->status==='employee_pending',409,'This DTR is no longer awaiting employee completion.');
+            abort_unless((int)$row->version===(int)$input['version'],409,'This DTR changed. Refresh the page and review again.');
+            $review=json_decode($row->review,true)?:[];
+            $employeeFields=array_intersect_key($input['proposed'],array_flip(['log_in','log_out','break_policy','breaktime_start','breaktime_end']));
+            $proposal=array_merge($review['admin_proposal']??json_decode($row->proposed,true),$employeeFields);
+            $proposal['overtime_status']=$review['admin_proposal']['overtime_status']??$proposal['overtime_status'];
+            $proposal['override_default_shift']=$review['admin_proposal']['override_default_shift']??$proposal['override_default_shift'];
+            $proposal=$this->validateProposal($proposal,$row->attendance_date);
+            $review['employee_proposal']=$proposal;
+            $review['employee_note']=trim((string)($input['note']??''));
+            $review['employee_submitted_at']=now()->toDateTimeString();
+            DB::table('attendance_import_rows')->where('id',$rowId)->update([
+                'status'=>'employee_submitted','version'=>$row->version+1,'review'=>json_encode($review,JSON_THROW_ON_ERROR),'updated_at'=>now(),
+            ]);
+        });
+    }
+
+    public function approveEmployeeDtr(string $batchId,int $rowId): array
+    {
+        $batch=$this->batch($batchId); $device=$this->device($batch->device_id);
+        return DB::transaction(function()use($batchId,$rowId,$device){
+            $activeBatch=DB::table('attendance_imports')->where('id',$batchId)->lockForUpdate()->first();
+            $row=DB::table('attendance_import_rows')->where('id',$rowId)->where('import_id',$batchId)->lockForUpdate()->first();
+            abort_unless($row && $row->status==='employee_submitted',409,'This interval has no employee submission awaiting approval.');
+            if (($activeBatch->cutoff_start && $row->attendance_date<$activeBatch->cutoff_start)||($activeBatch->cutoff_end && $row->attendance_date>$activeBatch->cutoff_end)) {
+                throw ValidationException::withMessages(['cutoff'=>'This date is outside the selected cutoff.']);
+            }
+            $review=json_decode($row->review,true)?:[];
+            $proposal=$this->validateProposal($review['employee_proposal']??$review['admin_proposal'],$row->attendance_date);
+            $employee=EmployeeModel::where('employee_id',$row->employee_idx)->where('branch_idx',$device->branch_idx)->lockForUpdate()->first();
+            abort_unless($employee,422,'The DTR employee mapping is no longer valid.');
+            $conflicts=DB::table('teves_payroll_employee_logs')->where('employee_idx',$employee->employee_id)->where('attendance_date',$row->attendance_date)->lockForUpdate()->get();
+            abort_unless(hash_equals($this->fingerprint($conflicts),$review['conflict_hash']??''),409,'Attendance changed while the employee was completing this DTR. Review the conflict in Employee Logs first.');
+            $isOT=$proposal['overtime_status']==='Yes';
+            $same=$conflicts->filter(fn($l)=>str_ends_with(strtolower($l->log_type),'ot')===$isOT);
+            $target=0;
+            if ($same->isNotEmpty()) {
+                if (($review['conflict_action']??'keep')==='keep') {
+                    DB::table('attendance_import_rows')->where('id',$rowId)->update(['status'=>'kept','version'=>$row->version+1,'updated_at'=>now()]);
+                    return ['status'=>'kept'];
+                }
+                abort_unless($same->count()===1,409,'Multiple existing intervals need manual review in Employee Logs.');
+                $target=$same->first()->employee_logs_id;
+            }
+            $request=Request::create('/attendance-import-approve','POST',array_merge($proposal,[
                 'branch_idx'=>$device->branch_idx,'employee_idx'=>$employee->employee_id,'employee_logs_id'=>$target,'attendance_date'=>$row->attendance_date,
             ]));
             $response=app(AttendanceLogWriter::class)->save($request);
             if (!$response || !in_array($response->getData(true)['success']??'', ['Created','Updated'],true)) {
-                throw ValidationException::withMessages(['attendance'=>'Could not save this interval. No changes were committed.']);
+                throw ValidationException::withMessages(['attendance'=>'Could not finalize this DTR. No attendance changes were committed.']);
             }
             $log=DB::table('teves_payroll_employee_logs')->where('employee_idx',$employee->employee_id)->where('attendance_date',$row->attendance_date)
                 ->when($target,fn($q)=>$q->where('employee_logs_id',$target))->orderByDesc('employee_logs_id')->first();
-            DB::table('attendance_import_rows')->where('id',$rowId)->update(['employee_idx'=>$employee->employee_id,'saved_log_id'=>$log->employee_logs_id,
-                'status'=>'saved','version'=>$row->version+1,'review'=>json_encode(['proposal'=>$proposal,'replaced_log'=>$target?$this->conflictView($same->first()):null]),
-                'saved_by'=>session('loginID'),'saved_at'=>now(),'updated_at'=>now()]);
-            // Return the snapshot produced by this save so another reviewed interval on
-            // the same date (e.g. regular plus OT) can use it without a false stale conflict.
-            $current=DB::table('teves_payroll_employee_logs')->where('employee_idx',$employee->employee_id)->where('attendance_date',$row->attendance_date)->get();
-            return ['status'=>'saved','log_id'=>$log->employee_logs_id,'version'=>$row->version+1,
-                'conflict_hash'=>$this->fingerprint($current),'conflicts'=>$current->map(fn($l)=>$this->conflictView($l))->all()];
+            $currentConflicts=DB::table('teves_payroll_employee_logs')->where('employee_idx',$employee->employee_id)->where('attendance_date',$row->attendance_date)->get();
+            $currentFingerprint=$this->fingerprint($currentConflicts);
+            DB::table('attendance_import_rows')->where('employee_idx',$employee->employee_id)->where('attendance_date',$row->attendance_date)
+                ->where('id','<>',$rowId)->whereIn('status',['employee_pending','employee_submitted'])->get(['id','review'])->each(function($pending)use($currentFingerprint){
+                    $pendingReview=json_decode($pending->review,true)?:[];
+                    $pendingReview['conflict_hash']=$currentFingerprint;
+                    DB::table('attendance_import_rows')->where('id',$pending->id)->update(['review'=>json_encode($pendingReview,JSON_THROW_ON_ERROR),'updated_at'=>now()]);
+                });
+            $review['final_proposal']=$proposal; $review['approved_by_user_idx']=session('loginID'); $review['approved_at']=now()->toDateTimeString();
+            DB::table('attendance_import_rows')->where('id',$rowId)->update([
+                'saved_log_id'=>$log->employee_logs_id,'status'=>'saved','version'=>$row->version+1,
+                'review'=>json_encode($review,JSON_THROW_ON_ERROR),'saved_by'=>session('loginID'),'saved_at'=>now(),'updated_at'=>now(),
+            ]);
+            return ['status'=>'saved','log_id'=>$log->employee_logs_id,'version'=>$row->version+1];
         });
     }
 

@@ -71,7 +71,7 @@ class AttendanceImportController extends Controller
     public function save(Request $request,string $batch,int $row,AttendanceImportService $service)
     {
         $v=$request->validate([
-            'action'=>['required',Rule::in(['save','skip'])],'version'=>'required|integer|min:1',
+            'action'=>['required',Rule::in(['save','skip','restore'])],'version'=>'required|integer|min:1',
             'employee_idx'=>'required_if:action,save|integer','confirmed'=>'required_if:action,save|boolean',
             'conflict_hash'=>'required_if:action,save|string|size:64','conflict_action'=>['nullable',Rule::in(['keep','replace'])],
             'proposed'=>'required_if:action,save|array',
@@ -82,6 +82,13 @@ class AttendanceImportController extends Controller
             'proposed.override_default_shift'=>['required_if:action,save',Rule::in(['No','Yes'])],
         ]);
         return response()->json($service->save($batch,$row,$v));
+    }
+
+    public function approve(Request $request,string $batch,int $row,AttendanceImportService $service)
+    {
+        $user=User::where('user_id',session('loginID'))->firstOrFail();
+        abort_unless(in_array($user->user_type,['Admin','Supervisor','Accounting_Staff'],true),403,'Only payroll reviewers can approve employee DTR.');
+        return response()->json($service->approveEmployeeDtr($batch,$row));
     }
 
     public function source(string $batch,AttendanceImportService $service)

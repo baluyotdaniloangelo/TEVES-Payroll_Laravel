@@ -11,6 +11,7 @@ use Session;
 use Validator;
 use DataTables;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 /*Email Function*/
 use App\Mail\ResetPassword;
@@ -30,7 +31,10 @@ class UserController extends Controller
 
 				$data = array();
 				$data = User::where('user_id', '=', Session::get('loginID'))->first();
-				return view("payroll.user", compact('data','title', 'active_link'));
+				$employee_options = DB::table('teves_payroll_employee_table as e')
+					->leftJoin('teves_branch_table as b', 'b.branch_id', '=', 'e.branch_idx')
+					->orderBy('e.employee_last_name')->get(['e.employee_id','e.employee_number','e.employee_full_name','e.employee_first_name','e.employee_last_name','b.branch_code']);
+				return view("payroll.user", compact('data','title', 'active_link','employee_options'));
 			
 			}
 		
@@ -121,7 +125,7 @@ class UserController extends Controller
 	public function user_info(Request $request){
 
 		$UserID = $request->UserID;
-		$data = UserAccountModel::find($UserID, ['user_name','user_real_name','user_type', 'user_job_title', 'user_email_address', 'user_type', 'user_branch_access_type']);
+		$data = UserAccountModel::find($UserID, ['user_name','user_real_name','user_type', 'user_job_title', 'user_email_address', 'user_branch_access_type','employee_idx']);
 		return response()->json($data);
 		
 	}
@@ -138,6 +142,12 @@ class UserController extends Controller
 	public function create_user_post(Request $request){
 
         $userID = $request->userID;
+        $request->validate([
+            'user_type' => ['required', Rule::in(['Admin','Supervisor','Accounting_Staff','Encoder','Employee'])],
+            'employee_idx' => ['nullable','required_if:user_type,Employee','integer',
+                Rule::exists('teves_payroll_employee_table','employee_id'),
+                Rule::unique('teves_payroll_user_table','employee_idx')->ignore($userID, 'user_id')],
+        ]);
 
         if($userID!=0){
            
@@ -194,6 +204,7 @@ class UserController extends Controller
 			$UserList->user_type 						= $request->user_type;
 			$UserList->user_email_address 				= $request->user_email_address;
 			$UserList->user_branch_access_type 			= $request->user_access;
+			$UserList->employee_idx 						= $request->user_type === 'Employee' ? $request->employee_idx : null;
 			$UserList->updated_by_user_id 				= Session::get('loginID');
 			
 			$result = $UserList->update();
@@ -257,6 +268,7 @@ class UserController extends Controller
 			    $UserList->user_password 			= hash::make($request->user_password);
 			    $UserList->user_type 				= $request->user_type;
 			    $UserList->user_branch_access_type 	= $request->user_access;
+			    $UserList->employee_idx 				= $request->user_type === 'Employee' ? $request->employee_idx : null;
 			
 			    $result = $UserList->save();
 			

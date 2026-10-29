@@ -120,10 +120,25 @@
 								                        <option value="Supervisor">Supervisor</option>
 								                        <option value="Accounting_Staff">Accounting Staff</option>
 								                        <option value="Encoder">Encoder</option>
+								                        <option value="Employee">Employee</option>
 								                    </select>
 												<span class="valid-feedback" id="user_typeError" title="Required"></span>
 											</div>
 										</div>
+
+                                        <div class="col-sm-12" id="employee-account-link" style="display:none">
+                                            <div class="input-block mb-2">
+                                                <label class="col-form-label">Payroll Employee <span class="text-danger">*</span></label>
+                                                <select class="form-select form-control" name="employee_idx" id="employee_idx">
+                                                    <option value="">Choose employee...</option>
+                                                    @foreach($employee_options as $employeeOption)
+                                                        <option value="{{ $employeeOption->employee_id }}">{{ $employeeOption->employee_number }} — {{ $employeeOption->employee_full_name ?: trim($employeeOption->employee_first_name.' '.$employeeOption->employee_last_name) }}@if($employeeOption->branch_code) ({{ $employeeOption->branch_code }})@endif</option>
+                                                    @endforeach
+                                                </select>
+                                                <span class="invalid-feedback" id="employee_idxError"></span>
+                                                <small class="text-muted">This account can access only the linked employee's DTR.</small>
+                                            </div>
+                                        </div>
 
                                         <div class="col-sm-12">
 											<div class="input-block mb-2">

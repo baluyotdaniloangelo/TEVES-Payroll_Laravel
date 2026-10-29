@@ -65,13 +65,13 @@
                 <div id="dtr-interval-detail" class="dtr-detail mt-3" hidden></div>
                 <div class="dtr-modal-actions"><button type="button" id="dtr-review-done" class="btn btn-primary">Done</button></div>
             </dialog>
-            <label class="form-check mt-3"><input type="checkbox" id="dtr-employee-confirm" class="form-check-input"><span class="form-check-label">I reviewed the employee, punches, break, dates, and classification.</span></label>
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mt-3"><span id="dtr-selection-count" aria-live="polite"></span><button id="dtr-save-selected" type="button" class="btn btn-primary">Save reviewed DTR for this employee</button></div>
+            <label class="form-check mt-3"><input type="checkbox" id="dtr-employee-confirm" class="form-check-input"><span class="form-check-label">I reviewed the employee, punches, break, dates, and classification; send these intervals for employee completion.</span></label>
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mt-3"><span id="dtr-selection-count" aria-live="polite"></span><button id="dtr-save-selected" type="button" class="btn btn-primary">Save review &amp; email employee</button></div>
             <p id="dtr-save-result" class="mt-2 mb-0" role="status" aria-live="polite"></p>
         </div></div>
     </section>
     <script id="dtr-device-data" type="application/json">{!! json_encode($devices, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
-    <script src="{{ asset('js/attendance-dtr.js') }}?v=20261029-complete-review-modal" defer></script>
+    <script src="{{ asset('js/attendance-dtr.js') }}?v=20261029-employee-dtr-review" defer></script>
     @endif
     <style>
         #attendance-dtr-page .dtr-mapping{display:grid;grid-template-columns:150px 20px minmax(200px,1fr) auto;gap:16px;align-items:center;padding:16px;border:1px solid #e3e5e9;border-radius:8px}

@@ -31,6 +31,10 @@ class UserAuthController extends Controller
 		if ($user){
 			if(Hash::check($request->InputPassword,$user->user_password)){
 				$request->session()->put('loginID', $user->user_id);
+				if (strcasecmp(trim((string) $user->user_type), 'Employee') === 0) {
+					abort_unless($user->employee_idx, 403, 'This employee account is not linked to a payroll employee. Contact payroll.');
+					return redirect()->route('my-dtr.index');
+				}
 				return redirect('employee');
 			}else{
 				return back()->with('fail', 'Incorrect Password');
