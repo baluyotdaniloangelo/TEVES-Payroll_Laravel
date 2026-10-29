@@ -116,6 +116,102 @@ class AttendanceImportService
             ['employee_idx'=>$employee,'updated_by'=>session('loginID'),'updated_at'=>now(),'created_at'=>now()]);
     }
 
+    public function queueMappedRows(string $batchId): array
+    {
+        $batch=$this->batch($batchId);$device=$this->device($batch->device_id);
+        $queued=DB::transaction(function()use($batchId,$device){
+            $activeBatch=DB::table('attendance_imports')->where('id',$batchId)->lockForUpdate()->first();
+            $rows=DB::table('attendance_import_rows')->where('import_id',$batchId)
+                ->whereIn('status',['pending','employee_pending'])
+                ->when($activeBatch->cutoff_start,fn($q)=>$q->where('attendance_date','>=',$activeBatch->cutoff_start))
+                ->when($activeBatch->cutoff_end,fn($q)=>$q->where('attendance_date','<=',$activeBatch->cutoff_end))
+                ->orderBy('attendance_date')->orderBy('id')->lockForUpdate()->get();
+            $mappings=DB::table('attendance_employee_mappings')->where('device_id',$device->id)->pluck('employee_idx','external_id');
+            $employeeIds=$rows->map(fn($row)=>(int)($row->employee_idx?:($mappings[$row->external_id]??0)))->filter()->unique()->values();
+            $employees=EmployeeModel::where('branch_idx',$device->branch_idx)->whereIn('employee_id',$employeeIds)->get([
+                'employee_id','employee_full_name','employee_first_name','employee_last_name','employee_number','branch_idx'
+            ])->keyBy('employee_id');
+            $accounts=DB::table('teves_payroll_user_table')->whereIn('employee_idx',$employeeIds)->where('user_type','Employee')
+                ->get(['user_id','employee_idx','user_email_address'])->keyBy('employee_idx');
+            $queuedCount=0;$unmapped=0;$missingAccounts=[];$groups=[];$conflicts=[];
+            foreach($rows as $row){
+                $employeeId=(int)($row->employee_idx?:($mappings[$row->external_id]??0));
+                $employee=$employees->get($employeeId);$account=$accounts->get($employeeId);
+                if(!$employee){$unmapped++;continue;}
+                if(!$account||!filter_var($account->user_email_address,FILTER_VALIDATE_EMAIL)){
+                    $missingAccounts[$employeeId]=$employee->employee_number.' — '.($employee->employee_full_name?:trim($employee->employee_first_name.' '.$employee->employee_last_name));
+                    continue;
+                }
+                if($row->status==='pending'){
+                    $review=json_decode($row->review,true)?:[];
+                    $proposal=array_merge(['break_policy'=>'review','overtime_status'=>'No','override_default_shift'=>'No'],json_decode($row->proposed,true)?:[]);
+                    $conflictKey=$employeeId.'|'.$row->attendance_date;
+                    if(!array_key_exists($conflictKey,$conflicts)){
+                        $matches=DB::table('teves_payroll_employee_logs')->where('employee_idx',$employeeId)->where('attendance_date',$row->attendance_date)->lockForUpdate()->get();
+                        $conflicts[$conflictKey]=$this->fingerprint($matches);
+                    }
+                    $review['admin_proposal']=$proposal;
+                    $review['conflict_action']='keep';
+                    $review['conflict_hash']=$conflicts[$conflictKey];
+                    $review['queued_by_user_idx']=session('loginID');
+                    $review['queued_at']=now()->toDateTimeString();
+                    DB::table('attendance_import_rows')->where('id',$row->id)->update([
+                        'employee_idx'=>$employeeId,'status'=>'employee_pending','version'=>$row->version+1,
+                        'review'=>json_encode($review,JSON_THROW_ON_ERROR),'updated_at'=>now(),
+                    ]);
+                    $queuedCount++;
+                }
+                if(!isset($groups[$employeeId]))$groups[$employeeId]=[
+                    'employee_id'=>$employeeId,'user_id'=>$account->user_id,'email'=>$account->user_email_address,
+                    'name'=>$employee->employee_full_name?:trim($employee->employee_first_name.' '.$employee->employee_last_name),
+                ];
+            }
+            $notifications=[];$alreadySent=0;
+            foreach($groups as $employeeId=>$group){
+                $notice=DB::table('attendance_employee_review_notifications')->where('import_id',$batchId)->where('employee_idx',$employeeId)->first();
+                if(!$notice){
+                    $noticeId=DB::table('attendance_employee_review_notifications')->insertGetId([
+                        'import_id'=>$batchId,'employee_idx'=>$employeeId,'user_idx'=>$group['user_id'],'recipient_email'=>$group['email'],
+                        'status'=>'pending','created_at'=>now(),'updated_at'=>now(),
+                    ]);
+                    $notice=DB::table('attendance_employee_review_notifications')->where('id',$noticeId)->first();
+                }elseif($notice->status!=='sent'){
+                    DB::table('attendance_employee_review_notifications')->where('id',$notice->id)->update([
+                        'user_idx'=>$group['user_id'],'recipient_email'=>$group['email'],'status'=>'pending','failure_message'=>null,'updated_at'=>now(),
+                    ]);
+                    $notice=DB::table('attendance_employee_review_notifications')->where('id',$notice->id)->first();
+                }
+                if($notice->status==='sent'){$alreadySent++;continue;}
+                $notifications[]=$group+['notice_id'=>$notice->id,'cutoff_start'=>$activeBatch->cutoff_start,'cutoff_end'=>$activeBatch->cutoff_end];
+            }
+            return ['queued'=>$queuedCount,'unmapped'=>$unmapped,'missing_accounts'=>array_values($missingAccounts),
+                'already_sent'=>$alreadySent,'notifications'=>$notifications];
+        });
+
+        $sent=0;$failed=[];
+        foreach($queued['notifications'] as $notification){
+            try{
+                Mail::to($notification['email'])->send(new EmployeeDtrReviewMail(
+                    $notification['name'],$notification['cutoff_start'],$notification['cutoff_end'],route('my-dtr.index',['batch'=>$batchId])
+                ));
+                DB::table('attendance_employee_review_notifications')->where('id',$notification['notice_id'])->update([
+                    'status'=>'sent','sent_at'=>now(),'failure_message'=>null,'updated_at'=>now(),
+                ]);
+                $sent++;
+            }catch(\Throwable $exception){
+                Log::warning('Employee DTR review email failed.',[
+                    'import_id'=>$batchId,'employee_idx'=>$notification['employee_id'],'user_id'=>$notification['user_id'],
+                ]);
+                DB::table('attendance_employee_review_notifications')->where('id',$notification['notice_id'])->update([
+                    'status'=>'failed','failure_message'=>'Mail transport failed. Review Payroll mail settings and retry.','updated_at'=>now(),
+                ]);
+                $failed[]=$notification['name'];
+            }
+        }
+        unset($queued['notifications']);
+        return $queued+['emails_sent'=>$sent,'email_failures'=>$failed];
+    }
+
     public function validateCutoff(array $input): array
     {
         $dates=\Illuminate\Support\Facades\Validator::make($input,[
@@ -227,7 +323,7 @@ class AttendanceImportService
                     $result['email_sent']=false;
                     $result['email_message']='DTR was saved for employee review, but the email could not be sent. Check mail settings and retry by saving a reviewed interval again.';
                 }
-            } else $result['email_sent']=true;
+            } else { $result['email_sent']=true; $result['email_already_sent']=true; }
         }
         return $result;
     }
@@ -243,10 +339,17 @@ class AttendanceImportService
             ])->map(function($row){
                 $review=json_decode($row->review,true)?:[];
                 $proposal=$review['employee_proposal']??$review['admin_proposal']??json_decode($row->proposed,true);
+                $missing=[];
+                foreach(['log_in'=>'time-in','log_out'=>'time-out'] as $field=>$label){if(empty($proposal[$field]))$missing[]=$label;}
+                if(($proposal['break_policy']??'review')==='review')$missing[]='break treatment';
+                elseif(($proposal['break_policy']??null)==='recorded'){
+                    if(empty($proposal['breaktime_start']))$missing[]='break-out';
+                    if(empty($proposal['breaktime_end']))$missing[]='break-in';
+                }
                 return ['id'=>$row->id,'import_id'=>$row->import_id,'date'=>$row->attendance_date,'raw'=>json_decode($row->raw,true),
                     'proposal'=>$proposal,'warnings'=>json_decode($row->warnings,true),'status'=>$row->status,'version'=>$row->version,
                     'filename'=>$row->filename,'cutoff_start'=>$row->cutoff_start,'cutoff_end'=>$row->cutoff_end,
-                    'branch_code'=>$row->branch_code,'branch_name'=>$row->branch_name,'note'=>$review['employee_note']??null];
+                    'branch_code'=>$row->branch_code,'branch_name'=>$row->branch_name,'note'=>$review['employee_note']??null,'missing'=>$missing];
             });
     }
 
@@ -258,8 +361,13 @@ class AttendanceImportService
             abort_unless($row->status==='employee_pending',409,'This DTR is no longer awaiting employee completion.');
             abort_unless((int)$row->version===(int)$input['version'],409,'This DTR changed. Refresh the page and review again.');
             $review=json_decode($row->review,true)?:[];
+            $adminProposal=$review['admin_proposal']??json_decode($row->proposed,true);
             $employeeFields=array_intersect_key($input['proposed'],array_flip(['log_in','log_out','break_policy','breaktime_start','breaktime_end']));
-            $proposal=array_merge($review['admin_proposal']??json_decode($row->proposed,true),$employeeFields);
+            foreach(['log_in','log_out','breaktime_start','breaktime_end'] as $field){
+                if(!empty($adminProposal[$field]))$employeeFields[$field]=$adminProposal[$field];
+            }
+            if(($adminProposal['break_policy']??'review')!=='review')$employeeFields['break_policy']=$adminProposal['break_policy'];
+            $proposal=array_merge($adminProposal,$employeeFields);
             $proposal['overtime_status']=$review['admin_proposal']['overtime_status']??$proposal['overtime_status'];
             $proposal['override_default_shift']=$review['admin_proposal']['override_default_shift']??$proposal['override_default_shift'];
             $proposal=$this->validateProposal($proposal,$row->attendance_date);

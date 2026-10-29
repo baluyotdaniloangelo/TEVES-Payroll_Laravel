@@ -209,7 +209,7 @@ Route::get('cut-off/list', [CutOffController::class, 'getCutOffList'])->name('ge
 /*Payslip*/
 Route::get('/payslip', [PayslipController::class,'print_payslip'])->name('payslip')->middleware('isLoggedIn');
 
-// Device report import: authenticated preview, mapping, and explicit per-row review.
+// Device report import: authenticated preview, mapping, employee completion, and admin review.
 Route::middleware('isLoggedIn')->prefix('attendance-import')->name('attendance-import.')->group(function () {
     $controller = \App\Http\Controllers\AttendanceImportController::class;
     Route::get('/', [$controller, 'index'])->name('index');
@@ -217,6 +217,7 @@ Route::middleware('isLoggedIn')->prefix('attendance-import')->name('attendance-i
     Route::post('/upload', [$controller, 'upload'])->name('upload');
     Route::get('/{batch}/preview', [$controller, 'preview'])->name('preview');
     Route::post('/{batch}/mapping', [$controller, 'mapping'])->name('mapping');
+    Route::post('/{batch}/queue-mapped', [$controller, 'queueMapped'])->name('queue-mapped');
     Route::post('/{batch}/cutoff', [$controller, 'cutoff'])->name('cutoff');
     Route::post('/{batch}/rows/{row}', [$controller, 'save'])->whereNumber('row')->name('save');
     Route::post('/{batch}/rows/{row}/approve', [$controller, 'approve'])->whereNumber('row')->name('approve');

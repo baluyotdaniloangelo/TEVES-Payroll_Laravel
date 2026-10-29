@@ -1,0 +1,9 @@
+.header .header-left .payroll-header-brand{display:flex!important;align-items:center;justify-content:center;width:48px;height:48px;margin:6px auto;padding:3px;border-radius:9px;background:#fff;line-height:normal!important}
+.header .header-left .payroll-header-brand img{display:block;width:42px;height:42px;object-fit:contain}
+@media(max-width:991px){.header .header-left{left:60px;width:54px;padding:0}.header .header-left .payroll-header-brand{margin:6px 0}}
+.payroll-sidebar .sidebar-vertical>.menu-title{padding:15px 18px 7px;color:#aebdca;font-size:10px;letter-spacing:.11em;text-transform:uppercase}
+.payroll-sidebar .sidebar-vertical>li>a.active{background:rgba(255,133,35,.18);border-left:3px solid #ff8523;color:#fff}
+.employee-filter-card{border:1px solid #e7ebf0;border-radius:12px;box-shadow:0 3px 14px rgba(25,42,62,.04)}
+.employee-filter-card .form-label{font-size:12px;font-weight:600;color:#455468;margin-bottom:5px}
+.employee-filter-card .form-control,.employee-filter-card .form-select{min-height:40px;border-color:#dfe5ec}
+#employee_details_modal .modal-body{max-height:calc(100vh - 150px);overflow-y:auto}

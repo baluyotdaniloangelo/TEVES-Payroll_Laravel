@@ -10,20 +10,47 @@
 					<div class="page-header">
 						<div class="row align-items-center">
 							<div class="col">
-								<h3 class="page-title">Employee</h3>
+								<h3 class="page-title">Employees</h3>
 								<ul class="breadcrumb">
-									<li class="breadcrumb-item"><a href="admin-dashboard.html">Dashboard</a></li>
-									<li class="breadcrumb-item active">Employee</li>
+									<li class="breadcrumb-item">Administration</li>
+									<li class="breadcrumb-item active">Employees</li>
 								</ul>
 							</div>
 							<div class="col-auto float-end ms-auto">
-								<a href="#" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#employee_details_modal" onclick="ResetEmployeeForm()"><i class="fa-solid fa-plus"></i> Add Employee</a>
+								<button type="button" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#employee_details_modal" onclick="ResetEmployeeForm()"><i class="fa-solid fa-plus"></i> Add Employee</button>
 								
 							</div>
 						</div>
 					</div>
 					
-					<!-- /Search Filter >-->
+					<div class="card employee-filter-card">
+						<div class="card-body">
+							<div class="row g-2 align-items-end">
+								<div class="col-xl-4 col-lg-6">
+									<label for="employee_search" class="form-label">Search employees</label>
+									<input id="employee_search" type="search" class="form-control" placeholder="Name, employee ID, position, branch..." autocomplete="off">
+								</div>
+								<div class="col-xl-2 col-md-3 col-sm-6">
+									<label for="employee_branch_filter" class="form-label">Branch</label>
+									<select id="employee_branch_filter" class="form-select"><option value="">All branches</option>@foreach ($branch_data as $branch)<option value="{{ $branch->branch_id }}">{{ $branch->branch_code }} — {{ $branch->branch_name }}</option>@endforeach</select>
+								</div>
+								<div class="col-xl-2 col-md-3 col-sm-6">
+									<label for="employee_department_filter" class="form-label">Department</label>
+									<select id="employee_department_filter" class="form-select"><option value="">All departments</option>@foreach ($department_data as $department)<option value="{{ $department->department_id }}">{{ $department->department_name }}</option>@endforeach</select>
+								</div>
+								<div class="col-xl-1 col-md-3 col-sm-6">
+									<label for="employee_status_filter" class="form-label">Status</label>
+									<select id="employee_status_filter" class="form-select"><option value="">All</option><option value="Active">Active</option><option value="Inactive">Inactive</option></select>
+								</div>
+								<div class="col-xl-2 col-md-3 col-sm-6">
+									<label for="employee_type_filter" class="form-label">Employment type</label>
+									<select id="employee_type_filter" class="form-select"><option value="">All types</option><option value="Regular">Regular</option><option value="Probationary">Probationary</option><option value="Contractual">Contractual</option><option value="Others">Others / Drivers</option></select>
+								</div>
+								<div class="col-xl-1 col-md-3 col-sm-6"><button type="button" class="btn btn-light w-100" id="clear_employee_filters">Clear</button></div>
+							</div>
+						</div>
+					</div>
+
 					<div class="row">
 						<div class="col-md-12">
 							<div class="table-responsive">
@@ -67,13 +94,14 @@
 							</div>
 							<div class="modal-body">
 								 <form class="g-2 needs-validation" id="Employeeform">
+									<div id="employee_form_error_summary" class="alert alert-danger d-none" role="alert" aria-live="polite"></div>
 								
 									<div class="row">
 										
 										<div class="col-sm-6">
 											<div class="input-block mb-3">
 												<label class="col-form-label">Branch</label>
-												<input class="form-control " type="text" list="branch_list" id="branch_idx" name="branch_idx" onchange="LoadDepartment()">
+												<input class="form-control" type="text" list="branch_list" id="branch_idx" name="branch_idx" onchange="LoadDepartment()" required>
 												<datalist id="branch_list">
 												<!--List Here -->
 													@foreach ($branch_data as $branch_data_cols)
@@ -87,12 +115,11 @@
 											<div class="input-block mb-3">
 												<label class="col-form-label">Department</label>
 												<!--<select class="select" id="department_idx" name="department_idx">-->
-												<input class="form-control " type="text" list="department_list" id="department_idx" name="department_idx">
+												<input class="form-control" type="text" list="department_list" id="department_idx" name="department_idx" required>
 												
 													<datalist id="department_list">
 														<option value=""></option>
 													</datalist>
-												</select>
 											</div>
 										</div>
 										
@@ -105,7 +132,7 @@
 										</div>
 										<div class="col-sm-3">
 											<div class="input-block mb-3">
-												<label class="col-form-label">First Name</label>
+												<label class="col-form-label">First Name <span class="text-danger">*</span></label>
 												<input class="form-control" type="text" id="employee_first_name" name="employee_first_name" required>
 												<span class="valid-feedback" id="employee_first_nameError" title="Required"></span>
 											</div>
@@ -119,9 +146,9 @@
 										</div>
 										<div class="col-sm-3">
 											<div class="input-block mb-3">
-												<label class="col-form-label">Name Extention</label>
+												<label class="col-form-label">Name Extension</label>
 												<input class="form-control" type="text" id="employee_extension_name" name="employee_extension_name">
-												<span class="valid-feedback" id="employee_middle_nameError" title="Required"></span>
+												<span class="invalid-feedback" id="employee_extension_nameError"></span>
 											</div>
 										</div>
 										<div class="col-sm-4">  
@@ -142,7 +169,7 @@
 										<div class="col-sm-4">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Hourly Rate / Percentage for Driver(Ex. 13) <span class="text-danger">*</span></label>
-												<input type="number" class="form-control" id="employee_rate" name="employee_rate" required>
+												<input type="number" class="form-control" id="employee_rate" name="employee_rate" min="0" step="0.01" required>
 												<span class="valid-feedback" id="employee_rateError" title="Required"></span>
 											</div>
 										</div>
@@ -198,6 +225,25 @@
 											</div>
 										</div>
 										
+										<div class="col-12"><hr><h5>Tax Information</h5><p class="text-muted small">Tax status is recorded for reference. Enter withholding tax manually in Deduction Logs for each cutoff.</p></div>
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label" for="employee_tin">TIN</label>
+												<input class="form-control" type="text" id="employee_tin" name="employee_tin" maxlength="30" inputmode="numeric" autocomplete="off">
+												<span class="invalid-feedback" id="employee_tinError"></span>
+											</div>
+										</div>
+										<div class="col-sm-6">
+											<div class="input-block mb-3">
+												<label class="col-form-label" for="employee_tax_status">Tax status</label>
+												<select class="form-select form-control" id="employee_tax_status" name="employee_tax_status">
+													<option value="">Not specified</option>
+													<option value="taxable">Taxable</option>
+													<option value="non_taxable">Non-taxable</option>
+												</select>
+												<span class="invalid-feedback" id="employee_tax_statusError"></span>
+											</div>
+										</div>
 										<div class="col-sm-3">  
 											<div class="input-block mb-3">
 												<label class="col-form-label">Time In <span class="text-danger">*</span></label>

@@ -5,9 +5,7 @@
         <div class="main-wrapper">
 			@include('layouts.navigations.header-navigation')     
 			@include('layouts.navigations.sidebar-navigation') 
-			@include('layouts.navigations.two-col-bar')		
 				@yield('content')
-			@include('layouts.navigations.layout-settings')	
        </div>
 		<!-- /Main Wrapper --> 
 		

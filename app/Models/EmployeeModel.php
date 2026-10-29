@@ -30,6 +30,8 @@ class EmployeeModel extends Model
 		'employee_picture',
 		'employee_phone',
 		'employee_email',
+		'employee_tin',
+		'employee_tax_status',
 		'branch_idx',
 		'department_idx',
 		'employee_status',

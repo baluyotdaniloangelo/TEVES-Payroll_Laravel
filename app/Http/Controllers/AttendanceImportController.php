@@ -68,6 +68,13 @@ class AttendanceImportController extends Controller
         return response()->json(['saved'=>true]);
     }
 
+    public function queueMapped(string $batch,AttendanceImportService $service)
+    {
+        $user=User::where('user_id',session('loginID'))->firstOrFail();
+        abort_unless(strcasecmp(trim((string)$user->user_type),'Employee')!==0,403);
+        return response()->json($service->queueMappedRows($batch));
+    }
+
     public function save(Request $request,string $batch,int $row,AttendanceImportService $service)
     {
         $v=$request->validate([

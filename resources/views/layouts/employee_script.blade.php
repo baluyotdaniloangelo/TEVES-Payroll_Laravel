@@ -11,23 +11,46 @@
 					processing: true,
 					responsive: true,
 					serverSide: true,
-					stateSave: true,/*Remember Searches*/
+					stateSave: false,
+					layout: { topStart: 'pageLength', topEnd: null, bottomStart: 'info', bottomEnd: 'paging' },
+					language: { emptyTable: 'No employees match the selected filters.', processing: 'Loading employees...' },
 					//scrollCollapse: true,
 					//scrollY: '500px',
 					//scrollX: '100%',
-					ajax: "{{ route('getEmployeeList') }}",
+					ajax: {
+						url: "{{ route('getEmployeeList') }}",
+						data: function (data) {
+							data.branch_filter = $('#employee_branch_filter').val();
+							data.department_filter = $('#employee_department_filter').val();
+							data.status_filter = $('#employee_status_filter').val();
+							data.type_filter = $('#employee_type_filter').val();
+						}
+					},
 					columns: [
 							{data: 'DT_RowIndex', name: 'DT_RowIndex' , orderable: false, searchable: false, className: "text-right"},       
 							{data: 'employee_number', className: "text-left"},
 							{data: 'employee_full_name'},
-							{data: 'branch_name'},
-							{data: 'department_name'},
+							{data: 'branch_name', name: 'teves_branch_table.branch_name'},
+							{data: 'department_name', name: 'teves_payroll_department_table.department_name'},
 							{data: 'employee_position'},
 							{data: 'employee_rate'},
 							{data: 'employee_status'},
 							{data: 'employment_type'},
 							{data: 'action', name: 'action', orderable: false, searchable: false, className: "text-center"},
 					]
+				});
+
+				let employeeSearchTimer;
+				$('#employee_search').on('input', function () {
+					clearTimeout(employeeSearchTimer);
+					const value = this.value;
+					employeeSearchTimer = setTimeout(function () { EmployeeList.search(value).draw(); }, 250);
+				});
+				$('#employee_branch_filter, #employee_department_filter, #employee_status_filter, #employee_type_filter').on('change', function () { EmployeeList.draw(); });
+				$('#clear_employee_filters').on('click', function () {
+					$('#employee_search').val('');
+					$('#employee_branch_filter, #employee_department_filter, #employee_status_filter, #employee_type_filter').val('');
+					EmployeeList.search('').draw();
 				});
 
 
@@ -46,12 +69,13 @@
 
 		
 	//LoadDepartment_regular_logs();
-	function LoadDepartment() {		
+	function LoadDepartment(selectedDepartment) {
 	
 		var branchID 			= $('#branch_list option[value="' + $('#branch_idx').val() + '"]').attr('data-id');
-		//alert(branchID);
+		$('#department_idx').val('');
 		$("#department_list option").remove();
 		$('<option style="display: none;"></option>').appendTo('#department_list');
+		if (!branchID) return;
 
 			  $.ajax({
 				url: "{{ route('getDepartmentList_for_selection') }}",
@@ -69,9 +93,10 @@
 							var department_id = response[i].department_id;						
 							var department_name = response[i].department_name;
 	
-							$('#department_list option:last').after(""+
-							"<option label='"+department_name+"' data-id='"+department_id+"' value='"+department_name+"'>" +
-							"");	
+							var departmentOption = new Option(department_name, department_name);
+							departmentOption.dataset.id = department_id;
+							$('#department_list').append(departmentOption);
+							if (selectedDepartment && selectedDepartment === department_name) $('#department_idx').val(department_name);
 							
 					}			
 				  }else{
@@ -95,10 +120,22 @@
 					$('#employee_last_nameError').text('');		
 					$('#employee_first_nameeError').text('');	
 					$('#employee_birthdayError').text('');		
+					$('#employee_form_error_summary').addClass('d-none').empty();
+					$('#Employeeform .is-invalid').removeClass('is-invalid');
+					['employee_tin', 'employee_tax_status'].forEach(function(field) {
+						$('#' + field + 'Error').text('');
+						$('#' + field).removeClass('is-invalid');
+					});
 
 			document.getElementById('Employeeform').className = "g-2 needs-validation was-validated";
 			
 			/*#0*/let employee_id 						= document.getElementById("submit_employee_details").value;
+			const employeeForm = document.getElementById('Employeeform');
+			if (!employeeForm.checkValidity()) {
+				employeeForm.classList.add('was-validated');
+				employeeForm.reportValidity();
+				return;
+			}
 
 			/*#1*/let employee_number 					= $("input[name=employee_number]").val();
 
@@ -121,12 +158,23 @@
 					
 			/*#11*///let department_idx					= $("#department_idx").val();
 				   var department_idx 					= $('#department_list option[value="' + $('#department_idx').val() + '"]').attr('data-id');
+				if (!branch_idx || !department_idx) {
+					const missing = !branch_idx ? 'Pumili ng branch mula sa listahan.' : 'Pumili ng department mula sa listahan.';
+					$('#employee_form_error_summary').removeClass('d-none').text(missing);
+					$('#' + (!branch_idx ? 'branch_idx' : 'department_idx')).addClass('is-invalid').trigger('focus');
+					return;
+				}
 					
 			/*#12*/let time_in 							= $("input[name=time_in]").val();
 			/*#13*/let break_time_in 					= $("input[name=break_time_in]").val();
 			/*#13*/let break_time_out 					= $("input[name=break_time_out]").val();
 			
 			/*#14*/let time_out 						= $("input[name=time_out]").val();
+			if (break_time_out <= break_time_in) {
+				$('#employee_form_error_summary').removeClass('d-none').text('Dapat mas huli ang break end kaysa break start.');
+				$('#break_time_out').addClass('is-invalid').trigger('focus');
+				return;
+			}
 			
 			 /*#15*/var _restday_monday 				= $('.restday_monday:checked').val() || 'off';
 					var restday_monday 					= (_restday_monday ==="on") ? "1":"0";
@@ -167,6 +215,8 @@
 						employee_rate:employee_rate,
 				  /*#8*/employee_phone:employee_phone,
 				  /*#9*/employee_email:employee_email,
+				  employee_tin:$('#employee_tin').val(),
+				  employee_tax_status:$('#employee_tax_status').val(),
 				  /*#10*/branch_idx:branch_idx,
 				  /*#11*/department_idx:department_idx,
 				  /*#12*/time_in:time_in,
@@ -183,7 +233,6 @@
 				  _token: "{{ csrf_token() }}"
 				},
 				success:function(response){
-				  console.log(response);
 				  if(response) {
 					  
 					$('#employee_last_nameError').text('');	
@@ -194,6 +243,7 @@
 					
 					$('#modal_success_details').html("Employee Information successfully "+response.success);
 					$('#success-alert-modal').modal('show');
+					$('#employee_details_modal').modal('hide');
 					
 					ResetEmployeeForm();
 					
@@ -201,101 +251,31 @@
 					//document.getElementById('branch_idxError').className = "invalid-tooltip";	
 					//document.getElementById('branch_idx').className = "form-control";
 					
-					$('#department_idxError').text('');
-					document.getElementById('department_idxError').className = "invalid-tooltip";	
-					document.getElementById('department_idx').className = "form-control";
-					
 					document.getElementById('Employeeform').className = "g-3 needs-validation";
 					
 				  }
 				},
 				error: function(error) {
-				 console.log(error);	
-				  			  
-				/*Required Item Show Status*/
-				if(error.responseJSON.errors.employee_last_name=="validation.required"){
-							  
-				  $('#employee_last_nameError').html("Last Name is Required");
-				  document.getElementById('employee_last_nameError').className = "invalid-feedback";
-				  
-				}
-				
-				if(error.responseJSON.errors.employee_first_name=="validation.required"){
-							  
-				  $('#employee_first_nameError').html("First Name is Required");
-				  document.getElementById('employee_first_nameError').className = "invalid-feedback";
-				  
-				}
-				
-				if(error.responseJSON.errors.employee_number=="validation.required"){
-							  
-					$('#employee_numberError').html("Employee ID is Required");
-					document.getElementById('employee_numberError').className = "invalid-feedback";
-				  
-				}else if(error.responseJSON.errors.employee_number=="validation.unique"){
-			
-					$('#employee_numberError').html("Employee ID already Exist");
-					document.getElementById('employee_numberError').className = "invalid-feedback";
-				
-				}
-				
-				if(error.responseJSON.errors.time_in=="validation.required"){
-							  
-				  $('#time_inError').html("Time In is Required");
-				  document.getElementById('time_inError').className = "invalid-feedback";
-				  
-				}
-				
-				if(error.responseJSON.errors.time_in=="validation.required"){
-							  
-				  $('#break_time_inError').html("Break Time is Required");
-				  document.getElementById('break_time_inError').className = "invalid-feedback";
-				  
-				}
-				
-				if(error.responseJSON.errors.time_out=="validation.required"){
-							  
-				  $('#time_outError').html("Time Out is Required");
-				  document.getElementById('time_outError').className = "invalid-feedback";
-				  
-				}
-				
-				if(error.responseJSON.errors.employee_rate=="validation.required"){
-							  
-				  $('#employee_rateError').html("Rate is Required");
-				  document.getElementById('employee_rateError').className = "invalid-feedback";
-				  
-				}
-				/*
-				if(branch_idx==0||branch_idx==undefined){
-					
-					$('#branch_idxError').text('Please Select a Division');
-					document.getElementById('branch_idxError').className = "invalid-tooltip";	
-					document.getElementById('branch_idx').className = "form-control is-invalid";
-				
-				}else{
-					
-					$('#branch_idxError').text('');
-					document.getElementById('branch_idxError').className = "invalid-tooltip";	
-					document.getElementById('branch_idx').className = "form-control";
-					
-				}
-				
-				if(department_idx==0||department_idx==undefined){
-					
-					$('#department_idxError').text('Please Select a Company');
-					document.getElementById('department_idxError').className = "invalid-tooltip";	
-					document.getElementById('department_idx').className = "form-control is-invalid";
-				
-				}else{
-					
-					$('#department_idxError').text('');
-					document.getElementById('department_idxError').className = "invalid-tooltip";	
-					document.getElementById('department_idx').className = "form-control";
-					
-				}*/
-			
-				$('#InvalidModal').modal('toggle');				  	  
+					const errors = error.responseJSON && error.responseJSON.errors ? error.responseJSON.errors : {};
+					const summary = $('#employee_form_error_summary').empty().removeClass('d-none');
+					const messages = [];
+					$('#Employeeform .is-invalid').removeClass('is-invalid');
+					Object.keys(errors).forEach(function (field) {
+						const input = $('#' + field);
+						const message = Array.isArray(errors[field]) ? errors[field][0] : errors[field];
+						messages.push(message);
+						if (input.length) {
+							input.addClass('is-invalid');
+							let feedback = $('#' + field + 'Error');
+							if (!feedback.length) feedback = $('<div class="invalid-feedback"></div>').attr('id', field + 'Error').insertAfter(input);
+							feedback.text(message).addClass('invalid-feedback').removeClass('valid-feedback');
+						}
+					});
+					if (!messages.length) messages.push('Hindi na-save ang employee. Pakisubukan muli.');
+					$('<strong>').text('Pakisuri ang mga sumusunod:').appendTo(summary);
+					const list = $('<ul class="mb-0 mt-1"></ul>').appendTo(summary);
+					messages.forEach(function (message) { $('<li>').text(message).appendTo(list); });
+					$('#employee_details_modal .modal-body').scrollTop(0);
 				  
 				}
 			   });
@@ -303,9 +283,10 @@
 	  });
 
 	<!--Select Employee For Update-->
-	$('body').on('click','#edit_employee',function(){
+	$('body').on('click','.js-edit-employee',function(event){
 			
 			event.preventDefault();
+			ResetEmployeeForm();
 			let employeeID = $(this).data('id');
 			
 			  $.ajax({
@@ -316,7 +297,6 @@
 				  _token: "{{ csrf_token() }}"
 				},
 				success:function(response){
-				  console.log(response);
 				  if(response) {
 					
 					document.getElementById("submit_employee_details").value = employeeID;
@@ -336,10 +316,11 @@
 					document.getElementById("employee_rate").value 				= response[0].employee_rate;
 					document.getElementById("employee_phone").value 			= response[0].employee_phone;
 					document.getElementById("employee_email").value 			= response[0].employee_email;
+					document.getElementById("employee_tin").value = response[0].employee_tin || '';
+					document.getElementById("employee_tax_status").value = response[0].employee_tax_status || '';
 					
 					document.getElementById("branch_idx").value					= response[0].branch_code+" - "+response[0].branch_name;
-					LoadDepartment();
-					document.getElementById("department_idx").value 			= response[0].department_name;
+					LoadDepartment(response[0].department_name);
 					document.getElementById("time_in").value 					= response[0].time_in;
 					document.getElementById("break_time_in").value 				= response[0].break_time_in;
 					document.getElementById("break_time_out").value 			= response[0].break_time_out;
@@ -401,7 +382,7 @@
 	  });
 	  
 	<!--Employee Deletion Confirmation-->
-	$('body').on('click','#delete_employee',function(){
+	$('body').on('click','.js-delete-employee',function(event){
 			
 			event.preventDefault();
 			let employeeID = $(this).data('id');
@@ -434,7 +415,7 @@
 	  });
 
 	<!--Employee Confirmed For Deletion-->
-	$('body').on('click','#deleteEmployeeConfirmed',function(){
+	$('body').on('click','#deleteEmployeeConfirmed',function(event){
 			
 			event.preventDefault();
 			
@@ -475,8 +456,14 @@
   
   	function ResetEmployeeForm(){
 			
-			event.preventDefault();
 			$('#Employeeform')[0].reset();
+			$('#employee_form_error_summary').addClass('d-none').empty();
+			$('#Employeeform .is-invalid').removeClass('is-invalid');
+			$('#department_list').empty().append('<option value=""></option>');
+			['employee_tin', 'employee_tax_status'].forEach(function(field) {
+				$('#' + field + 'Error').text('');
+				$('#' + field).removeClass('is-invalid');
+			});
 			
 			$('#modal_title_action_employee').html('Add Employee');
 			

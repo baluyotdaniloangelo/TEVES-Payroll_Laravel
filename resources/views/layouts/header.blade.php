@@ -40,8 +40,5 @@
 		
 		<!-- Main CSS -->
         <link rel="stylesheet" href="{{asset('assets/css/style.css')}}">
-    </head>  
-  
-  
-  
-  
+        <link rel="stylesheet" href="{{ asset('assets/css/payroll-navigation.css') }}">
+    </head>

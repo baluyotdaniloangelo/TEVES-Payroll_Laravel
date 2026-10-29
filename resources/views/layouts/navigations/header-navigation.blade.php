@@ -3,15 +3,9 @@
 			
 				<!-- Logo -->
                 <div class="header-left">
-                     <a href="#" class="logo">
-						<!--<img src="assets/img/logo.svg" alt="Logo">-->
-					</a>
-					<a href="admin-dashboard.html" class="logo collapse-logo">
-						<img src="assets/img/collapse-logo.svg" alt="Logo">
-					</a>
-					<a href="admin-dashboard.html" class="logo2">
-						<img src="assets/img/logo2.png" width="40" height="40" alt="Logo">
-					</a>
+                    <a href="{{ route('employee') }}" class="logo payroll-header-brand" aria-label="Payroll home">
+                        <img src="{{ asset('client_logo/logo.png') }}" width="40" height="40" alt="Teves Petroleum">
+                    </a>
                 </div>
 				<!-- /Logo -->
 				

@@ -123,7 +123,7 @@
             form.append('cutoff_start', cutoff.cutoff_start); form.append('cutoff_end', cutoff.cutoff_end);
             const uploaded = await api(base + '/upload', form); await load(uploaded.id);
             $('import-history').add(new Option(result.batch.filename, uploaded.id), 1); $('import-history').value = uploaded.id;
-            message('DTR plotted by employee. Remember each employee mapping once, then review the dates before saving.');
+            message('DTR plotted by employee. Remember the employee mappings, then save the mapped logs to email employees.');
         } catch (e) { message(e.message, true); } finally { busy = false; event.submitter.disabled = false; }
     };
     function selectEmployee(id) { if (busy) return; $('dtr-review-modal').close(); selected = id; detailId = null; render(); }
@@ -159,7 +159,7 @@
         $('dtr-mapping-state').className = 'mt-2 mb-0 small ' + (employee ? 'text-success' : 'text-warning');
         $('dtr-mapping-state').textContent = employee ? 'Remembered: ' + group.id + ' → ' + employee.number + ' — ' + employee.name + '. Applies to all pending dates and future uploads from this device profile.' : 'Choose the payroll employee once. This export name alone does not confirm the match.';
         $('dtr-employee-heading').textContent = (employee ? employee.name : group.name || group.id) + ' · DTR';
-        $('dtr-employee-count').textContent = 'Employee ' + (index + 1) + ' of ' + groups.length + ' · ' + visibleRows(group).filter(r => r.status === 'saved').length + ' of ' + visibleRows(group).length + ' cutoff intervals saved';
+        $('dtr-employee-count').textContent = 'Employee ' + (index + 1) + ' of ' + groups.length + ' · ' + visibleRows(group).filter(r => ['saved','employee_pending','employee_submitted'].includes(r.status)).length + ' of ' + visibleRows(group).length + ' intervals saved/queued';
         $('dtr-employee-confirm').checked = !!confirmations.get(group.id);
         $('dtr-save-result').textContent = '';
         renderGrid(); if (detailId !== null) showDetail(detailId); else { $('dtr-interval-detail').hidden = true; $('dtr-review-modal').close(); }
@@ -183,11 +183,11 @@
         if (row.status === 'kept') return 'Existing attendance kept';
         if (row.status === 'skipped') return 'Skipped';
         if (!row.employee_idx) return 'Map employee';
-        if (!p.log_in || !p.log_out) return 'Missing punch';
+        if (!p.log_in || !p.log_out) return 'Employee to complete missing punch';
         if (!ready(row)) return 'Review break';
         if (row.conflicts.length) return 'Existing logs';
         if (row.warnings.length) return 'Review shift';
-        return 'Ready for review';
+        return 'Ready';
     }
     function change(row, key, value) {
         const state = draft(row); state.proposed[key] = value; state.dirty = true; state.feedback = ''; invalidate();
@@ -239,17 +239,19 @@
     }
     function updateSelection() {
         const group = current(); if (!group) return;
-        const eligible = visibleRows(group).filter(r => !['saved','employee_pending','employee_submitted','kept'].includes(r.status) && r.employee_idx && ready(r));
-        const selectedRows = visibleRows(group).filter(r => !['saved','employee_submitted','kept'].includes(r.status) && draft(r).selected);
+        const eligible = visibleRows(group).filter(r => !['saved','employee_submitted','kept','skipped'].includes(r.status) && r.employee_idx && ready(r));
+        const selectedRows = visibleRows(group).filter(r => !['saved','employee_submitted','kept','skipped'].includes(r.status) && draft(r).selected);
         $('dtr-selection-count').textContent = new Set(selectedRows.map(r => r.date)).size + ' dates / ' + selectedRows.length + ' intervals selected · cutoff ' + activeCutoff.cutoff_start + ' to ' + activeCutoff.cutoff_end;
         $('dtr-review-complete').checked = eligible.length > 0 && eligible.every(r => draft(r).selected);
         $('dtr-review-complete').disabled = cutoffPending() || !group.employee;
         $('dtr-employee-confirm').disabled = cutoffPending() || !group.employee || mappingPending() || !selectedRows.length;
         $('dtr-save-selected').disabled = busy || cutoffPending() || !group.employee || mappingPending() || !selectedRows.length || !confirmations.get(group.id);
+        const hasMappedRows = groups.some(g => visibleRows(g).some(r => r.employee_idx && ['pending','employee_pending'].includes(r.status)));
+        $('dtr-send-mapped').disabled = busy || cutoffPending() || !hasMappedRows;
     }
     $('dtr-review-complete').onchange = () => {
         const value = $('dtr-review-complete').checked;
-        visibleRows().forEach(row => { if (!['saved','employee_pending','employee_submitted','kept'].includes(row.status) && row.employee_idx && ready(row)) draft(row).selected = value; });
+        visibleRows().forEach(row => { if (!['saved','employee_submitted','kept','skipped'].includes(row.status) && row.employee_idx && ready(row)) draft(row).selected = value; });
         invalidate(); renderGrid();
     };
     $('dtr-employee-confirm').onchange = () => { confirmations.set(selected, $('dtr-employee-confirm').checked); updateSelection(); };
@@ -344,7 +346,7 @@
     }
     $('dtr-save-selected').onclick = async () => {
         const group = current(); if (busy || !group) return;
-        if (cutoffPending() || !confirmations.get(group.id) || mappingPending()) { message('Apply the cutoff, remember the mapping, and confirm your review before saving.', true); return; }
+        if (cutoffPending() || !confirmations.get(group.id) || mappingPending()) { message('Apply the cutoff, confirm the employee mapping, and confirm your admin edits before saving.', true); return; }
         const rows = visibleRows(group).filter(r => !['saved','employee_submitted','kept'].includes(r.status) && draft(r).selected);
         if (!rows.length) return;
         busy = true; lockReview(true); let queued = 0, kept = 0, failed = 0, emailFailed = 0;
@@ -357,16 +359,41 @@
                     state.error = false;
                     if (response.status === 'employee_pending') {
                         row.status = response.status; row.version = response.version || row.version + 1;
-                        state.selected = false; state.dirty = false; state.feedback = response.email_sent === false ? 'Saved; email failed.' : 'Saved and sent to employee.'; queued++;
+                        state.selected = false; state.dirty = false; state.feedback = response.email_sent === false ? 'Saved; email failed.' : (response.email_already_sent ? 'Admin edits saved; employee was already emailed.' : 'Saved and emailed to employee.'); queued++;
                         if (response.email_sent === false) emailFailed++;
                     } else { state.feedback = 'Existing attendance kept.'; state.selected = false; kept++; }
                 } catch (e) { state.feedback = e.message; state.error = true; failed++; }
-                $('dtr-save-result').textContent = queued + ' sent for employee completion · ' + kept + ' existing records kept · ' + failed + ' need review · ' + emailFailed + ' email failures';
+                $('dtr-save-result').textContent = queued + ' intervals saved/updated for employee completion · ' + kept + ' existing records kept · ' + failed + ' need review · ' + emailFailed + ' email failures';
             }
         } finally {
             confirmations.set(group.id, false); busy = false; lockReview(false); render();
-            $('dtr-save-result').textContent = queued + ' intervals sent for employee completion · ' + kept + ' existing records kept · ' + failed + ' need review · ' + emailFailed + ' email failures. Final attendance is posted only after payroll approval.';
+            $('dtr-save-result').textContent = queued + ' intervals saved/updated for employee completion · ' + kept + ' existing records kept · ' + failed + ' need review · ' + emailFailed + ' email failures. Final attendance is posted only after payroll approval.';
         }
+    };
+    $('dtr-send-mapped').onclick = async () => {
+        if (busy || !batch) return;
+        if (cutoffPending()) { message('Apply the cutoff before saving mapped logs.', true); return; }
+        if (!window.confirm('Save all mapped device logs in this cutoff and email each linked employee to complete only missing DTR details?')) return;
+        const button = $('dtr-send-mapped'), activeEmployee = selected;
+        busy = true; lockReview(true); button.textContent = 'Saving mapped logs…'; $('dtr-send-result').textContent = '';
+        try {
+            const response = await api(base + '/' + batch + '/queue-mapped', {});
+            const activeBatch = batch;
+            await load(activeBatch, true);
+            if (groups.some(group => group.id === activeEmployee)) { selected = activeEmployee; render(); }
+            const missing = response.missing_accounts || [], failures = response.email_failures || [];
+            const details = [
+                (response.queued || 0) + ' new intervals queued',
+                (response.emails_sent || 0) + ' employee emails sent',
+                (response.already_sent || 0) + ' employees already emailed',
+                (response.unmapped || 0) + ' unmapped intervals',
+                missing.length + ' employees missing an Employee account or valid email',
+                failures.length + ' email failures'
+            ].join(' · ');
+            $('dtr-send-result').textContent = details + (missing.length ? '. Add Employee accounts/email for: ' + missing.join(', ') : '') + (failures.length ? '. Email failed for: ' + failures.join(', ') : '');
+            $('dtr-send-result').className = 'mt-2 mb-0 ' + ((missing.length || failures.length || response.unmapped) ? 'text-warning' : 'text-success');
+        } catch (e) { message(e.message, true); }
+        finally { busy = false; lockReview(false); button.textContent = 'Save mapped logs & email employees'; render(); }
     };
     window.addEventListener('beforeunload', event => { if (dirty()) { event.preventDefault(); event.returnValue = ''; } });
 })();

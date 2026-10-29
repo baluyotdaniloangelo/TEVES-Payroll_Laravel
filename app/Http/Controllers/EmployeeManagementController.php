@@ -32,8 +32,9 @@ class EmployeeManagementController extends Controller
 			$active_link = 'employee';
 			
 			$branch_data = BranchModel::orderby('branch_name')->get();
+			$department_data = DepartmentModel::orderBy('department_name')->get();
 			
-			return view("payroll.employee", compact('data', 'title', 'branch_data', 'active_link'));
+			return view("payroll.employee", compact('data', 'title', 'branch_data', 'department_data', 'active_link'));
 		}
 	} 
 
@@ -43,11 +44,10 @@ class EmployeeManagementController extends Controller
 
 		if ($request->ajax()) {
 
-		$user_data = User::where('user_id', '=', Session::get('loginID'))->first();
-
-		$employee_list_data = EmployeeModel::join('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
-					->join('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
-              		->get([
+		$employee_list_data = EmployeeModel::query()
+					->leftJoin('teves_payroll_department_table', 'teves_payroll_department_table.department_id', '=', 'teves_payroll_employee_table.department_idx')
+					->leftJoin('teves_branch_table', 'teves_branch_table.branch_id', '=', 'teves_payroll_employee_table.branch_idx')
+					->select([
 					'teves_payroll_employee_table.employee_id',
 					'teves_payroll_employee_table.employee_full_name',
 					'teves_payroll_employee_table.employee_number',
@@ -58,6 +58,19 @@ class EmployeeManagementController extends Controller
 					'teves_branch_table.branch_name',
 					'teves_payroll_department_table.department_name']);
 
+		if ($request->filled('branch_filter')) {
+			$employee_list_data->where('teves_payroll_employee_table.branch_idx', $request->input('branch_filter'));
+		}
+		if ($request->filled('department_filter')) {
+			$employee_list_data->where('teves_payroll_employee_table.department_idx', $request->input('department_filter'));
+		}
+		if ($request->filled('status_filter')) {
+			$employee_list_data->where('teves_payroll_employee_table.employee_status', $request->input('status_filter'));
+		}
+		if ($request->filled('type_filter')) {
+			$employee_list_data->where('teves_payroll_employee_table.employment_type', $request->input('type_filter'));
+		}
+
 		return DataTables::of($employee_list_data)
 				->addIndexColumn()
                 ->addColumn('action', function($row){
@@ -66,8 +79,8 @@ class EmployeeManagementController extends Controller
 					<div class="dropdown dropdown-action">
 						<a href="#" class="action-icon dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="true"><i class="si si-options-vertical" data-bs-toggle="tooltip" aria-label="si-options-vertical" data-bs-original-title="si-options-vertical"></i></a>
 							<div class="dropdown-menu dropdown-menu-right " data-popper-placement="bottom-end" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);">
-								<a class="dropdown-item" href="#" data-id="'.$row->employee_id.'" id="edit_employee"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
-								<a class="dropdown-item" href="#" data-id="'.$row->employee_id.'" id="delete_employee"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>
+								<a class="dropdown-item js-edit-employee" href="#" data-id="'.$row->employee_id.'"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
+								<a class="dropdown-item js-delete-employee" href="#" data-id="'.$row->employee_id.'"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>
 							</div>
 					</div>';
 					
@@ -102,6 +115,8 @@ class EmployeeManagementController extends Controller
 					'teves_payroll_employee_table.employee_picture',
 					'teves_payroll_employee_table.employee_phone',
 					'teves_payroll_employee_table.employee_email',
+					'teves_payroll_employee_table.employee_tin',
+					'teves_payroll_employee_table.employee_tax_status',
 					'teves_branch_table.branch_id',
 					'teves_branch_table.branch_name',
 					'teves_branch_table.branch_code',
@@ -136,6 +151,23 @@ class EmployeeManagementController extends Controller
 	} 
 
 	public function submit_employee_information(Request $request){
+			$request->validate([
+				'employee_tin' => ['nullable', 'string', 'max:30', 'regex:/^[0-9 -]+$/'],
+				'employee_tax_status' => ['nullable', Rule::in(['taxable', 'non_taxable'])],
+				'employee_rate' => ['required', 'numeric', 'min:0'],
+				'employee_status' => ['required', Rule::in(['Active', 'Inactive'])],
+				'employment_type' => ['required', Rule::in(['Regular', 'Probationary', 'Contractual', 'Others'])],
+				'branch_idx' => ['required', 'integer', Rule::exists('teves_branch_table', 'branch_id')],
+				'department_idx' => ['required', 'integer', Rule::exists('teves_payroll_department_table', 'department_id')],
+				'employee_last_name' => ['required', 'string', 'max:100'],
+				'employee_first_name' => ['required', 'string', 'max:100'],
+				'employee_birthday' => ['required', 'date'],
+				'employee_email' => ['nullable', 'email', 'max:150'],
+				'time_in' => ['required', 'date_format:H:i,H:i:s'],
+				'break_time_in' => ['required', 'date_format:H:i,H:i:s'],
+				'break_time_out' => ['required', 'date_format:H:i,H:i:s'],
+				'time_out' => ['required', 'date_format:H:i,H:i:s'],
+			]);
 		
 			$employee_id = $request->employee_id;
 			$request->validate([
@@ -211,6 +243,9 @@ class EmployeeManagementController extends Controller
 				
 				$EmployeeDetails->created_by_user_idx 	= Session::get('loginID');
 				
+				foreach (['employee_tin', 'employee_tax_status'] as $field) {
+					if ($request->exists($field)) $EmployeeDetails->{$field} = $request->input($field);
+				}
 				$result = $EmployeeDetails->save();
 				
 				if($result){
@@ -262,6 +297,9 @@ class EmployeeManagementController extends Controller
 				
 				$EmployeeDetails->updated_by_user_idx 	= Session::get('loginID');
 				
+				foreach (['employee_tin', 'employee_tax_status'] as $field) {
+					if ($request->exists($field)) $EmployeeDetails->{$field} = $request->input($field);
+				}
 				$result = $EmployeeDetails->update();
 				
 				if($result){
