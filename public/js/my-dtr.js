@@ -38,7 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const policy = form.querySelector('input[name="proposed[break_policy]"]:checked')?.value ||
                 form.querySelector('input[type="hidden"][name="proposed[break_policy]"]')?.value;
             const recorded = policy === 'recorded';
-            breakFields.hidden = !recorded;
+            breakFields.classList.toggle('is-inactive', !recorded);
+            const hint = breakFields.querySelector('[data-break-hint]');
+            if (hint) hint.textContent = recorded ? 'Enter only the missing break times.' :
+                'Select Recorded break above to enter break times. Choose No break if you did not take a recorded break.';
             breakFields.querySelectorAll('[data-break-time]').forEach(input => {
                 input.disabled = !recorded;
                 input.required = recorded;

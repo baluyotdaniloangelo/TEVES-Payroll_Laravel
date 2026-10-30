@@ -1,7 +1,7 @@
 @extends('layouts.employee')
 
 @push('page_styles')
-<link rel="stylesheet" href="{{ asset('assets/css/my-dtr.css') }}?v=20261030">
+<link rel="stylesheet" href="{{ asset('assets/css/my-dtr.css') }}?v=20261030-break-fields">
 @endpush
 
 @section('content')
@@ -59,13 +59,13 @@
                         $value = static fn ($key) => $isOldRow ? old('proposed.'.$key, $proposal[$key] ?? '') : ($proposal[$key] ?? '');
                         $dateValue = static fn ($key) => str_replace(' ', 'T', substr((string) $value($key), 0, 16));
                         $breakPolicy = (string) $value('break_policy');
-                        $savedPolicy = $proposal['break_policy'] ?? 'review';
+                        $savedPolicy = in_array('break treatment', $item['missing'], true) ? 'review' : ($proposal['break_policy'] ?? 'review');
                         $selected = $activeId === (int) $item['id'];
                     @endphp
                     <section class="dtr-detail-panel {{ $selected ? 'is-active' : '' }}" id="dtr-panel-{{ $item['id'] }}" role="tabpanel" aria-labelledby="dtr-tab-{{ $item['id'] }}" data-dtr-panel="{{ $item['id'] }}" @unless($selected) hidden @endunless>
                         <div class="dtr-detail-heading">
                             <div><h2>{{ \Carbon\Carbon::parse($item['date'])->format('l, F j, Y') }}</h2><p>{{ $item['branch_code'] }} · {{ $item['branch_name'] }} · {{ $item['filename'] }}</p></div>
-                            <span class="dtr-pill {{ $isSubmitted ? 'is-done' : '' }}">{{ $isSubmitted ? 'Submitted to payroll' : (count($item['missing']) ? count($item['missing']).' details missing' : 'Ready to confirm') }}</span>
+                            <span class="dtr-pill {{ $isSubmitted ? 'is-done' : '' }}">{{ $isSubmitted ? 'Submitted to payroll' : (count($item['missing']) ? count($item['missing']).' '.(count($item['missing']) === 1 ? 'detail' : 'details').' missing' : 'Ready to confirm') }}</span>
                         </div>
 
                         <div class="dtr-section-title">Saved punches</div>
@@ -107,8 +107,8 @@
                                     @endif
                                 </div>
                                 @if($savedPolicy !== 'none' && (empty($proposal['breaktime_start']) || empty($proposal['breaktime_end'])))
-                                    <div class="dtr-break-fields" data-break-fields @if($breakPolicy !== 'recorded') hidden @endif>
-                                        <p>Enter only the missing break times if you had a recorded break.</p><div class="dtr-form-grid">
+                                    <div class="dtr-break-fields {{ $breakPolicy === 'recorded' ? '' : 'is-inactive' }}" data-break-fields>
+                                        <p data-break-hint>{{ $breakPolicy === 'recorded' ? 'Enter only the missing break times.' : 'Select Recorded break above to enter break times. Choose No break if you did not take a recorded break.' }}</p><div class="dtr-form-grid">
                                             @foreach(['breaktime_start' => 'Break out', 'breaktime_end' => 'Break in'] as $field => $label)
                                                 @if(empty($proposal[$field]))<div class="dtr-form-field"><label for="dtr-{{ $field }}-{{ $item['id'] }}">{{ $label }} <span>Required for recorded break</span></label><input id="dtr-{{ $field }}-{{ $item['id'] }}" type="datetime-local" class="form-control" name="proposed[{{ $field }}]" value="{{ $dateValue($field) }}" data-break-time @if($breakPolicy !== 'recorded') disabled @else required @endif></div>@endif
                                             @endforeach
@@ -126,5 +126,5 @@
         </div>
     @endif
 </div>
-<script src="{{ asset('js/my-dtr.js') }}?v=20261030" defer></script>
+<script src="{{ asset('js/my-dtr.js') }}?v=20261030-break-fields" defer></script>
 @endsection
