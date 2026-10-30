@@ -92,7 +92,10 @@ class AttendanceImportService
                 'cutoff_start'=>$batch->cutoff_start??$period[0],'cutoff_end'=>$batch->cutoff_end??$period[1]],
             'employees'=>$employees,'rows'=>$rows->map(function($row)use($mapping,$employees,$existing){
                 $review=$row->review?json_decode($row->review,true):[];
-                $proposed=$review['employee_proposal']??$review['admin_proposal']??array_merge(json_decode($row->proposed,true),$review['proposal']??[]);
+                $fallback=array_merge(json_decode($row->proposed,true)?:[],$review['proposal']??[]);
+                $proposed=$row->status==='employee_pending'
+                    ? ($review['admin_proposal']??$fallback)
+                    : ($review['employee_proposal']??$review['admin_proposal']??$fallback);
                 $mapped=$mapping[$row->external_id]??null;
                 if (!$employees->contains('id',$mapped)) $mapped=null;
                 $employee=$row->employee_idx ?: $mapped;
@@ -352,8 +355,9 @@ class AttendanceImportService
                 'i.filename','i.cutoff_start','i.cutoff_end','b.branch_code','b.branch_name',
             ])->map(function($row){
                 $review=json_decode($row->review,true)?:[];
-                $adminProposal=$review['admin_proposal']??json_decode($row->proposed,true)??[];
-                $proposal=$review['employee_proposal']??$adminProposal;
+                $adminProposal=$review['admin_proposal']??(json_decode($row->proposed,true)?:[]);
+                // A pending row must reflect the latest payroll review, not an older employee submission.
+                $proposal=$row->status==='employee_submitted' ? ($review['employee_proposal']??$adminProposal) : $adminProposal;
                 $missing=[];
                 foreach(['log_in'=>'time-in','log_out'=>'time-out'] as $field=>$label){if(empty($proposal[$field]))$missing[]=$label;}
                 if(($proposal['break_policy']??'review')==='review')$missing[]='break treatment';
@@ -365,8 +369,14 @@ class AttendanceImportService
                     'proposal'=>$proposal,'warnings'=>json_decode($row->warnings,true),'status'=>$row->status,'version'=>$row->version,
                     'filename'=>$row->filename,'cutoff_start'=>$row->cutoff_start,'cutoff_end'=>$row->cutoff_end,
                     'branch_code'=>$row->branch_code,'branch_name'=>$row->branch_name,'note'=>$review['employee_note']??null,'missing'=>$missing,
-                    'break_policy_editable'=>($adminProposal['break_policy']??'review')==='review'];
+                    'break_policy_editable'=>$row->status==='employee_pending' && $this->employeeCanChooseBreakPolicy($adminProposal)];
             });
+    }
+
+    private function employeeCanChooseBreakPolicy(array $adminProposal): bool
+    {
+        $policy=$adminProposal['break_policy']??'review';
+        return $policy==='review' || ($policy==='recorded' && empty($adminProposal['breaktime_start']) && empty($adminProposal['breaktime_end']));
     }
 
     public function submitEmployeeDtr(int $employeeId,int $rowId,array $input): void
@@ -377,12 +387,12 @@ class AttendanceImportService
             abort_unless($row->status==='employee_pending',409,'This DTR is no longer awaiting employee completion.');
             abort_unless((int)$row->version===(int)$input['version'],409,'This DTR changed. Refresh the page and review again.');
             $review=json_decode($row->review,true)?:[];
-            $adminProposal=$review['admin_proposal']??json_decode($row->proposed,true);
+            $adminProposal=$review['admin_proposal']??(json_decode($row->proposed,true)?:[]);
             $employeeFields=array_intersect_key($input['proposed'],array_flip(['log_in','log_out','break_policy','breaktime_start','breaktime_end']));
             foreach(['log_in','log_out','breaktime_start','breaktime_end'] as $field){
                 if(!empty($adminProposal[$field]))$employeeFields[$field]=$adminProposal[$field];
             }
-            if(($adminProposal['break_policy']??'review')!=='review')$employeeFields['break_policy']=$adminProposal['break_policy'];
+            if(!$this->employeeCanChooseBreakPolicy($adminProposal))$employeeFields['break_policy']=$adminProposal['break_policy']??'review';
             $proposal=array_merge($adminProposal,$employeeFields);
             $proposal['overtime_status']=$review['admin_proposal']['overtime_status']??$proposal['overtime_status'];
             $proposal['override_default_shift']=$review['admin_proposal']['override_default_shift']??$proposal['override_default_shift'];
