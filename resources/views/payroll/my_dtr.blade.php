@@ -1,56 +1,128 @@
 @extends('layouts.employee')
 
+@push('page_styles')
+<link rel="stylesheet" href="{{ asset('assets/css/my-dtr.css') }}?v=20261030">
+@endpush
+
 @section('content')
-<div class="page-header"><div><h3 class="page-title">My DTR</h3><p class="text-muted mb-0">{{ $employee->employee_full_name }} · {{ $employee->employee_number }}</p></div><a class="btn btn-outline-secondary" href="{{ route('logout-user') }}">Log out</a></div>
-@if(session('success'))<div class="alert alert-success" role="status">{{ session('success') }}</div>@endif
-@if($errors->any())<div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>@endif
-<div class="alert alert-info">Complete missing punches and submit each DTR interval. Payroll will review it before it is added to finalized attendance.</div>
-@forelse($items as $item)
-    @php($proposal = $item['proposal'])
-    <div class="card mb-3"><div class="card-body">
-        <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
-            <div><h5 class="mb-1">{{ \Carbon\Carbon::parse($item['date'])->format('M d, Y') }} · {{ $item['branch_code'] }} — {{ $item['branch_name'] }}</h5><small class="text-muted">{{ $item['cutoff_start'] }} to {{ $item['cutoff_end'] }} · {{ $item['filename'] }}</small></div>
-            <span class="badge {{ $item['status'] === 'employee_submitted' ? 'bg-success' : 'bg-warning text-dark' }}">{{ $item['status'] === 'employee_submitted' ? 'Submitted to payroll' : 'Needs your completion' }}</span>
+@php
+    $firstPending = $items->firstWhere('status', 'employee_pending');
+    $activeId = (int) (old('dtr_row') ?: data_get($firstPending, 'id', data_get($items->first(), 'id', 0)));
+    $pendingCount = $items->where('status', 'employee_pending')->count();
+    $formatPunch = static fn ($value) => $value ? \Carbon\Carbon::parse($value)->format('M d, Y · h:i A') : null;
+@endphp
+<div class="employee-dtr" data-my-dtr>
+    <div class="dtr-page-heading">
+        <div>
+            <span class="dtr-eyebrow">Employee portal</span>
+            <h1>Complete your DTR</h1>
+            <p>Review one date at a time and submit only the details that are missing.</p>
         </div>
-        <p class="small text-muted mb-2">Device punches: {{ implode(', ', $item['raw']['punches'] ?? []) }}</p>
-        @if($item['missing'])
-            <p class="mb-3"><strong>Needs your attention:</strong> {{ implode(', ', $item['missing']) }}. Captured device punches are locked; fill only blank details.</p>
-            @if(in_array('break treatment', $item['missing'], true))<p class="small text-muted">If you choose Recorded break, complete only the missing break-out or break-in time. Choose No break if you did not take a recorded break.</p>@endif
-        @else
-            <p class="text-success mb-3">No punch fields are missing. Confirm the recorded attendance and submit it to payroll.</p>
-        @endif
-        @if($item['warnings'])<p class="text-warning">{{ implode(' ', $item['warnings']) }}</p>@endif
-        @if($item['status'] === 'employee_submitted')
-            <p class="text-success mb-0">Your DTR was submitted. Payroll will review it before finalizing.</p>
-            @if($item['note'])<p class="mt-2 mb-0"><strong>Your note:</strong> {{ $item['note'] }}</p>@endif
-        @else
-        <form method="post" action="{{ route('my-dtr.submit', $item['id']) }}" class="row g-3">
-            @csrf
-            <input type="hidden" name="version" value="{{ $item['version'] }}">
-            <div class="col-md-3"><label class="form-label">Time in</label><input @required(empty($proposal['log_in'])) @readonly(!empty($proposal['log_in'])) type="datetime-local" class="form-control" name="proposed[log_in]" value="{{ old('proposed.log_in', str_replace(' ', 'T', substr((string)($proposal['log_in'] ?? ''),0,16))) }}"></div>
-            <div class="col-md-3"><label class="form-label">Time out</label><input @required(empty($proposal['log_out'])) @readonly(!empty($proposal['log_out'])) type="datetime-local" class="form-control" name="proposed[log_out]" value="{{ old('proposed.log_out', str_replace(' ', 'T', substr((string)($proposal['log_out'] ?? ''),0,16))) }}"></div>
-            <div class="col-md-2"><label class="form-label">Break treatment</label>
-                @if(($proposal['break_policy'] ?? 'review') === 'review')
-                    <select class="form-select" name="proposed[break_policy]" data-break-select required><option value="" @selected(!old('proposed.break_policy')) disabled>Choose</option><option value="recorded" @selected(old('proposed.break_policy') === 'recorded')>Recorded break</option><option value="none" @selected(old('proposed.break_policy') === 'none')>No break</option></select>
-                @else
-                    <input type="hidden" name="proposed[break_policy]" value="{{ $proposal['break_policy'] }}"><select class="form-select" data-break-select disabled><option selected>{{ $proposal['break_policy'] === 'none' ? 'No break' : 'Recorded break' }}</option></select>
-                @endif
+        <div class="dtr-queue-count">{{ $pendingCount }} awaiting completion · {{ $items->count() }} total</div>
+    </div>
+
+    @if(session('success'))<div class="alert alert-success" role="status">{{ session('success') }}</div>@endif
+    @if($errors->any())
+        <div class="alert alert-danger" role="alert">
+            <strong>Please check this date.</strong> {{ $errors->first() }}
+        </div>
+    @endif
+
+    <div class="dtr-info" role="note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>Saved punches are locked. You can complete only the missing times and break details. Payroll reviews your submission before finalizing.</span></div>
+
+    @if($items->isEmpty())
+        <div class="dtr-empty"><i class="fa-regular fa-circle-check" aria-hidden="true"></i><h2>All caught up</h2><p>There are no DTR dates waiting for your completion.</p></div>
+    @else
+        <div class="dtr-workspace">
+            <aside class="dtr-date-panel" aria-label="DTR dates">
+                <div class="dtr-panel-heading"><strong>Dates to review</strong><small>{{ $items->count() }} dates</small></div>
+                <div class="dtr-date-list" role="tablist" aria-label="Choose a DTR date">
+                    @foreach($items as $item)
+                        @php($selected = $activeId === (int) $item['id'])
+                        <button type="button" class="dtr-date-tab {{ $selected ? 'is-active' : '' }}" id="dtr-tab-{{ $item['id'] }}" role="tab" aria-selected="{{ $selected ? 'true' : 'false' }}" aria-controls="dtr-panel-{{ $item['id'] }}" data-dtr-tab="{{ $item['id'] }}">
+                            <span class="dtr-date-icon"><strong>{{ \Carbon\Carbon::parse($item['date'])->format('d') }}</strong><small>{{ strtoupper(\Carbon\Carbon::parse($item['date'])->format('M')) }}</small></span>
+                            <span class="dtr-date-copy"><strong>{{ \Carbon\Carbon::parse($item['date'])->format('l') }}</strong><small>{{ $item['cutoff_start'] }} to {{ $item['cutoff_end'] }}</small></span>
+                            <span class="dtr-date-status {{ $item['status'] === 'employee_submitted' ? 'is-done' : '' }}">{{ $item['status'] === 'employee_submitted' ? 'Submitted' : (count($item['missing']) ? count($item['missing']).' missing' : 'Confirm') }}</span>
+                        </button>
+                    @endforeach
+                </div>
+            </aside>
+
+            <div class="dtr-detail-panels">
+                @foreach($items as $item)
+                    @php
+                        $proposal = $item['proposal'] ?? [];
+                        $isSubmitted = $item['status'] === 'employee_submitted';
+                        $isOldRow = (int) old('dtr_row') === (int) $item['id'];
+                        $value = static fn ($key) => $isOldRow ? old('proposed.'.$key, $proposal[$key] ?? '') : ($proposal[$key] ?? '');
+                        $dateValue = static fn ($key) => str_replace(' ', 'T', substr((string) $value($key), 0, 16));
+                        $breakPolicy = (string) $value('break_policy');
+                        $savedPolicy = $proposal['break_policy'] ?? 'review';
+                        $selected = $activeId === (int) $item['id'];
+                    @endphp
+                    <section class="dtr-detail-panel {{ $selected ? 'is-active' : '' }}" id="dtr-panel-{{ $item['id'] }}" role="tabpanel" aria-labelledby="dtr-tab-{{ $item['id'] }}" data-dtr-panel="{{ $item['id'] }}" @unless($selected) hidden @endunless>
+                        <div class="dtr-detail-heading">
+                            <div><h2>{{ \Carbon\Carbon::parse($item['date'])->format('l, F j, Y') }}</h2><p>{{ $item['branch_code'] }} · {{ $item['branch_name'] }} · {{ $item['filename'] }}</p></div>
+                            <span class="dtr-pill {{ $isSubmitted ? 'is-done' : '' }}">{{ $isSubmitted ? 'Submitted to payroll' : (count($item['missing']) ? count($item['missing']).' details missing' : 'Ready to confirm') }}</span>
+                        </div>
+
+                        <div class="dtr-section-title">Saved punches</div>
+                        <div class="dtr-saved-grid">
+                            @foreach(['log_in' => 'Time in', 'log_out' => 'Time out', 'breaktime_start' => 'Break out', 'breaktime_end' => 'Break in'] as $field => $label)
+                                @if(!empty($proposal[$field]))
+                                    <div class="dtr-saved-field"><span>{{ $label }}</span><strong>{{ $formatPunch($proposal[$field]) }}</strong><small><i class="fa-solid fa-lock" aria-hidden="true"></i> Locked</small></div>
+                                @endif
+                            @endforeach
+                            @if($savedPolicy !== 'review')
+                                <div class="dtr-saved-field"><span>Break treatment</span><strong>{{ $savedPolicy === 'none' ? 'No break' : 'Recorded break' }}</strong><small><i class="fa-solid fa-lock" aria-hidden="true"></i> Locked</small></div>
+                            @endif
+                        </div>
+                        @if(!empty($item['raw']['punches']))<p class="dtr-source">Device punches: {{ implode(', ', $item['raw']['punches']) }}</p>@endif
+
+                        @if($isSubmitted)
+                            <div class="dtr-submitted"><i class="fa-solid fa-circle-check" aria-hidden="true"></i><div><strong>Submitted to payroll</strong><p>Payroll will review this date before finalizing your attendance.</p>@if($item['note'])<p><strong>Your note:</strong> {{ $item['note'] }}</p>@endif</div></div>
+                        @else
+                            <form method="post" action="{{ route('my-dtr.submit', $item['id']) }}" data-dtr-form>
+                                @csrf
+                                <input type="hidden" name="version" value="{{ $item['version'] }}">
+                                <input type="hidden" name="dtr_row" value="{{ $item['id'] }}">
+                                @foreach(['log_in', 'log_out', 'breaktime_start', 'breaktime_end'] as $field)
+                                    @if(!empty($proposal[$field]))<input type="hidden" name="proposed[{{ $field }}]" value="{{ $dateValue($field) }}">@endif
+                                @endforeach
+                                @if($savedPolicy !== 'review')<input type="hidden" name="proposed[break_policy]" value="{{ $savedPolicy }}">@endif
+
+                                <div class="dtr-section-title">Complete missing details</div>
+                                @if($item['warnings'])<div class="dtr-warning" role="note">{{ implode(' ', $item['warnings']) }}</div>@endif
+                                @if(!$item['missing'])<p class="dtr-ready">All punch details are present. Confirm this date and submit it to payroll.</p>@endif
+                                <div class="dtr-form-grid">
+                                    @foreach(['log_in' => 'Time in', 'log_out' => 'Time out'] as $field => $label)
+                                        @if(empty($proposal[$field]))
+                                            <div class="dtr-form-field"><label for="dtr-{{ $field }}-{{ $item['id'] }}">{{ $label }} <span>Required</span></label><input id="dtr-{{ $field }}-{{ $item['id'] }}" type="datetime-local" class="form-control" name="proposed[{{ $field }}]" value="{{ $dateValue($field) }}" required></div>
+                                        @endif
+                                    @endforeach
+                                    @if($savedPolicy === 'review')
+                                        <fieldset class="dtr-form-field dtr-break-choice"><legend>Break treatment <span>Required</span></legend><div class="dtr-choice-list"><label><input type="radio" name="proposed[break_policy]" value="none" @checked($breakPolicy === 'none') required><span>No break</span></label><label><input type="radio" name="proposed[break_policy]" value="recorded" @checked($breakPolicy === 'recorded') required><span>Recorded break</span></label></div></fieldset>
+                                    @endif
+                                </div>
+                                @if($savedPolicy !== 'none' && (empty($proposal['breaktime_start']) || empty($proposal['breaktime_end'])))
+                                    <div class="dtr-break-fields" data-break-fields @if($breakPolicy !== 'recorded') hidden @endif>
+                                        <p>Enter only the missing break times if you had a recorded break.</p><div class="dtr-form-grid">
+                                            @foreach(['breaktime_start' => 'Break out', 'breaktime_end' => 'Break in'] as $field => $label)
+                                                @if(empty($proposal[$field]))<div class="dtr-form-field"><label for="dtr-{{ $field }}-{{ $item['id'] }}">{{ $label }} <span>Required for recorded break</span></label><input id="dtr-{{ $field }}-{{ $item['id'] }}" type="datetime-local" class="form-control" name="proposed[{{ $field }}]" value="{{ $dateValue($field) }}" data-break-time @if($breakPolicy !== 'recorded') disabled @else required @endif></div>@endif
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+                                <div class="dtr-form-field dtr-note"><label for="dtr-note-{{ $item['id'] }}">Note for payroll <em>(optional)</em></label><textarea id="dtr-note-{{ $item['id'] }}" name="note" class="form-control" rows="2" maxlength="1000" placeholder="Add context for a missing punch">{{ $isOldRow ? old('note') : '' }}</textarea></div>
+                                <label class="dtr-confirm"><input type="checkbox" name="acknowledged" value="1" @checked($isOldRow && old('acknowledged')) required><span>I confirm these are my actual attendance details.</span></label>
+                                <div class="dtr-form-actions"><small>Payroll will review your submission before finalizing.</small><button type="submit" class="btn dtr-submit">Submit this date to payroll <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></div>
+                            </form>
+                        @endif
+                    </section>
+                @endforeach
             </div>
-            <div class="col-md-2"><label class="form-label">Break out</label><input type="datetime-local" class="form-control" name="proposed[breaktime_start]" value="{{ old('proposed.breaktime_start', str_replace(' ', 'T', substr((string)($proposal['breaktime_start'] ?? ''),0,16))) }}" @readonly(!empty($proposal['breaktime_start'])) @required(($proposal['break_policy'] ?? '') === 'recorded' && empty($proposal['breaktime_start'])) @disabled(($proposal['break_policy'] ?? '') === 'none')></div>
-            <div class="col-md-2"><label class="form-label">Break in</label><input type="datetime-local" class="form-control" name="proposed[breaktime_end]" value="{{ old('proposed.breaktime_end', str_replace(' ', 'T', substr((string)($proposal['breaktime_end'] ?? ''),0,16))) }}" @readonly(!empty($proposal['breaktime_end'])) @required(($proposal['break_policy'] ?? '') === 'recorded' && empty($proposal['breaktime_end'])) @disabled(($proposal['break_policy'] ?? '') === 'none')></div>
-            <div class="col-12"><label class="form-label">Note for payroll (optional)</label><textarea class="form-control" name="note" maxlength="1000" rows="2" placeholder="Explain any correction or missing punch">{{ old('note') }}</textarea></div>
-            <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" name="acknowledged" value="1" required id="dtr-confirm-{{ $item['id'] }}"><label class="form-check-label" for="dtr-confirm-{{ $item['id'] }}">I confirm these are my actual attendance times.</label></div></div>
-            <div class="col-12 text-end"><button type="submit" class="btn btn-primary">Submit DTR to payroll</button></div>
-        </form>
-        @endif
-    </div></div>
-@empty
-    <div class="card"><div class="card-body text-center py-5"><h5>All caught up</h5><p class="text-muted mb-0">There are no DTR intervals waiting for your completion.</p></div></div>
-@endforelse
-<script>
-document.querySelectorAll('[data-break-select]').forEach(select => select.addEventListener('change', () => {
-    const form = select.form, noBreak = select.value === 'none';
-    ['proposed[breaktime_start]','proposed[breaktime_end]'].forEach(name => { const input = form.querySelector(`[name="${name}"]`); input.disabled = noBreak; input.required = !noBreak && !input.readOnly; });
-}));
-</script>
+        </div>
+    @endif
+</div>
+<script src="{{ asset('js/my-dtr.js') }}?v=20261030" defer></script>
 @endsection

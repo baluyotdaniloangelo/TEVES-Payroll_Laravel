@@ -8,7 +8,7 @@
     const $ = id => document.getElementById(id);
     const node = (tag, text, cls) => { const el = document.createElement(tag); if (text != null) el.textContent = text; if (cls) el.className = cls; return el; };
     const drafts = new Map(), confirmations = new Map();
-    let batch = null, result = null, groups = [], selected = null, detailId = null, busy = false, activeCutoff = null, manualMappingOpen = false;
+    let batch = null, result = null, groups = [], selected = null, selectedDate = null, detailId = null, busy = false, activeCutoff = null, manualMappingOpen = false;
     const policies = [['review', 'Choose break treatment'], ['recorded', 'Recorded / manually entered break'], ['none', 'No break — explicitly confirmed']];
     const types = [['No', 'Regular / rest day'], ['Yes', 'Overtime']];
     const overrides = [['No', 'No — use employee shift'], ['Yes', 'Yes — disregard shift timing']];
@@ -49,7 +49,7 @@
             $('dtr-cutoff-end').min = $('dtr-cutoff-start').value;
             confirmations.clear(); drafts.forEach(d => { d.selected = false; });
             $('dtr-employee-confirm').checked = false; cutoffLabel();
-            if (result) { detailId = null; $('dtr-review-modal').close(); renderGrid(); }
+            if (result) { selectedDate = null; detailId = null; $('dtr-review-modal').close(); renderGrid(); }
         };
     });
     $('dtr-apply-cutoff').onclick = async () => {
@@ -111,7 +111,7 @@
     async function load(id, preserve = false) {
         const data = await api(base + '/' + id + '/preview');
         const same = batch === id; result = data; batch = id;
-        if (!preserve || !same) { drafts.clear(); confirmations.clear(); selected = null; detailId = null; manualMappingOpen = false; }
+        if (!preserve || !same) { drafts.clear(); confirmations.clear(); selected = null; selectedDate = null; detailId = null; manualMappingOpen = false; }
         activeCutoff = { cutoff_start: data.batch.cutoff_start || data.batch.period_start, cutoff_end: data.batch.cutoff_end || data.batch.period_end };
         $('dtr-cutoff-start').value = activeCutoff.cutoff_start; $('dtr-cutoff-end').value = activeCutoff.cutoff_end;
         $('dtr-cutoff-end').min = activeCutoff.cutoff_start;
@@ -143,8 +143,9 @@
                     : 'Upload complete. All employee IDs were already mapped; the logs are ready to view.'));
         } catch (e) { message(e.message, true); } finally { busy = false; event.submitter.disabled = false; updateSelection(); }
     };
-    function selectEmployee(id) { if (busy) return; $('dtr-review-modal').close(); selected = id; detailId = null; render(); }
+    function selectEmployee(id) { if (busy) return; $('dtr-review-modal').close(); selected = id; selectedDate = null; detailId = null; render(); }
     $('dtr-export-employee').onchange = () => selectEmployee($('dtr-export-employee').value);
+    $('dtr-log-employee').onchange = () => selectEmployee($('dtr-log-employee').value);
     $('dtr-prev-employee').onclick = () => { const index = groups.findIndex(g => g.id === selected); if (index > 0) selectEmployee(groups[index - 1].id); };
     $('dtr-next-employee').onclick = () => { const index = groups.findIndex(g => g.id === selected); if (index < groups.length - 1) selectEmployee(groups[index + 1].id); };
     $('dtr-save-mapping').onclick = async () => {
@@ -158,7 +159,7 @@
             // Retain edited times, but refresh the employee and conflict snapshot for all dates.
             await load(batch, true);
             const nextUnmapped = unmappedGroups()[0];
-            if (nextUnmapped) selected = nextUnmapped.id;
+            if (nextUnmapped) { selected = nextUnmapped.id; selectedDate = null; }
             else manualMappingOpen = false;
             render();
             message(nextUnmapped
@@ -175,6 +176,12 @@
         const index = groups.indexOf(group), employee = person(group.employee);
         $('dtr-export-employee').replaceChildren(); groups.forEach(g => $('dtr-export-employee').add(new Option(g.id + ' — ' + (g.name || 'Unnamed') + (g.employee ? ' · mapped' : ' · unmapped'), g.id)));
         $('dtr-export-employee').value = group.id;
+        $('dtr-log-employee').replaceChildren();
+        groups.forEach(g => {
+            const name = person(g.employee)?.name || g.name || 'Unnamed';
+            $('dtr-log-employee').add(new Option(g.id + ' — ' + name, g.id));
+        });
+        $('dtr-log-employee').value = group.id;
         $('dtr-prev-employee').disabled = index === 0; $('dtr-next-employee').disabled = index === groups.length - 1;
         $('dtr-device-id').textContent = group.id; $('dtr-export-name').textContent = group.name;
         $('dtr-payroll-employee').replaceChildren(new Option('Select enrolled employee', ''));
@@ -240,7 +247,24 @@
     function renderGrid() {
         const group = current(), body = $('dtr-grid-body'); body.replaceChildren();
         const byDate = new Map(); visibleRows(group).forEach(r => { if (!byDate.has(r.date)) byDate.set(r.date, []); byDate.get(r.date).push(r); });
-        dayList().forEach(date => {
+        const dates = dayList();
+        if (!dates.includes(selectedDate)) selectedDate = dates.find(date => byDate.has(date)) || dates[0] || null;
+        const nav = $('dtr-date-nav'); nav.replaceChildren();
+        dates.forEach(date => {
+            const rows = byDate.get(date) || [];
+            const button = node('button', null, 'dtr-day-button' + (date === selectedDate ? ' is-active' : ''));
+            button.type = 'button'; button.setAttribute('aria-pressed', String(date === selectedDate));
+            button.setAttribute('aria-label', date + ', ' + rows.length + ' intervals');
+            const icon = node('span', null, 'dtr-day-icon');
+            icon.append(node('strong', new Date(date + 'T12:00:00').toLocaleDateString('en-US', { day: '2-digit' })),
+                node('small', new Date(date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short' }).toUpperCase()));
+            const copy = node('span', null, 'dtr-day-copy');
+            copy.append(node('strong', new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long' })),
+                node('small', rows.length ? rows.length + ' interval' + (rows.length === 1 ? '' : 's') : 'No punches'));
+            button.append(icon, copy); button.onclick = () => { selectedDate = date; renderGrid(); };
+            nav.append(button);
+        });
+        dates.filter(date => date === selectedDate).forEach(date => {
             const rows = byDate.get(date) || [];
             if (!rows.length) {
                 const tr = node('tr'); tr.append(node('td'), node('td', shortDate(date), 'dtr-date'));
@@ -264,7 +288,7 @@
     }
     function updateSelection() {
         const group = current(); if (!group) return;
-        const eligible = visibleRows(group).filter(r => !['saved','employee_submitted','kept','skipped'].includes(r.status) && r.employee_idx && ready(r));
+        const eligible = visibleRows(group).filter(r => r.date === selectedDate && !['saved','employee_submitted','kept','skipped'].includes(r.status) && r.employee_idx && ready(r));
         const selectedRows = visibleRows(group).filter(r => !['saved','employee_submitted','kept','skipped'].includes(r.status) && draft(r).selected);
         $('dtr-selection-count').textContent = new Set(selectedRows.map(r => r.date)).size + ' dates / ' + selectedRows.length + ' intervals selected · cutoff ' + activeCutoff.cutoff_start + ' to ' + activeCutoff.cutoff_end;
         $('dtr-review-complete').checked = eligible.length > 0 && eligible.every(r => draft(r).selected);
@@ -276,7 +300,7 @@
     }
     $('dtr-review-complete').onchange = () => {
         const value = $('dtr-review-complete').checked;
-        visibleRows().forEach(row => { if (!['saved','employee_submitted','kept','skipped'].includes(row.status) && row.employee_idx && ready(row)) draft(row).selected = value; });
+        visibleRows().forEach(row => { if (row.date === selectedDate && !['saved','employee_submitted','kept','skipped'].includes(row.status) && row.employee_idx && ready(row)) draft(row).selected = value; });
         invalidate(); renderGrid();
     };
     $('dtr-employee-confirm').onchange = () => { confirmations.set(selected, $('dtr-employee-confirm').checked); updateSelection(); };
