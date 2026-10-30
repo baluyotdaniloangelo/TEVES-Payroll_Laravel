@@ -38,7 +38,9 @@
                 <div class="dtr-panel-heading"><strong>Dates to review</strong><small>{{ $items->count() }} dates</small></div>
                 <div class="dtr-date-list" role="tablist" aria-label="Choose a DTR date">
                     @foreach($items as $item)
-                        @php($selected = $activeId === (int) $item['id'])
+                        @php
+                            $selected = $activeId === (int) $item['id'];
+                        @endphp
                         <button type="button" class="dtr-date-tab {{ $selected ? 'is-active' : '' }}" id="dtr-tab-{{ $item['id'] }}" role="tab" aria-selected="{{ $selected ? 'true' : 'false' }}" aria-controls="dtr-panel-{{ $item['id'] }}" data-dtr-tab="{{ $item['id'] }}">
                             <span class="dtr-date-icon"><strong>{{ \Carbon\Carbon::parse($item['date'])->format('d') }}</strong><small>{{ strtoupper(\Carbon\Carbon::parse($item['date'])->format('M')) }}</small></span>
                             <span class="dtr-date-copy"><strong>{{ \Carbon\Carbon::parse($item['date'])->format('l') }}</strong><small>{{ $item['cutoff_start'] }} to {{ $item['cutoff_end'] }}</small></span>
