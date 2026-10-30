@@ -42,9 +42,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const hint = breakFields.querySelector('[data-break-hint]');
             if (hint) hint.textContent = recorded ? 'Enter only the missing break times.' :
                 'Select Recorded break above to enter break times. Choose No break if you did not take a recorded break.';
-            breakFields.querySelectorAll('[data-break-time]').forEach(input => {
+            breakFields.querySelectorAll('[data-break-input]').forEach(input => {
                 input.disabled = !recorded;
-                input.required = recorded;
+                input.required = recorded && input.hasAttribute('data-break-time');
             });
         };
         form.querySelectorAll('input[name="proposed[break_policy]"]').forEach(input =>

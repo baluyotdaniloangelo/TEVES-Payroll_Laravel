@@ -1,7 +1,7 @@
 @extends('layouts.employee')
 
 @push('page_styles')
-<link rel="stylesheet" href="{{ asset('assets/css/my-dtr.css') }}?v=20261030-break-fields">
+<link rel="stylesheet" href="{{ asset('assets/css/my-dtr.css') }}?v=20261030-break-dates">
 @endpush
 
 @section('content')
@@ -59,7 +59,8 @@
                         $value = static fn ($key) => $isOldRow ? old('proposed.'.$key, $proposal[$key] ?? '') : ($proposal[$key] ?? '');
                         $dateValue = static fn ($key) => str_replace(' ', 'T', substr((string) $value($key), 0, 16));
                         $breakPolicy = (string) $value('break_policy');
-                        $savedPolicy = in_array('break treatment', $item['missing'], true) ? 'review' : ($proposal['break_policy'] ?? 'review');
+                        $breakPolicyEditable = (bool) ($item['break_policy_editable'] ?? (($proposal['break_policy'] ?? 'review') === 'review'));
+                        $savedPolicy = $breakPolicyEditable ? 'review' : ($proposal['break_policy'] ?? 'review');
                         $selected = $activeId === (int) $item['id'];
                     @endphp
                     <section class="dtr-detail-panel {{ $selected ? 'is-active' : '' }}" id="dtr-panel-{{ $item['id'] }}" role="tabpanel" aria-labelledby="dtr-tab-{{ $item['id'] }}" data-dtr-panel="{{ $item['id'] }}" @unless($selected) hidden @endunless>
@@ -91,7 +92,7 @@
                                 @foreach(['log_in', 'log_out', 'breaktime_start', 'breaktime_end'] as $field)
                                     @if(!empty($proposal[$field]))<input type="hidden" name="proposed[{{ $field }}]" value="{{ $dateValue($field) }}">@endif
                                 @endforeach
-                                @if($savedPolicy !== 'review')<input type="hidden" name="proposed[break_policy]" value="{{ $savedPolicy }}">@endif
+                                @unless($breakPolicyEditable)<input type="hidden" name="proposed[break_policy]" value="{{ $savedPolicy }}">@endunless
 
                                 <div class="dtr-section-title">Complete missing details</div>
                                 @if($item['warnings'])<div class="dtr-warning" role="note">{{ implode(' ', $item['warnings']) }}</div>@endif
@@ -102,7 +103,7 @@
                                             <div class="dtr-form-field"><label for="dtr-{{ $field }}-{{ $item['id'] }}">{{ $label }} <span>Required</span></label><input id="dtr-{{ $field }}-{{ $item['id'] }}" type="datetime-local" class="form-control" name="proposed[{{ $field }}]" value="{{ $dateValue($field) }}" required></div>
                                         @endif
                                     @endforeach
-                                    @if($savedPolicy === 'review')
+                                    @if($breakPolicyEditable)
                                         <fieldset class="dtr-form-field dtr-break-choice"><legend>Break treatment <span>Required</span></legend><div class="dtr-choice-list"><label><input type="radio" name="proposed[break_policy]" value="none" @checked($breakPolicy === 'none') required><span>No break</span></label><label><input type="radio" name="proposed[break_policy]" value="recorded" @checked($breakPolicy === 'recorded') required><span>Recorded break</span></label></div></fieldset>
                                     @endif
                                 </div>
@@ -110,7 +111,12 @@
                                     <div class="dtr-break-fields {{ $breakPolicy === 'recorded' ? '' : 'is-inactive' }}" data-break-fields>
                                         <p data-break-hint>{{ $breakPolicy === 'recorded' ? 'Enter only the missing break times.' : 'Select Recorded break above to enter break times. Choose No break if you did not take a recorded break.' }}</p><div class="dtr-form-grid">
                                             @foreach(['breaktime_start' => 'Break out', 'breaktime_end' => 'Break in'] as $field => $label)
-                                                @if(empty($proposal[$field]))<div class="dtr-form-field"><label for="dtr-{{ $field }}-{{ $item['id'] }}">{{ $label }} <span>Required for recorded break</span></label><input id="dtr-{{ $field }}-{{ $item['id'] }}" type="datetime-local" class="form-control" name="proposed[{{ $field }}]" value="{{ $dateValue($field) }}" data-break-time @if($breakPolicy !== 'recorded') disabled @else required @endif></div>@endif
+                                                @if(empty($proposal[$field]))
+                                                    <div class="dtr-form-field"><div class="dtr-break-label">{{ $label }} <span>Required for recorded break</span></div><div class="dtr-break-time-pair">
+                                                        <label for="dtr-{{ $field }}-date-{{ $item['id'] }}">Date<input id="dtr-{{ $field }}-date-{{ $item['id'] }}" type="date" class="form-control" name="break_dates[{{ $field }}]" value="{{ $isOldRow ? old('break_dates.'.$field, $item['date']) : $item['date'] }}" data-break-input @disabled($breakPolicy !== 'recorded')></label>
+                                                        <label for="dtr-{{ $field }}-time-{{ $item['id'] }}">Time<input id="dtr-{{ $field }}-time-{{ $item['id'] }}" type="time" class="form-control" name="break_times[{{ $field }}]" value="{{ $isOldRow ? old('break_times.'.$field, '') : '' }}" data-break-input data-break-time @disabled($breakPolicy !== 'recorded') @required($breakPolicy === 'recorded')></label>
+                                                    </div></div>
+                                                @endif
                                             @endforeach
                                         </div>
                                     </div>
@@ -126,5 +132,5 @@
         </div>
     @endif
 </div>
-<script src="{{ asset('js/my-dtr.js') }}?v=20261030-break-fields" defer></script>
+<script src="{{ asset('js/my-dtr.js') }}?v=20261030-break-dates" defer></script>
 @endsection

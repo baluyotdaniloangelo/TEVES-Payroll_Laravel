@@ -23,6 +23,15 @@ class EmployeeDtrController extends Controller
     {
         $user = User::where('user_id', session('loginID'))->firstOrFail();
         abort_unless(strcasecmp(trim((string) $user->user_type), 'Employee') === 0 && $user->employee_idx, 403);
+        $proposed = $request->input('proposed', []);
+        if (is_array($proposed)) {
+            foreach (['breaktime_start', 'breaktime_end'] as $field) {
+                if ($request->filled('break_times.'.$field)) {
+                    $proposed[$field] = $request->input('break_dates.'.$field).'T'.$request->input('break_times.'.$field);
+                }
+            }
+            $request->merge(['proposed' => $proposed]);
+        }
         $values = $request->validate([
             'version' => ['required','integer','min:1'],
             'proposed.log_in' => ['required','date_format:Y-m-d\\TH:i'],
@@ -30,6 +39,10 @@ class EmployeeDtrController extends Controller
             'proposed.break_policy' => ['required',Rule::in(['recorded','none'])],
             'proposed.breaktime_start' => ['nullable','required_if:proposed.break_policy,recorded','date_format:Y-m-d\\TH:i'],
             'proposed.breaktime_end' => ['nullable','required_if:proposed.break_policy,recorded','date_format:Y-m-d\\TH:i'],
+            'break_dates.breaktime_start' => ['nullable','date_format:Y-m-d'],
+            'break_dates.breaktime_end' => ['nullable','date_format:Y-m-d'],
+            'break_times.breaktime_start' => ['nullable','date_format:H:i'],
+            'break_times.breaktime_end' => ['nullable','date_format:H:i'],
             'note' => ['nullable','string','max:1000'],
             'acknowledged' => ['accepted'],
         ]);

@@ -352,7 +352,8 @@ class AttendanceImportService
                 'i.filename','i.cutoff_start','i.cutoff_end','b.branch_code','b.branch_name',
             ])->map(function($row){
                 $review=json_decode($row->review,true)?:[];
-                $proposal=$review['employee_proposal']??$review['admin_proposal']??json_decode($row->proposed,true);
+                $adminProposal=$review['admin_proposal']??json_decode($row->proposed,true)??[];
+                $proposal=$review['employee_proposal']??$adminProposal;
                 $missing=[];
                 foreach(['log_in'=>'time-in','log_out'=>'time-out'] as $field=>$label){if(empty($proposal[$field]))$missing[]=$label;}
                 if(($proposal['break_policy']??'review')==='review')$missing[]='break treatment';
@@ -363,7 +364,8 @@ class AttendanceImportService
                 return ['id'=>$row->id,'import_id'=>$row->import_id,'date'=>$row->attendance_date,'raw'=>json_decode($row->raw,true),
                     'proposal'=>$proposal,'warnings'=>json_decode($row->warnings,true),'status'=>$row->status,'version'=>$row->version,
                     'filename'=>$row->filename,'cutoff_start'=>$row->cutoff_start,'cutoff_end'=>$row->cutoff_end,
-                    'branch_code'=>$row->branch_code,'branch_name'=>$row->branch_name,'note'=>$review['employee_note']??null,'missing'=>$missing];
+                    'branch_code'=>$row->branch_code,'branch_name'=>$row->branch_name,'note'=>$review['employee_note']??null,'missing'=>$missing,
+                    'break_policy_editable'=>($adminProposal['break_policy']??'review')==='review'];
             });
     }
 
