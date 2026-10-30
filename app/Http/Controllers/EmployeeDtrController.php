@@ -15,7 +15,8 @@ class EmployeeDtrController extends Controller
         abort_unless(strcasecmp(trim((string) $user->user_type), 'Employee') === 0 && $user->employee_idx, 403);
         $employee = \App\Models\EmployeeModel::where('employee_id', $user->employee_idx)->firstOrFail();
         $items = $attendance->employeeItems((int) $employee->employee_id);
-        return view('payroll.my_dtr', compact('user', 'employee', 'items'));
+        $title = 'My DTR';
+        return view('payroll.my_dtr', compact('user', 'employee', 'items', 'title'));
     }
 
     public function submit(Request $request, int $row, AttendanceImportService $attendance)
