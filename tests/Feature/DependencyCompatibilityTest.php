@@ -76,7 +76,7 @@ class DependencyCompatibilityTest extends TestCase
 
     public function test_spreadsheet_export_can_be_read_back(): void
     {
-        $file = tempnam(storage_path('framework'), 'payroll-sheet-');
+        $file = tempnam(sys_get_temp_dir(), 'payroll-sheet-');
         try {
             $sheet = new Spreadsheet();
             $sheet->getActiveSheet()->setCellValue('A1', 'Employee')->setCellValue('B1', 12500);

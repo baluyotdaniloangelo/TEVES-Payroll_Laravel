@@ -55,6 +55,7 @@ class EmployeeManagementController extends Controller
 					'teves_payroll_employee_table.employee_status',
 					'teves_payroll_employee_table.employment_type',
 					'teves_payroll_employee_table.employee_rate',
+					'teves_branch_table.branch_code',
 					'teves_branch_table.branch_name',
 					'teves_payroll_department_table.department_name']);
 

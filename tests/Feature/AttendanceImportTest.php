@@ -20,9 +20,10 @@ class AttendanceImportTest extends TestCase
     {
         parent::setUp();
         config(['activitylog.enabled'=>false]);
+        app()->useStoragePath(sys_get_temp_dir().'/teves-payroll-test-storage');
         Storage::fake('local');
         Schema::create('teves_payroll_user_table',function(Blueprint $t){$t->increments('user_id');$t->string('user_branch_access_type');$t->string('user_real_name')->default('Tester');$t->string('user_type')->default('Admin');});
-        Schema::create('teves_branch_table',function(Blueprint $t){$t->increments('branch_id');$t->string('branch_name');});
+        Schema::create('teves_branch_table',function(Blueprint $t){$t->increments('branch_id');$t->string('branch_code')->default('BR');$t->string('branch_name');});
         Schema::create('teves_payroll_user_branch_access',function(Blueprint $t){$t->integer('user_idx');$t->integer('branch_idx');});
         Schema::create('teves_payroll_employee_table',function(Blueprint $t){
             $t->increments('employee_id');$t->integer('branch_idx');$t->integer('department_idx')->default(1);
@@ -146,12 +147,12 @@ class AttendanceImportTest extends TestCase
         foreach (['ALL','All','all'] as $access) {
             DB::table('teves_payroll_user_table')->where('user_id',1)->update(['user_branch_access_type'=>$access]);
             $this->assertSame([1,2],$service->branches()->pluck('branch_id')->all());
-            $this->get('/attendance-import')->assertOk()->assertSee('<option value="1">Branch A</option>',false)->assertSee('<option value="2">Branch B</option>',false);
+            $this->get('/attendance-import')->assertOk()->assertSee('<option value="1">BR — Branch A</option>',false)->assertSee('<option value="2">BR — Branch B</option>',false);
         }
         DB::table('teves_payroll_user_table')->where('user_id',1)->update(['user_branch_access_type'=>'BYSITE']);
         DB::table('teves_payroll_user_branch_access')->insert(['user_idx'=>1,'branch_idx'=>2]);
         $this->assertSame([2],$service->branches()->pluck('branch_id')->all());
-        $this->get('/attendance-import')->assertOk()->assertDontSee('<option value="1">Branch A</option>',false)->assertSee('<option value="2">Branch B</option>',false);
+        $this->get('/attendance-import')->assertOk()->assertDontSee('<option value="1">BR — Branch A</option>',false)->assertSee('<option value="2">BR — Branch B</option>',false);
         $this->postJson('/attendance-import/devices',['branch_idx'=>1,'name'=>'Denied'])->assertForbidden();
         DB::table('teves_payroll_user_table')->where('user_id',1)->update(['user_branch_access_type'=>'BYBRANCH']);
         DB::table('teves_payroll_user_branch_access')->where('user_idx',1)->delete();
@@ -212,11 +213,11 @@ class AttendanceImportTest extends TestCase
 
     public function test_plotting_page_has_navigation_row_rules_and_employee_confirmation_before_save(): void
     {
-        $response=$this->get('/attendance-import')->assertOk()->assertSee('DTR Plotting')->assertSee('Break treatment')->assertSee('Attendance type')->assertSee('Override default shift');
+        $response=$this->get('/attendance-import')->assertOk()->assertSee('DTR Plotting')->assertSee('Review attendance interval');
         $html=$response->getContent();
         $this->assertStringContainsString('href="http://localhost/attendance-import"',$html);
         $this->assertStringContainsString('id="dtr-export-employee"',$html);
-        $this->assertStringContainsString('I reviewed the employee, punches, break, dates, and classification.',$html);
+        $this->assertStringContainsString('I reviewed the selected DTR intervals and approve them for Employee Logs.',$html);
         $this->assertLessThan(strpos($html,'id="dtr-save-selected"'),strpos($html,'id="dtr-employee-confirm"'));
         $this->assertStringContainsString('js/attendance-dtr.js',$html);
         $this->assertStringContainsString('id="dtr-cutoff-start"',$html);

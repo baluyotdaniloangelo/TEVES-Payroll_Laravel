@@ -16,7 +16,8 @@ class EmployeeDtrController extends Controller
         $employee = \App\Models\EmployeeModel::where('employee_id', $user->employee_idx)->firstOrFail();
         $items = $attendance->employeeItems((int) $employee->employee_id);
         $title = 'My DTR';
-        return view('payroll.my_dtr', compact('user', 'employee', 'items', 'title'));
+        $active_link = 'my_dtr';
+        return view('payroll.my_dtr', compact('user', 'employee', 'items', 'title', 'active_link'));
     }
 
     public function submit(Request $request, int $row, AttendanceImportService $attendance)

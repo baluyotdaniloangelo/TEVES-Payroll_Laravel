@@ -8,7 +8,7 @@
     const $ = id => document.getElementById(id);
     const node = (tag, text, cls) => { const el = document.createElement(tag); if (text != null) el.textContent = text; if (cls) el.className = cls; return el; };
     const drafts = new Map(), confirmations = new Map();
-    let batch = null, result = null, groups = [], selected = null, selectedDate = null, detailId = null, busy = false, activeCutoff = null, manualMappingOpen = false;
+    let batch = null, result = null, groups = [], selected = null, detailId = null, busy = false, activeCutoff = null, manualMappingOpen = false;
     const policies = [['review', 'Choose break treatment'], ['recorded', 'Recorded / manually entered break'], ['none', 'No break — explicitly confirmed']];
     const types = [['No', 'Regular / rest day'], ['Yes', 'Overtime']];
     const overrides = [['No', 'No — use employee shift'], ['Yes', 'Yes — disregard shift timing']];
@@ -49,7 +49,7 @@
             $('dtr-cutoff-end').min = $('dtr-cutoff-start').value;
             confirmations.clear(); drafts.forEach(d => { d.selected = false; });
             $('dtr-employee-confirm').checked = false; cutoffLabel();
-            if (result) { selectedDate = null; detailId = null; $('dtr-review-modal').close(); renderGrid(); }
+            if (result) { detailId = null; $('dtr-review-modal').close(); renderGrid(); }
         };
     });
     $('dtr-apply-cutoff').onclick = async () => {
@@ -111,7 +111,7 @@
     async function load(id, preserve = false) {
         const data = await api(base + '/' + id + '/preview');
         const same = batch === id; result = data; batch = id;
-        if (!preserve || !same) { drafts.clear(); confirmations.clear(); selected = null; selectedDate = null; detailId = null; manualMappingOpen = false; }
+        if (!preserve || !same) { drafts.clear(); confirmations.clear(); selected = null; detailId = null; manualMappingOpen = false; }
         activeCutoff = { cutoff_start: data.batch.cutoff_start || data.batch.period_start, cutoff_end: data.batch.cutoff_end || data.batch.period_end };
         $('dtr-cutoff-start').value = activeCutoff.cutoff_start; $('dtr-cutoff-end').value = activeCutoff.cutoff_end;
         $('dtr-cutoff-end').min = activeCutoff.cutoff_start;
@@ -143,7 +143,7 @@
                     : 'Upload complete. All employee IDs were already mapped; the logs are ready to view.'));
         } catch (e) { message(e.message, true); } finally { busy = false; event.submitter.disabled = false; updateSelection(); }
     };
-    function selectEmployee(id) { if (busy) return; $('dtr-review-modal').close(); selected = id; selectedDate = null; detailId = null; render(); }
+    function selectEmployee(id) { if (busy) return; $('dtr-review-modal').close(); selected = id; detailId = null; render(); }
     $('dtr-export-employee').onchange = () => selectEmployee($('dtr-export-employee').value);
     $('dtr-log-employee').onchange = () => selectEmployee($('dtr-log-employee').value);
     $('dtr-prev-employee').onclick = () => { const index = groups.findIndex(g => g.id === selected); if (index > 0) selectEmployee(groups[index - 1].id); };
@@ -159,7 +159,7 @@
             // Retain edited times, but refresh the employee and conflict snapshot for all dates.
             await load(batch, true);
             const nextUnmapped = unmappedGroups()[0];
-            if (nextUnmapped) { selected = nextUnmapped.id; selectedDate = null; }
+            if (nextUnmapped) selected = nextUnmapped.id;
             else manualMappingOpen = false;
             render();
             message(nextUnmapped
@@ -207,6 +207,50 @@
         const p = draft(row).proposed;
         return !!(p.log_in && p.log_out && (p.break_policy === 'none' || (p.break_policy === 'recorded' && p.breaktime_start && p.breaktime_end)));
     }
+    function dateTimeMs(value, date) {
+        if (!value) return null;
+        let text = String(value).trim();
+        const ampm = text.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i);
+        if (ampm) {
+            let hour = Number(ampm[1]) % 12;
+            if (ampm[4].toUpperCase() === 'PM') hour += 12;
+            text = date + 'T' + String(hour).padStart(2, '0') + ':' + ampm[2] + ':' + (ampm[3] || '00');
+        } else if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(text)) {
+            text = date + 'T' + text;
+        } else {
+            text = text.replace(' ', 'T');
+        }
+        const timestamp = new Date(text).getTime();
+        return Number.isFinite(timestamp) ? timestamp : null;
+    }
+    function workHours(row) {
+        const p = draft(row).proposed, employee = person(row.employee_idx);
+        if (!ready(row) || !employee) return null;
+        const inAt = dateTimeMs(p.log_in, row.date), outAt = dateTimeMs(p.log_out, row.date);
+        if (inAt === null || outAt === null || outAt <= inAt) return null;
+        const elapsed = (outAt - inAt) / 3600000;
+        let breakHours = 0, earlyBreakReturn = 0;
+        if (p.break_policy === 'recorded') {
+            const breakOut = dateTimeMs(p.breaktime_start, row.date), breakIn = dateTimeMs(p.breaktime_end, row.date);
+            if (breakOut === null || breakIn === null || breakIn < breakOut || breakOut < inAt || breakIn > outAt) return null;
+            breakHours = (breakIn - breakOut) / 3600000;
+            const scheduledBreakEnd = dateTimeMs(employee.break_time_out, row.date);
+            if (scheduledBreakEnd !== null && p.override_default_shift !== 'Yes') earlyBreakReturn = Math.max(0, (scheduledBreakEnd - breakIn) / 3600000);
+        }
+        let earlyStart = 0;
+        const scheduledStart = dateTimeMs(employee.time_in, row.date);
+        if (scheduledStart !== null && p.override_default_shift !== 'Yes') earlyStart = Math.max(0, (scheduledStart - inAt) / 3600000);
+        const adjusted = Math.max(0, elapsed - breakHours - earlyStart - earlyBreakReturn);
+        return p.overtime_status === 'Yes' ? elapsed : Math.min(8, adjusted);
+    }
+    function workHoursCell(row) {
+        const cell = node('td', null, 'dtr-work-hours');
+        cell.dataset.label = 'Work Hours';
+        const hours = workHours(row);
+        cell.append(node('strong', hours === null ? '—' : hours.toFixed(2) + ' hrs'));
+        if (hours === null) cell.append(node('small', 'Complete punches and break setting'));
+        return cell;
+    }
     function statusFor(row) {
         const p = draft(row).proposed;
         if (row.status === 'saved') return 'Saved';
@@ -228,6 +272,7 @@
     }
     function timeCell(row, key, label) {
         const state = draft(row), cell = node('td'), input = node('input', null, 'form-control form-control-sm');
+        cell.dataset.label = label;
         input.type = 'time'; input.value = timeOf(state.proposed[key]); input.setAttribute('aria-label', label + ' ' + row.date + ' interval ' + row.id);
         input.disabled = ['saved','employee_submitted','kept'].includes(row.status) || (key.startsWith('breaktime') && state.proposed.break_policy === 'none');
         input.onchange = () => { const date = stampDate(state.proposed[key]) || row.date; change(row, key, input.value ? date + 'T' + input.value : null); };
@@ -238,57 +283,53 @@
     function optionLabel(options, value) { return options.find(([optionValue]) => optionValue === value)?.[1] || 'Not selected'; }
     function classificationCell(row) {
         const cell = node('td', null, 'dtr-classification'), proposed = draft(row).proposed;
+        cell.dataset.label = 'Classification';
         const summary = [optionLabel(policies, proposed.break_policy), optionLabel(types, proposed.overtime_status), optionLabel(overrides, proposed.override_default_shift)].join(' · ');
         cell.append(node('span', summary, 'dtr-classification-summary'));
         return cell;
+    }
+    function dateCell(date, row = null) {
+        const cell = node('td', null, 'dtr-date'), wrapper = node('div', null, 'dtr-date-cell');
+        cell.dataset.label = 'Date';
+        const stamp = new Date(date + 'T12:00:00');
+        const badge = node('span', null, 'dtr-date-badge');
+        badge.append(node('strong', stamp.toLocaleDateString('en-US', { day: '2-digit' })),
+            node('small', stamp.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()));
+        const copy = node('span', null, 'dtr-date-copy');
+        copy.append(node('strong', stamp.toLocaleDateString('en-US', { weekday: 'long' })),
+            node('small', row
+                ? (row.proposed.overtime_status === 'Yes' ? 'Overtime' : 'Regular / rest day')
+                : 'No punches in this file'));
+        wrapper.append(badge, copy); cell.append(wrapper); return cell;
     }
     ['dtr-review-close', 'dtr-review-done'].forEach(id => { $(id).onclick = () => $('dtr-review-modal').close(); });
     $('dtr-review-modal').addEventListener('close', () => { detailId = null; renderGrid(); });
     function renderGrid() {
         const group = current(), body = $('dtr-grid-body'); body.replaceChildren();
         const byDate = new Map(); visibleRows(group).forEach(r => { if (!byDate.has(r.date)) byDate.set(r.date, []); byDate.get(r.date).push(r); });
-        const dates = dayList();
-        if (!dates.includes(selectedDate)) selectedDate = dates.find(date => byDate.has(date)) || dates[0] || null;
-        const nav = $('dtr-date-nav'); nav.replaceChildren();
-        dates.forEach(date => {
-            const rows = byDate.get(date) || [];
-            const button = node('button', null, 'dtr-day-button' + (date === selectedDate ? ' is-active' : ''));
-            button.type = 'button'; button.setAttribute('aria-pressed', String(date === selectedDate));
-            button.setAttribute('aria-label', date + ', ' + rows.length + ' intervals');
-            const icon = node('span', null, 'dtr-day-icon');
-            icon.append(node('strong', new Date(date + 'T12:00:00').toLocaleDateString('en-US', { day: '2-digit' })),
-                node('small', new Date(date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short' }).toUpperCase()));
-            const copy = node('span', null, 'dtr-day-copy');
-            copy.append(node('strong', new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long' })),
-                node('small', rows.length ? rows.length + ' interval' + (rows.length === 1 ? '' : 's') : 'No punches'));
-            button.append(icon, copy); button.onclick = () => { selectedDate = date; renderGrid(); };
-            nav.append(button);
-        });
-        dates.filter(date => date === selectedDate).forEach(date => {
+        dayList().forEach(date => {
             const rows = byDate.get(date) || [];
             if (!rows.length) {
-                const tr = node('tr'); tr.append(node('td'), node('td', shortDate(date), 'dtr-date'));
-                const empty = node('td', 'No punches in this file — no absence or hours assumed.', 'text-muted'); empty.colSpan = 7; tr.append(empty); body.append(tr); return;
+                const tr = node('tr'); tr.append(node('td'), dateCell(date));
+                const empty = node('td', 'No absence or hours assumed.', 'text-muted'); empty.colSpan = 8; tr.append(empty); body.append(tr); return;
             }
             rows.forEach(row => {
                 const state = draft(row), tr = node('tr'); tr.dataset.row = row.id; if (state.selected) tr.className = 'dtr-row-selected';
-                const selectCell = node('td'), check = node('input', null, 'form-check-input'); check.type = 'checkbox'; check.checked = state.selected;
-                check.setAttribute('aria-label', 'Include ' + date + ' interval ' + row.id); check.disabled = ['saved','employee_submitted','kept'].includes(row.status) || !row.employee_idx;
+                const selectCell = node('td'), check = node('input', null, 'form-check-input'); selectCell.dataset.label = 'Include'; check.type = 'checkbox'; check.checked = state.selected;
+                check.setAttribute('aria-label', 'Include ' + date + ' interval ' + row.id); check.disabled = ['saved','employee_submitted','kept','skipped'].includes(row.status) || !row.employee_idx;
                 check.onchange = () => { state.selected = check.checked; invalidate(); tr.classList.toggle('dtr-row-selected', check.checked); updateSelection(); }; selectCell.append(check); tr.append(selectCell);
-                const dateCell = node('td', shortDate(date), 'dtr-date');
-                dateCell.append(node('span', new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short' }) + ' · ' + (state.proposed.overtime_status === 'Yes' ? 'Overtime' : 'Regular / rest day'), 'dtr-day-note'));
-                tr.append(dateCell, timeCell(row, 'log_in', 'Time in'), timeCell(row, 'breaktime_start', 'Break out'), timeCell(row, 'breaktime_end', 'Break in'), timeCell(row, 'log_out', 'Time out'));
-                const status = node('td'); status.append(node('span', statusFor(row), row.status === 'saved' ? 'text-success' : 'text-warning'));
+                tr.append(dateCell(date, state), timeCell(row, 'log_in', 'Time in'), timeCell(row, 'breaktime_start', 'Break out'), timeCell(row, 'breaktime_end', 'Break in'), timeCell(row, 'log_out', 'Time out'), workHoursCell(row));
+                const status = node('td'); status.dataset.label = 'Status'; status.append(node('span', statusFor(row), row.status === 'saved' ? 'text-success' : 'text-warning'));
                 if (state.feedback) status.append(node('p', state.feedback, 'dtr-row-message mb-0 ' + (state.error ? 'text-danger' : 'text-success'))); tr.append(status);
                 tr.append(classificationCell(row));
-                const action = node('td'), details = node('button', 'Review', 'btn btn-sm btn-outline-secondary'); details.type = 'button'; details.setAttribute('aria-label', 'Review details ' + date + ' interval ' + row.id); details.onclick = () => { detailId = row.id; showDetail(row.id); }; action.append(details); tr.append(action); body.append(tr);
+                const action = node('td'), details = node('button', 'Review', 'btn btn-sm btn-outline-secondary'); action.dataset.label = 'Details'; details.type = 'button'; details.setAttribute('aria-label', 'Review details ' + date + ' interval ' + row.id); details.onclick = () => { detailId = row.id; showDetail(row.id); }; action.append(details); tr.append(action); body.append(tr);
             });
         });
         updateSelection();
     }
     function updateSelection() {
         const group = current(); if (!group) return;
-        const eligible = visibleRows(group).filter(r => r.date === selectedDate && !['saved','employee_submitted','kept','skipped'].includes(r.status) && r.employee_idx && ready(r));
+        const eligible = visibleRows(group).filter(r => !['saved','employee_submitted','kept','skipped'].includes(r.status) && r.employee_idx && ready(r));
         const selectedRows = visibleRows(group).filter(r => !['saved','employee_submitted','kept','skipped'].includes(r.status) && draft(r).selected);
         $('dtr-selection-count').textContent = new Set(selectedRows.map(r => r.date)).size + ' dates / ' + selectedRows.length + ' intervals selected · cutoff ' + activeCutoff.cutoff_start + ' to ' + activeCutoff.cutoff_end;
         $('dtr-review-complete').checked = eligible.length > 0 && eligible.every(r => draft(r).selected);
@@ -300,7 +341,7 @@
     }
     $('dtr-review-complete').onchange = () => {
         const value = $('dtr-review-complete').checked;
-        visibleRows().forEach(row => { if (row.date === selectedDate && !['saved','employee_submitted','kept','skipped'].includes(row.status) && row.employee_idx && ready(row)) draft(row).selected = value; });
+        visibleRows().forEach(row => { if (!['saved','employee_submitted','kept','skipped'].includes(row.status) && row.employee_idx && ready(row)) draft(row).selected = value; });
         invalidate(); renderGrid();
     };
     $('dtr-employee-confirm').onchange = () => { confirmations.set(selected, $('dtr-employee-confirm').checked); updateSelection(); };
@@ -398,7 +439,7 @@
         if (cutoffPending() || !confirmations.get(group.id) || mappingPending()) { message('Apply the cutoff, confirm the employee mapping, and confirm your admin edits before saving.', true); return; }
         const rows = visibleRows(group).filter(r => !['saved','employee_submitted','kept'].includes(r.status) && draft(r).selected);
         if (!rows.length) return;
-        busy = true; lockReview(true); let queued = 0, kept = 0, failed = 0, emailFailed = 0;
+        busy = true; lockReview(true); let approved = 0, kept = 0, failed = 0;
         try {
             for (const row of rows) {
                 const state = draft(row);
@@ -406,23 +447,22 @@
                     const response = await api(base + '/' + batch + '/rows/' + row.id, { action: 'save', version: row.version, employee_idx: row.employee_idx, confirmed: true,
                         proposed: state.proposed, conflict_hash: row.conflict_hash, conflict_action: state.conflict_action });
                     state.error = false;
-                    if (response.status === 'employee_pending') {
-                        row.status = response.status; row.version = response.version || row.version + 1;
-                        state.selected = false; state.dirty = false; state.feedback = response.email_sent === false ? 'Saved; email failed.' : (response.email_already_sent ? 'Admin edits saved; employee was already emailed.' : 'Saved and emailed to employee.'); queued++;
-                        if (response.email_sent === false) emailFailed++;
+                    if (response.status === 'saved') {
+                        row.status = 'saved'; row.saved_log_id = response.log_id || null; row.version = response.version || row.version + 1;
+                        state.selected = false; state.dirty = false; state.feedback = 'Admin approved and posted to Employee Logs.'; approved++;
                     } else { state.feedback = 'Existing attendance kept.'; state.selected = false; kept++; }
                 } catch (e) { state.feedback = e.message; state.error = true; failed++; }
-                $('dtr-save-result').textContent = queued + ' intervals saved/updated for employee completion · ' + kept + ' existing records kept · ' + failed + ' need review · ' + emailFailed + ' email failures';
+                $('dtr-save-result').textContent = approved + ' intervals approved and posted to Employee Logs · ' + kept + ' existing records kept · ' + failed + ' need review';
             }
         } finally {
             confirmations.set(group.id, false); busy = false; lockReview(false); render();
-            $('dtr-save-result').textContent = queued + ' intervals saved/updated for employee completion · ' + kept + ' existing records kept · ' + failed + ' need review · ' + emailFailed + ' email failures. Final attendance is posted only after payroll approval.';
+            $('dtr-save-result').textContent = approved + ' intervals approved and posted to Employee Logs · ' + kept + ' existing records kept · ' + failed + ' need review';
         }
     };
     $('dtr-send-mapped').onclick = async () => {
         if (busy || !batch) return;
         if (cutoffPending()) { message('Apply the cutoff before saving mapped logs.', true); return; }
-        if (!window.confirm('Save all mapped device logs in this cutoff and email each linked employee to complete only missing DTR details?')) return;
+        if (!window.confirm('Post complete mapped DTR entries as approved, and email employees only where time or break details are missing?')) return;
         const button = $('dtr-send-mapped'), activeEmployee = selected;
         busy = true; lockReview(true); button.textContent = 'Saving mapped logs…'; $('dtr-send-result').textContent = '';
         try {
@@ -432,10 +472,12 @@
             if (groups.some(group => group.id === activeEmployee)) { selected = activeEmployee; render(); }
             const missingAccounts = response.missing_accounts || [], missingEmails = response.missing_emails || [], failures = response.email_failures || [];
             const details = [
-                (response.queued || 0) + ' new intervals queued',
+                (response.auto_approved || 0) + ' complete intervals posted and approved',
+                (response.queued || 0) + ' incomplete intervals sent for employee completion',
                 (response.emails_sent || 0) + ' employee emails sent',
                 (response.already_sent || 0) + ' employees already emailed',
                 (response.unmapped || 0) + ' unmapped intervals',
+                (response.needs_review || 0) + ' intervals need payroll review',
                 missingAccounts.length + ' employees missing a linked Employee account',
                 missingEmails.length + ' employees missing a valid email address',
                 failures.length + ' email failures'
@@ -444,9 +486,9 @@
                 + (missingAccounts.length ? '. Create/link Employee accounts for: ' + missingAccounts.join(', ') : '')
                 + (missingEmails.length ? '. Add a valid email in Employee Information or the linked Employee account for: ' + missingEmails.join(', ') : '')
                 + (failures.length ? '. Email failed for: ' + failures.join(', ') : '');
-            $('dtr-send-result').className = 'mt-2 mb-0 ' + ((missingAccounts.length || missingEmails.length || failures.length || response.unmapped) ? 'text-warning' : 'text-success');
+            $('dtr-send-result').className = 'mt-2 mb-0 ' + ((missingAccounts.length || missingEmails.length || failures.length || response.unmapped || response.needs_review) ? 'text-warning' : 'text-success');
         } catch (e) { message(e.message, true); }
-        finally { busy = false; lockReview(false); button.textContent = 'Save mapped logs & email employees'; render(); }
+        finally { busy = false; lockReview(false); button.textContent = 'Save DTR & email employees with missing details'; render(); }
     };
     window.addEventListener('beforeunload', event => { if (dirty()) { event.preventDefault(); event.returnValue = ''; } });
 })();

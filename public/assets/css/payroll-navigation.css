@@ -7,3 +7,29 @@
 .employee-filter-card .form-label{font-size:12px;font-weight:600;color:#455468;margin-bottom:5px}
 .employee-filter-card .form-control,.employee-filter-card .form-select{min-height:40px;border-color:#dfe5ec}
 #employee_details_modal .modal-body{max-height:calc(100vh - 150px);overflow-y:auto}
+#employee_details_modal .employee-form-layout{display:block}
+#employee_details_modal .employee-form-main{min-width:0}
+#employee_details_modal .employee-form-tabs{display:flex;gap:5px;margin-bottom:12px;padding:4px;overflow-x:auto;border:1px solid #e3e8ed;border-radius:10px;background:#f8fafb}
+#employee_details_modal .employee-form-tab{display:flex;align-items:center;justify-content:center;gap:7px;flex:1;min-width:max-content;min-height:42px;padding:8px 11px;border:0;border-radius:7px;background:transparent;color:#667786;font-size:11px;font-weight:700;white-space:nowrap;cursor:pointer}
+#employee_details_modal .employee-form-tab.is-active{background:#fff;color:#d96b25;box-shadow:0 2px 7px #273d501c}
+#employee_details_modal .employee-form-tab:focus-visible{outline:2px solid #e77d2d;outline-offset:-2px}
+#employee_details_modal .employee-form-pane[hidden]{display:none!important}
+#employee_details_modal .employee-form-pane{margin:0 0 14px;padding:17px;border:1px solid #e3e8ed;border-left:3px solid #ff922e;border-radius:10px;background:#fff}
+#employee_details_modal .employee-schedule-grid{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:24px;align-items:start}
+#employee_details_modal .employee-schedule-times{min-width:0}
+#employee_details_modal .employee-restday-panel{min-width:0;margin:0;padding:9px 14px;border:1px solid #e3e8ed;border-radius:8px;background:#f8fafb}
+#employee_details_modal .employee-form-pane .row{--bs-gutter-x:12px}
+#employee_details_modal .employee-form-pane .input-block{margin-bottom:11px!important}
+#employee_details_modal .employee-form-pane .col-form-label{font-size:11px;font-weight:600}
+#employee_details_modal .employee-form-pane .form-control,#employee_details_modal .employee-form-pane .form-select{min-height:39px}
+#employee_details_modal .employee-schedule-panel .input-block:last-child{margin-bottom:0!important}
+#employee_details_modal .employee-restday-option{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:42px;margin:0;padding:8px 2px;border-bottom:1px solid #e7ecef;cursor:pointer;font-size:12px;font-weight:600;color:#344554}
+#employee_details_modal .employee-restday-option:last-child{border-bottom:0}
+#employee_details_modal .employee-restday-option input{flex:none;width:18px;height:18px;margin:0;accent-color:#ff922e;cursor:pointer}
+@media(max-width:991px){
+ #employee_details_modal .employee-schedule-grid{grid-template-columns:minmax(0,1fr) 240px;gap:15px}
+}
+@media(max-width:767px){
+ #employee_details_modal .employee-schedule-grid{grid-template-columns:1fr}
+ #employee_details_modal .employee-form-pane{padding:14px}
+}

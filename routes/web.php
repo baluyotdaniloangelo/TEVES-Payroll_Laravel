@@ -213,6 +213,7 @@ Route::get('/payslip', [PayslipController::class,'print_payslip'])->name('paysli
 Route::middleware('isLoggedIn')->prefix('attendance-import')->name('attendance-import.')->group(function () {
     $controller = \App\Http\Controllers\AttendanceImportController::class;
     Route::get('/', [$controller, 'index'])->name('index');
+    Route::get('/saved', [$controller, 'savedEntries'])->name('saved');
     Route::post('/devices', [$controller, 'device'])->name('devices');
     Route::post('/upload', [$controller, 'upload'])->name('upload');
     Route::get('/{batch}/preview', [$controller, 'preview'])->name('preview');
@@ -221,6 +222,11 @@ Route::middleware('isLoggedIn')->prefix('attendance-import')->name('attendance-i
     Route::post('/{batch}/cutoff', [$controller, 'cutoff'])->name('cutoff');
     Route::post('/{batch}/rows/{row}', [$controller, 'save'])->whereNumber('row')->name('save');
     Route::post('/{batch}/rows/{row}/approve', [$controller, 'approve'])->whereNumber('row')->name('approve');
+    Route::post('/return-log/{log}', [$controller, 'returnLogToEmployee'])->whereNumber('log')->name('return-log');
+    Route::post('/saved/rows/{row}/complete', [$controller, 'completePendingDtr'])->whereNumber('row')->name('complete-pending');
+    Route::post('/saved/rows/{row}/return', [$controller, 'returnSubmittedDtr'])->whereNumber('row')->name('return-submitted');
+    Route::post('/{batch}/resend/{employee}', [$controller, 'resendEmployeeDtr'])->whereNumber('employee')->name('resend-email');
+    Route::post('/saved/{log}/update', [$controller, 'updateSavedDtr'])->whereNumber('log')->name('update-log');
     Route::get('/{batch}/source', [$controller, 'source'])->name('source');
 });
 
@@ -228,3 +234,11 @@ Route::middleware('isLoggedIn')->prefix('my-dtr')->name('my-dtr.')->group(functi
     Route::get('/', [\App\Http\Controllers\EmployeeDtrController::class, 'index'])->name('index');
     Route::post('/{row}', [\App\Http\Controllers\EmployeeDtrController::class, 'submit'])->whereNumber('row')->name('submit');
 });
+Route::get('/my-payroll', [\App\Http\Controllers\EmployeePayrollHistoryController::class, 'index'])
+    ->name('my-payroll.index')->middleware('isLoggedIn');
+Route::middleware('isLoggedIn')->prefix('my-profile')->name('my-profile.')->group(function(){
+    Route::get('/',[\App\Http\Controllers\EmployeePortalController::class,'profile'])->name('index');
+    Route::post('/password',[\App\Http\Controllers\EmployeePortalController::class,'changePassword'])->name('password');
+});
+Route::get('/my-updates',[\App\Http\Controllers\EmployeePortalController::class,'notifications'])
+    ->name('my-updates.index')->middleware('isLoggedIn');

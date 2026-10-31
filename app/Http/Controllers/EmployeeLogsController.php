@@ -72,18 +72,7 @@ class EmployeeLogsController extends Controller
                     $imported = \Illuminate\Support\Facades\DB::table('attendance_import_rows')->where('saved_log_id', $row->employee_logs_id)->exists();
                     return $imported ? 'Imported' : 'Manual / Legacy';
                 })
-                ->addColumn('action', function($row){				
-					$actionBtn = '
-					<div class="dropdown dropdown-action">
-						<a href="#" class="action-icon dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="true"><i class="si si-options-vertical" data-bs-toggle="tooltip" aria-label="si-options-vertical" data-bs-original-title="si-options-vertical"></i></a>
-							<div class="dropdown-menu dropdown-menu-right " data-popper-placement="bottom-end" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);">
-								<a class="dropdown-item" href="#" data-id="'.$row->employee_logs_id.'" id="edit_employee_logs"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
-								<a class="dropdown-item" href="#" data-id="'.$row->employee_logs_id.'" id="delete_employee_logs"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>
-							</div>
-					</div>';
-                    return $actionBtn;
-					
-                })
+                ->addColumn('action', fn($row) => $this->attendanceLogActions($row))
 					
 				->rawColumns(['action'])
                 /*SEARCH FILTER*/
@@ -167,18 +156,7 @@ class EmployeeLogsController extends Controller
                     $imported = \Illuminate\Support\Facades\DB::table('attendance_import_rows')->where('saved_log_id', $row->employee_logs_id)->exists();
                     return $imported ? 'Imported' : 'Manual / Legacy';
                 })
-                ->addColumn('action', function($row){				
-					$actionBtn = '
-					<div class="dropdown dropdown-action">
-						<a href="#" class="action-icon dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="true"><i class="si si-options-vertical" data-bs-toggle="tooltip" aria-label="si-options-vertical" data-bs-original-title="si-options-vertical"></i></a>
-							<div class="dropdown-menu dropdown-menu-right " data-popper-placement="bottom-end" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);">
-								<a class="dropdown-item" href="#" data-id="'.$row->employee_logs_id.'" id="edit_employee_logs"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
-								<a class="dropdown-item" href="#" data-id="'.$row->employee_logs_id.'" id="delete_employee_logs"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>
-							</div>
-					</div>';
-                    return $actionBtn;
-					
-                })
+                ->addColumn('action', fn($row) => $this->attendanceLogActions($row))
 					
 				->rawColumns(['action'])
                 ->make(true);
@@ -225,18 +203,7 @@ class EmployeeLogsController extends Controller
                     $imported = \Illuminate\Support\Facades\DB::table('attendance_import_rows')->where('saved_log_id', $row->employee_logs_id)->exists();
                     return $imported ? 'Imported' : 'Manual / Legacy';
                 })
-                ->addColumn('action', function($row){				
-					$actionBtn = '
-					<div class="dropdown dropdown-action">
-						<a href="#" class="action-icon dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="true"><i class="si si-options-vertical" data-bs-toggle="tooltip" aria-label="si-options-vertical" data-bs-original-title="si-options-vertical"></i></a>
-							<div class="dropdown-menu dropdown-menu-right " data-popper-placement="bottom-end" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);">
-								<a class="dropdown-item" href="#" data-id="'.$row->employee_logs_id.'" id="edit_employee_logs"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
-								<a class="dropdown-item" href="#" data-id="'.$row->employee_logs_id.'" id="delete_employee_logs"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>
-							</div>
-					</div>';
-                    return $actionBtn;
-					
-                })
+                ->addColumn('action', fn($row) => $this->attendanceLogActions($row))
 					
 				->rawColumns(['action'])
                 ->make(true);
@@ -285,6 +252,23 @@ class EmployeeLogsController extends Controller
 		return 'Deleted';
 		
 	} 
+
+    private function attendanceLogActions($row): string
+    {
+        $logId=(int)$row->employee_logs_id;
+        $actionBtn='<div class="dropdown dropdown-action">
+            <a href="#" class="action-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="true"><i class="si si-options-vertical" aria-hidden="true"></i></a>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="#" data-id="'.$logId.'" id="edit_employee_logs"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
+                <a class="dropdown-item" href="#" data-id="'.$logId.'" id="delete_employee_logs"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>';
+
+        if (\Illuminate\Support\Facades\Schema::hasTable('attendance_import_rows')
+            && DB::table('attendance_import_rows')->where('saved_log_id',$logId)->where('status','saved')->exists()) {
+            $actionBtn.='<a class="dropdown-item text-warning return-imported-dtr" href="#" data-id="'.$logId.'"><i class="fa-solid fa-rotate-left m-r-5"></i> Return to My DTR</a>';
+        }
+
+        return $actionBtn.'</div></div>';
+    }
 
 	public function submit_employee_regular_logs_information(Request $request)
     {

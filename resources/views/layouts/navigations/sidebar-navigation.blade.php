@@ -9,6 +9,7 @@
                     <ul>
                         <li><a class="{{ ($active_link ?? '') === 'employee_attendance_logs' ? 'active' : '' }}" href="{{ route('employee_attendance_logs') }}">Employee Attendance Logs</a></li>
                         <li><a class="{{ ($active_link ?? '') === 'attendance_dtr_plotting' ? 'active' : '' }}" href="{{ route('attendance-import.index') }}">DTR Plotting</a></li>
+                        <li><a class="{{ ($active_link ?? '') === 'saved_dtr_entries' ? 'active' : '' }}" href="{{ route('attendance-import.saved') }}">Saved DTR Entries</a></li>
                         <li><a class="{{ ($active_link ?? '') === 'drivers_attendance_logs' ? 'active' : '' }}" href="{{ route('drivers_attendance_logs') }}">Drivers Attendance Logs</a></li>
                     </ul>
                 </li>

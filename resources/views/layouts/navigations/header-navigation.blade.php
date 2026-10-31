@@ -271,6 +271,9 @@
 						<div class="dropdown-menu">
 							@if(isset($user) && strcasecmp(trim((string)$user->user_type), 'Employee') === 0)
 							<a class="dropdown-item" href="{{ route('my-dtr.index') }}">My DTR</a>
+							<a class="dropdown-item" href="{{ route('my-payroll.index') }}">My Payroll</a>
+							<a class="dropdown-item" href="{{ route('my-updates.index') }}">My Updates</a>
+							<a class="dropdown-item" href="{{ route('my-profile.index') }}">My Profile</a>
 							@else
 							<a class="dropdown-item" href="profile.html">My Profile</a>
 							<a class="dropdown-item" href="settings.html">Settings</a>

@@ -247,6 +247,7 @@
 									<li><a href="leave-settings.html">Leave Settings</a></li>
 									<li><a href="attendance.html">Attendance (Admin)</a></li>
                                     <li><a href="{{ route('attendance-import.index') }}" class="{{ ($active_link ?? '') === 'attendance_dtr_plotting' ? 'active' : '' }}">DTR Plotting</a></li>
+                                    <li><a href="{{ route('attendance-import.saved') }}" class="{{ ($active_link ?? '') === 'saved_dtr_entries' ? 'active' : '' }}">Saved DTR Entries</a></li>
 									<li><a href="attendance-employee.html">Attendance (Employee)</a></li>
 									<li><a href="departments.html">Departments</a></li>
 									<li><a href="designations.html">Designations</a></li>

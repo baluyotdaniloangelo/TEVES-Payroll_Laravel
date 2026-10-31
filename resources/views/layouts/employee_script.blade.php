@@ -3,6 +3,35 @@
   <script src="{{asset('Datatables/2.0.8/js/dataTables.js')}}"></script>
    <script src="{{asset('Datatables/responsive/3.0.2/js/dataTables.responsive.js')}}"></script>
    <script type="text/javascript">
+			function showEmployeeFormTab(name){
+				const modal = document.getElementById('employee_details_modal');
+				if (!modal) return;
+				modal.querySelectorAll('[data-employee-tab]').forEach(function(tab){
+					const active = tab.dataset.employeeTab === name;
+					tab.classList.toggle('is-active', active);
+					tab.setAttribute('aria-selected', active ? 'true' : 'false');
+					tab.tabIndex = active ? 0 : -1;
+				});
+				modal.querySelectorAll('[data-employee-tab-panel]').forEach(function(panel){
+					panel.hidden = panel.dataset.employeeTabPanel !== name;
+				});
+			}
+			$(function(){
+				showEmployeeFormTab('identity');
+				$('#employee_details_modal [data-employee-tab]').on('click',function(){
+					showEmployeeFormTab(this.dataset.employeeTab);
+				});
+				$('#employee_details_modal [data-employee-tab]').on('keydown',function(event){
+					if (!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+					event.preventDefault();
+					const tabs = Array.from(document.querySelectorAll('#employee_details_modal [data-employee-tab]'));
+					const current = tabs.indexOf(this);
+					const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1
+						: (current + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+					showEmployeeFormTab(tabs[next].dataset.employeeTab);
+					tabs[next].focus();
+				});
+			});
 
 			<!--Load Table-->
 			$(function () {
@@ -30,7 +59,7 @@
 							{data: 'DT_RowIndex', name: 'DT_RowIndex' , orderable: false, searchable: false, className: "text-right"},       
 							{data: 'employee_number', className: "text-left"},
 							{data: 'employee_full_name'},
-							{data: 'branch_name', name: 'teves_branch_table.branch_name'},
+							{data: 'branch_code', name: 'teves_branch_table.branch_code'},
 							{data: 'department_name', name: 'teves_payroll_department_table.department_name'},
 							{data: 'employee_position'},
 							{data: 'employee_rate'},
@@ -131,9 +160,14 @@
 			
 			/*#0*/let employee_id 						= document.getElementById("submit_employee_details").value;
 			const employeeForm = document.getElementById('Employeeform');
-			if (!employeeForm.checkValidity()) {
+			const firstInvalid = Array.from(employeeForm.elements).find(function(field){
+				return field.willValidate && !field.validity.valid;
+			});
+			if (firstInvalid) {
 				employeeForm.classList.add('was-validated');
-				employeeForm.reportValidity();
+				const panel = firstInvalid.closest('[data-employee-tab-panel]');
+				if (panel) showEmployeeFormTab(panel.dataset.employeeTabPanel);
+				firstInvalid.reportValidity();
 				return;
 			}
 
@@ -161,6 +195,7 @@
 				if (!branch_idx || !department_idx) {
 					const missing = !branch_idx ? 'Pumili ng branch mula sa listahan.' : 'Pumili ng department mula sa listahan.';
 					$('#employee_form_error_summary').removeClass('d-none').text(missing);
+					showEmployeeFormTab('identity');
 					$('#' + (!branch_idx ? 'branch_idx' : 'department_idx')).addClass('is-invalid').trigger('focus');
 					return;
 				}
@@ -275,6 +310,9 @@
 					$('<strong>').text('Pakisuri ang mga sumusunod:').appendTo(summary);
 					const list = $('<ul class="mb-0 mt-1"></ul>').appendTo(summary);
 					messages.forEach(function (message) { $('<li>').text(message).appendTo(list); });
+					const firstErrorInput = errors[Object.keys(errors)[0]] ? document.getElementById(Object.keys(errors)[0]) : null;
+					const errorPanel = firstErrorInput && firstErrorInput.closest('[data-employee-tab-panel]');
+					if (errorPanel) showEmployeeFormTab(errorPanel.dataset.employeeTabPanel);
 					$('#employee_details_modal .modal-body').scrollTop(0);
 				  
 				}
@@ -457,6 +495,7 @@
   	function ResetEmployeeForm(){
 			
 			$('#Employeeform')[0].reset();
+			showEmployeeFormTab('identity');
 			$('#employee_form_error_summary').addClass('d-none').empty();
 			$('#Employeeform .is-invalid').removeClass('is-invalid');
 			$('#department_list').empty().append('<option value=""></option>');

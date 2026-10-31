@@ -466,6 +466,35 @@
 	  });
 	  
 	<!--Employee Deletion Confirmation-->
+	$('body').on('click','.return-imported-dtr',function(e){
+		e.preventDefault();
+		const logId=$(this).data('id');
+		const tableElement=$(this).closest('table');
+		if(!window.confirm('Return this posted DTR to the employee for correction? The saved attendance log will be removed and the employee can edit its punches in My DTR. Payroll-locked logs cannot be returned.')) return;
+
+		$.ajax({
+			url: "{{ url('/attendance-import/return-log') }}/"+logId,
+			type: 'POST',
+			data: {_token: "{{ csrf_token() }}"},
+			success: function(response){
+				const tableId=tableElement.attr('id');
+				if(tableId && $.fn.DataTable.isDataTable('#'+tableId)){
+					$('#'+tableId).DataTable().ajax.reload(null,false);
+				}
+				const message=response.email_sent
+					? 'DTR returned to My DTR for correction. The employee was emailed.'
+					: (response.email_message || 'DTR returned to My DTR for correction. No notification email was sent.');
+				$('#modal_success_details').text(message);
+				$('#success-alert-modal').modal('show');
+			},
+			error: function(xhr){
+				const message=xhr.responseJSON?.message || 'Unable to return this DTR. Refresh the page and try again.';
+				window.alert(message);
+			}
+		});
+	});
+
+	<!--Employee Deletion Confirmation-->
 	$('body').on('click','#delete_employee_logs',function(){
 			
 			event.preventDefault();

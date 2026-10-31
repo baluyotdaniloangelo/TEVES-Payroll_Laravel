@@ -205,7 +205,9 @@ class AttendanceLogWriter
 			/*Compute Tardiness*/
 			 $tardiness_morning_shift = ($employee_default_time_in_strtotime - $time_in_string_to_time) / 3600;
 			//echo "[$tardiness_morning_shift]";
-			 $tardiness_late_afternoon = ($employee_default_breaktime_out_strtotime - $break_time_out_string_to_time) / 3600;
+			 $no_break_treatment = $request->input('break_policy') === 'none'
+				|| (strtotime($breaktime_start) === strtotime($log_in) && strtotime($breaktime_end) === strtotime($log_in));
+			 $tardiness_late_afternoon = $no_break_treatment ? 0 : ($employee_default_breaktime_out_strtotime - $break_time_out_string_to_time) / 3600;
 			/*Tardiness for Morning*/
 			if($tardiness_morning_shift<0){
 				/*Negative Means Late*/
@@ -360,15 +362,20 @@ class AttendanceLogWriter
 						}
 			
 			if($overtime_status=='No'){
-
-                if($total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + 0 + $total_undertime_hours)>=8){
-                     $excess_hours_after_shift = ($total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + 0 + $total_undertime_hours) )-8;
-                }
-                else{
-                     $excess_hours_after_shift = 0;
-                }
-
-			    $total_regular_hours = $total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + $excess_hours_after_shift + $total_undertime_hours);
+				if ($request->exists('break_policy') || $no_break_treatment) {
+					// Punch duration already reflects an early departure. Do not subtract undertime twice.
+					$work_hours_before_cap = max(0, (float)$total_hours_from_log_in_and_out - (float)$total_excess_hours - (float)$total_breaktime_hours);
+					$excess_hours_after_shift = max(0, $work_hours_before_cap - 8);
+					$total_regular_hours = max(0, $work_hours_before_cap - $excess_hours_after_shift);
+				} else {
+					if($total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + 0 + $total_undertime_hours)>=8){
+						 $excess_hours_after_shift = ($total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + 0 + $total_undertime_hours) )-8;
+					}
+					else{
+						 $excess_hours_after_shift = 0;
+					}
+				    $total_regular_hours = $total_hours_from_log_in_and_out - ($total_excess_hours + $total_breaktime_hours + $excess_hours_after_shift + $total_undertime_hours);
+				}
 			    $total_tardiness_hours = $total_tardiness;
 				
 			    if($check_employee_rest_day == 1){
@@ -587,6 +594,15 @@ class AttendanceLogWriter
 			
 				$EmployeeRegularLogs = new EmployeeLogsModel();
 				$EmployeeRegularLogs = EmployeeLogsModel::find($employee_logs_id);
+
+				// Clear the prior pay category before writing the recalculated category.
+				// Otherwise changing shift/rest-day classification can leave stale pay totals.
+				foreach ([
+					'total_regular_hours','total_regular_overtime_hours','total_restday_hours','total_restday_overtime_hours',
+					'regular_pay','regular_overtime_pay','restday_pay','restday_overtime_pay',
+				] as $calculatedField) {
+					$EmployeeRegularLogs->{$calculatedField} = 0;
+				}
 				
 				$EmployeeRegularLogs->branch_idx 						= $branch_idx;
 				$EmployeeRegularLogs->department_idx 					= $department_idx;

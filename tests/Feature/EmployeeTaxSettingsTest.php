@@ -39,7 +39,8 @@ class EmployeeTaxSettingsTest extends TestCase
     private function employeeData(): array
     {
         return ['employee_id'=>0, 'employee_number'=>'E01', 'employee_first_name'=>'Ana', 'employee_last_name'=>'Santos',
-            'employee_birthday'=>'1990-01-01', 'employee_rate'=>100, 'branch_idx'=>1, 'department_idx'=>1,
+            'employee_birthday'=>'1990-01-01', 'employee_rate'=>100, 'employee_status'=>'Active',
+            'employment_type'=>'Regular', 'branch_idx'=>1, 'department_idx'=>1,
             'time_in'=>'08:00', 'break_time_in'=>'12:00', 'break_time_out'=>'13:00', 'time_out'=>'17:00',
             'employee_tin'=>'123-456-789', 'employee_tax_status'=>'taxable'];
     }
