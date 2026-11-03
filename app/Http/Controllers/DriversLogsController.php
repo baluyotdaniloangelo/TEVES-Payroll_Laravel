@@ -24,6 +24,7 @@ class DriversLogsController extends Controller
             'today' => now()->toDateString(),
             'list' => route('getDriversLogsList'),
             'comparison' => route('getDriversLogsComputationComparison'),
+            'savedPayrolls' => route('getDriversSavedPayrollsList'),
             'recalculate' => route('RecalculateDriverLog'),
             'branches' => route('getBranchList_for_selection'),
             'drivers' => route('getDriversList_for_item_selection'),
@@ -49,11 +50,15 @@ class DriversLogsController extends Controller
                 'branch.branch_name',
                 'employee.employee_number',
                 DB::raw("CONCAT(TRIM(employee.employee_last_name), ', ', TRIM(employee.employee_first_name), IF(NULLIF(TRIM(employee.employee_middle_name), '') IS NULL, '', CONCAT(' ', TRIM(employee.employee_middle_name))), IF(NULLIF(TRIM(employee.employee_extension_name), '') IS NULL, '', CONCAT(' ', TRIM(employee.employee_extension_name)))) as employee_full_name"),
+                DB::raw('(SELECT COUNT(*) FROM driver_payroll_items WHERE driver_payroll_items.drivers_logs_id = teves_payroll_drivers_logs.drivers_logs_id) as saved_payroll_count'),
             ]);
 
         return DataTables::of($logs)
             ->addIndexColumn()
             ->addColumn('action', function ($row) {
+                if ((int) $row->saved_payroll_count > 0 || ((int) ($row->cutoff_idx ?? 0)) > 0) {
+                    return '<span class="badge bg-light text-dark border" title="This trip is included in a saved payroll">Payroll saved · locked</span>';
+                }
                 return '<div class="dropdown dropdown-action">
                     <a href="#" class="action-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="si si-options-vertical"></i></a>
                     <div class="dropdown-menu dropdown-menu-right">
@@ -82,6 +87,7 @@ class DriversLogsController extends Controller
                 'employee.employee_rate as current_rate',
                 DB::raw("CONCAT(TRIM(employee.employee_last_name), ', ', TRIM(employee.employee_first_name), IF(NULLIF(TRIM(employee.employee_middle_name), '') IS NULL, '', CONCAT(' ', TRIM(employee.employee_middle_name))), IF(NULLIF(TRIM(employee.employee_extension_name), '') IS NULL, '', CONCAT(' ', TRIM(employee.employee_extension_name)))) as employee_full_name"),
                 DB::raw('(teves_payroll_drivers_logs.gross_amount * employee.employee_rate / 100) as recalculated_trip_pay'),
+                'teves_payroll_drivers_logs.cutoff_idx',
                 DB::raw('(SELECT COUNT(*) FROM driver_payroll_items WHERE driver_payroll_items.drivers_logs_id = teves_payroll_drivers_logs.drivers_logs_id) as payroll_locked'),
             ]);
 
@@ -89,7 +95,7 @@ class DriversLogsController extends Controller
             ->addIndexColumn()
             ->addColumn('difference', fn ($row) => (float) $row->recalculated_trip_pay - (float) $row->saved_trip_pay)
             ->addColumn('action', function ($row) {
-                if ((int) $row->payroll_locked > 0) {
+                if ((int) $row->payroll_locked > 0 || ((int) ($row->cutoff_idx ?? 0)) > 0) {
                     return '<span class="text-muted">Included in saved payroll</span>';
                 }
                 return '<button type="button" class="btn btn-sm btn-outline-primary js-recalculate-driver-log" data-id="' . (int) $row->drivers_logs_id . '">Use current rate</button>';
@@ -98,11 +104,48 @@ class DriversLogsController extends Controller
             ->make(true);
     }
 
+    public function getDriversSavedPayrollsList(Request $request)
+    {
+        abort_unless(Session::has('loginID'), 401);
+        abort_unless($request->ajax(), 404);
+        $account = User::where('user_id', Session::get('loginID'))->firstOrFail();
+        $canRevoke = strcasecmp(trim((string) $account->user_type), 'Admin') === 0;
+        $payrolls = DB::table('driver_payrolls as payroll')
+            ->join('teves_payroll_employee_table as employee', 'employee.employee_id', '=', 'payroll.employee_idx')
+            ->join('teves_branch_table as branch', 'branch.branch_id', '=', 'payroll.branch_idx')
+            ->select('payroll.*', 'employee.employee_number', 'employee.employee_full_name', 'branch.branch_code')
+            ->selectSub(DB::table('driver_payroll_items')->selectRaw('COUNT(*)')
+                ->whereColumn('driver_payroll_items.driver_payroll_id', 'payroll.driver_payroll_id'), 'total_trip_count')
+            ->selectSub(DB::table('driver_payrolls as latest')
+                ->select('latest.driver_payroll_id')->whereColumn('latest.employee_idx', 'payroll.employee_idx')
+                ->orderByDesc('latest.cutoff_end')->orderByDesc('latest.cutoff_start')
+                ->orderByDesc('latest.driver_payroll_id')->limit(1), 'latest_payroll_id');
+
+        return DataTables::of($payrolls)
+            ->addIndexColumn()
+            ->addColumn('action', function ($row) use ($canRevoke) {
+                $print = route('drivers_payroll.print', [$row->employee_idx,
+                    'cutoff_start' => $row->cutoff_start, 'cutoff_end' => $row->cutoff_end]);
+                $view = route('drivers_payroll.index', ['employee_id' => $row->employee_idx,
+                    'cutoff_start' => $row->cutoff_start, 'cutoff_end' => $row->cutoff_end, 'tab' => 'saved']);
+                $actions = '<div class="driver-payroll-actions"><a class="btn btn-sm btn-outline-primary" href="'.e($view).'">View</a>'
+                    .'<a class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener" href="'.e($print).'">Print</a>';
+                if ($canRevoke && $row->cutoff_idx === null
+                    && (int) $row->latest_payroll_id === (int) $row->driver_payroll_id) {
+                    $actions .= '<button type="button" class="btn btn-sm btn-outline-danger js-revoke-driver-payroll"'
+                        .' data-url="'.e(route('drivers_payroll.revoke', $row->driver_payroll_id)).'"'
+                        .' data-payroll="'.e($row->payroll_no).'">Revoke</button>';
+                }
+                return $actions.'</div>';
+            })
+            ->rawColumns(['action'])->make(true);
+    }
+
     public function recalculateDriverLog(Request $request)
     {
         $validated = $request->validate(['drivers_logs_id' => ['required', 'integer', 'min:1']]);
         $log = DriversLogsModel::findOrFail($validated['drivers_logs_id']);
-        if (DB::table('driver_payroll_items')->where('drivers_logs_id', $log->drivers_logs_id)->exists()) {
+        if ($this->isPayrollLocked($log)) {
             return response()->json(['message' => 'Kasama na sa saved payroll ang trip na ito.'], 409);
         }
 
@@ -130,6 +173,7 @@ class DriversLogsController extends Controller
             ]);
         abort_unless($log, 404);
         $log->employee_full_name = $this->formatEmployeeName($log);
+        $log->payroll_locked = $this->isPayrollLocked($log);
         return response()->json($log);
     }
 
@@ -137,7 +181,7 @@ class DriversLogsController extends Controller
     {
         $validated = $request->validate(['DriverlogsID' => ['required', 'integer', 'min:1']]);
         $log = DriversLogsModel::findOrFail($validated['DriverlogsID']);
-        if (DB::table('driver_payroll_items')->where('drivers_logs_id', $log->drivers_logs_id)->exists()) {
+        if ($this->isPayrollLocked($log)) {
             return response()->json(['message' => 'Hindi puwedeng burahin ang trip na kasama na sa saved driver payroll.'], 409);
         }
         $log->delete();
@@ -194,7 +238,7 @@ class DriversLogsController extends Controller
 
         $logId = (int) $validated['drivers_logs_id'];
         $log = $logId ? DriversLogsModel::findOrFail($logId) : new DriversLogsModel();
-        if ($logId && DB::table('driver_payroll_items')->where('drivers_logs_id', $logId)->exists()) {
+        if ($logId && $this->isPayrollLocked($log)) {
             throw ValidationException::withMessages(['drivers_logs_id' => 'Kasama na ang trip na ito sa saved payroll kaya hindi na ito puwedeng baguhin.']);
         }
 
@@ -234,5 +278,11 @@ class DriversLogsController extends Controller
             $employee->employee_extension_name ?? null,
         ])->map(fn ($part) => trim((string) $part))->filter()->implode(' ');
         return trim($last . ($last !== '' && $given !== '' ? ', ' : '') . $given);
+    }
+
+    private function isPayrollLocked(DriversLogsModel $log): bool
+    {
+        return ((int) ($log->cutoff_idx ?? 0)) > 0
+            || DB::table('driver_payroll_items')->where('drivers_logs_id', $log->drivers_logs_id)->exists();
     }
 }

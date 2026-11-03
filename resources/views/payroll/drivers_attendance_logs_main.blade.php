@@ -1,4 +1,5 @@
 @extends('layouts.layout')  
+@push('page_styles')<link rel="stylesheet" href="{{ asset('assets/css/driver-payroll-actions.css') }}">@endpush
 @section('content')  
 			<!-- Page Wrapper -->
             <div class="page-wrapper">
@@ -27,6 +28,7 @@
 						<div class="card-body">
 							<ul class="nav nav-tabs mb-3" id="driver-log-tabs" role="tablist">
 								<li class="nav-item" role="presentation"><button class="nav-link active" id="driver-logs-tab" data-bs-toggle="tab" data-bs-target="#driver-logs-pane" type="button" role="tab">Trip Logs</button></li>
+								<li class="nav-item" role="presentation"><button class="nav-link" id="driver-saved-payrolls-tab" data-bs-toggle="tab" data-bs-target="#driver-saved-payrolls-pane" type="button" role="tab">Saved Driver Payrolls</button></li>
 								<li class="nav-item" role="presentation"><button class="nav-link" id="driver-comparison-tab" data-bs-toggle="tab" data-bs-target="#driver-comparison-pane" type="button" role="tab">Computation Comparison</button></li>
 							</ul>
 							<div class="tab-content">
@@ -61,12 +63,19 @@
 													</table>
 													</div>
 								</div>
+								<div class="tab-pane fade" id="driver-saved-payrolls-pane" role="tabpanel" aria-labelledby="driver-saved-payrolls-tab">
+									<p class="text-muted">Saved payrolls by driver and cutoff. The latest cutoff for each driver can be revoked by an admin when revision is needed.</p>
+									<div class="table-responsive"><table class="table dataTable display nowrap cell-border" id="DriversSavedPayrollsTable" width="100%" cellspacing="0">
+										<thead><tr><th>#</th><th>Payroll No.</th><th>Driver</th><th>Branch</th><th>Cutoff start</th><th>Cutoff end</th><th>Trip Ref. No.</th><th>Trips</th><th>Total trip pay</th><th>Actions</th></tr></thead><tbody></tbody>
+									</table></div>
+								</div>
 								<div class="tab-pane fade" id="driver-comparison-pane" role="tabpanel" aria-labelledby="driver-comparison-tab">
 									<p class="text-muted">Compare the rate and trip pay saved on each log with the driver's current rate. Use <strong>Use current rate</strong> to recalculate an unpaid trip.</p>
 									<div class="table-responsive"><table class="table dataTable display nowrap cell-border" id="DriversLogsComputationTable" width="100%" cellspacing="0">
 										<thead><tr><th>#</th><th>Date</th><th>Employee Number</th><th>Employee Name</th><th>Gross Amount</th><th>Saved Rate</th><th>Saved Trip Pay</th><th>Current Rate</th><th>Recalculated Pay</th><th>Difference</th><th>Action</th></tr></thead><tbody></tbody>
 									</table></div>
 								</div>
+								
 										</div>
 									</div>
 									
@@ -81,6 +90,7 @@
 				<!-- Forms -->
 				<!-- Attendance Logs -->
 				@include('payroll.partials.drivers_logs_modals')
+				@include('payroll.partials.driver_payroll_revoke_modal')
 				
 				<!-- Forms -->
 				

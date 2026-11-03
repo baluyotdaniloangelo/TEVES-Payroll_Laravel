@@ -9,7 +9,7 @@
 				
 					<!-- Account Logo -->
 					<div class="account-logo">
-						<img src="assets/img/logo2.png" alt="">
+                        <img src="{{ asset('client_logo/logo.png') }}" width="40" height="40" alt="Teves Petroleum">
 					</div>
 					<!-- /Account Logo -->
 					

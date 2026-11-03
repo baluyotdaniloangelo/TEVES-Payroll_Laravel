@@ -1,4 +1,7 @@
 @extends('layouts.layout')  
+@push('page_styles')
+<link rel="stylesheet" href="{{ asset('assets/css/employee-directory.css') }}?v={{ filemtime(public_path('assets/css/employee-directory.css')) }}">
+@endpush
 @section('content')  
 			<!-- Page Wrapper -->
             <div class="page-wrapper">
@@ -6,85 +9,54 @@
 				<!-- Page Content -->
                 <div class="content container-fluid">
 				
-					<!-- Page Header -->
-					<div class="page-header">
-						<div class="row align-items-center">
-							<div class="col">
-								<h3 class="page-title">Employees</h3>
-								<ul class="breadcrumb">
-									<li class="breadcrumb-item">Administration</li>
-									<li class="breadcrumb-item active">Employees</li>
-								</ul>
-							</div>
-							<div class="col-auto float-end ms-auto">
-								<button type="button" class="btn add-btn" data-bs-toggle="modal" data-bs-target="#employee_details_modal" onclick="ResetEmployeeForm()"><i class="fa-solid fa-plus"></i> Add Employee</button>
-								
-							</div>
-						</div>
-					</div>
-					
-					<div class="card employee-filter-card">
-						<div class="card-body">
-							<div class="row g-2 align-items-end">
-								<div class="col-xl-4 col-lg-6">
-									<label for="employee_search" class="form-label">Search employees</label>
-									<input id="employee_search" type="search" class="form-control" placeholder="Name, employee ID, position, branch..." autocomplete="off">
-								</div>
-								<div class="col-xl-2 col-md-3 col-sm-6">
-									<label for="employee_branch_filter" class="form-label">Branch</label>
-									<select id="employee_branch_filter" class="form-select"><option value="">All branches</option>@foreach ($branch_data as $branch)<option value="{{ $branch->branch_id }}">{{ $branch->branch_code }} — {{ $branch->branch_name }}</option>@endforeach</select>
-								</div>
-								<div class="col-xl-2 col-md-3 col-sm-6">
-									<label for="employee_department_filter" class="form-label">Department</label>
-									<select id="employee_department_filter" class="form-select"><option value="">All departments</option>@foreach ($department_data as $department)<option value="{{ $department->department_id }}">{{ $department->department_name }}</option>@endforeach</select>
-								</div>
-								<div class="col-xl-1 col-md-3 col-sm-6">
-									<label for="employee_status_filter" class="form-label">Status</label>
-									<select id="employee_status_filter" class="form-select"><option value="">All</option><option value="Active">Active</option><option value="Inactive">Inactive</option></select>
-								</div>
-								<div class="col-xl-2 col-md-3 col-sm-6">
-									<label for="employee_type_filter" class="form-label">Employment type</label>
-									<select id="employee_type_filter" class="form-select"><option value="">All types</option><option value="Regular">Regular</option><option value="Probationary">Probationary</option><option value="Contractual">Contractual</option><option value="Others">Others / Drivers</option></select>
-								</div>
-								<div class="col-xl-1 col-md-3 col-sm-6"><button type="button" class="btn btn-light w-100" id="clear_employee_filters">Clear</button></div>
-							</div>
-						</div>
-					</div>
-
-					<div class="row">
-						<div class="col-md-12">
-							<div class="table-responsive">
-								<table class="table dataTable display nowrap cell-border" id="EmployeeListDatatable" width="100%" cellspacing="0">
-											<thead>
-												<tr>
-													<th class="all">#</th>
-										 			<th class="all" title="Employee Number">Employee No.</th>
-													<th class="all" title="Employee Name">Employee Name</th>
-													<th>Branch Code</th>
-													<th class="none">Department</th>			
-													<th class="none">Position</th>			
-													<th class="none">Hourly Rate</th>				
-													<th class="all">Employment Status</th>
-													<th class="all">Employment Type</th>
-													<th class="all">Action</th>
-												</tr>
-											</thead>				
-											
-											<tbody>
-												
-											</tbody>
-											
-											
-										</table>
-							</div>
-						</div>
-					</div>
+                    <div class="employee-directory">
+                        <div class="directory-heading">
+                            <div>
+                                <nav class="directory-breadcrumb" aria-label="Breadcrumb"><i class="fsm-icon-house" aria-hidden="true"></i> Home <span>/</span> Administration <span>/</span> Employees</nav>
+                                <div class="directory-title-line"><h1>Employees</h1><span class="directory-live"><span></span> Directory active · {{ number_format((int) ($employeeSummary->total ?? 0)) }} employees</span></div>
+                                <p>Browse and manage employee records across all branches.</p>
+                            </div>
+                            <button type="button" class="directory-add" data-bs-toggle="modal" data-bs-target="#employee_details_modal" onclick="ResetEmployeeForm()"><i class="fsm-icon-plus" aria-hidden="true"></i> Add Employee</button>
+                        </div>
+                        <div class="directory-summary" aria-label="Employee summary">
+                            <div class="directory-stat"><span class="directory-stat-icon"><i class="fsm-icon-users"></i></span><span class="directory-stat-tag">ALL STAFF</span><strong>{{ number_format((int) ($employeeSummary->total ?? 0)) }}</strong><span>Total employees</span></div>
+                            <div class="directory-stat"><span class="directory-stat-icon green"><i class="fsm-icon-user-check"></i></span><span class="directory-stat-tag green">LIVE</span><strong>{{ number_format((int) ($employeeSummary->active ?? 0)) }}</strong><span>Active</span></div>
+                            <div class="directory-stat"><span class="directory-stat-icon red"><i class="fsm-icon-user-x"></i></span><span class="directory-stat-tag red">INACTIVE</span><strong>{{ number_format((int) ($employeeSummary->inactive ?? 0)) }}</strong><span>Inactive</span></div>
+                            <div class="directory-stat"><span class="directory-stat-icon amber"><i class="fsm-icon-clock-3"></i></span><span class="directory-stat-tag amber">UNDER REVIEW</span><strong>{{ number_format((int) ($employeeSummary->probationary ?? 0)) }}</strong><span>On probation</span></div>
+                            <div class="directory-stat"><span class="directory-stat-icon blue"><i class="fsm-icon-truck"></i></span><span class="directory-stat-tag blue">OTHER TYPE</span><strong>{{ number_format((int) ($employeeSummary->others ?? 0)) }}</strong><span>Others / Drivers</span></div>
+                        </div>
+                        <div class="directory-filters" aria-label="Employee filters">
+                            <label class="directory-search"><i class="fsm-icon-search" aria-hidden="true"></i><span class="visually-hidden">Search employees</span><input id="employee_search" type="search" placeholder="Search name, position, ID..." autocomplete="off"></label>
+                            <label><span class="visually-hidden">Rows per page</span><select id="employee_page_length" class="form-select"><option value="10">10 rows</option><option value="25">25 rows</option><option value="50">50 rows</option><option value="100">100 rows</option></select></label>
+                            <label><span class="visually-hidden">Branch</span><select id="employee_branch_filter" class="form-select"><option value="">All branches</option>@foreach ($branch_data as $branch)<option value="{{ $branch->branch_id }}">{{ $branch->branch_code }} — {{ $branch->branch_name }}</option>@endforeach</select></label>
+                            <label><span class="visually-hidden">Department</span><select id="employee_department_filter" class="form-select"><option value="">All departments</option>@foreach ($department_data as $department)<option value="{{ $department->department_id }}">{{ $department->department_name }}</option>@endforeach</select></label>
+                            <label><span class="visually-hidden">Employment type</span><select id="employee_type_filter" class="form-select"><option value="">All types</option><option value="Regular">Regular</option><option value="Probationary">Probationary</option><option value="Contractual">Contractual</option><option value="Others">Others / Drivers</option></select></label>
+                            <label><span class="visually-hidden">Status</span><select id="employee_status_filter" class="form-select"><option value="">All status</option><option value="Active">Active</option><option value="Inactive">Inactive</option></select></label>
+                            <button type="button" class="directory-apply" id="apply_employee_filters"><i class="fsm-icon-check"></i> Apply</button>
+                            <button type="button" class="directory-reset" id="clear_employee_filters">Reset</button>
+                        </div>
+                        <div class="directory-table-card">
+                            <div class="table-responsive">
+                                <table class="table dataTable" id="EmployeeListDatatable" width="100%" cellspacing="0">
+                                    <thead><tr>
+                                        <th class="all">Employee</th>
+                                        <th>Department</th>
+                                        <th>Branch code</th>
+                                        <th>Employment type</th>
+                                        <th class="all">Status</th>
+                                        <th class="all">Actions</th>
+                                    </tr></thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 				<!-- /Page Content -->
 				
 				<!-- Add Employee Modal -->
 				<div id="employee_details_modal" class="modal custom-modal fade" data-bs-backdrop="static" role="dialog">
-					<div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+					<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" role="document">
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title" id="modal_title_action_employee">Add Employee</h5>
@@ -306,10 +278,10 @@
 									</section>
 									</div>
 									</div>
-									<div class="submit-section">
-										<button class="btn btn-primary submit-btn" id="submit_employee_details" value="0">Submit</button>
-									</div>
 								</form>
+							</div>
+							<div class="modal-footer employee-modal-footer">
+								<button type="submit" form="Employeeform" class="btn btn-primary submit-btn" id="submit_employee_details" value="0">Submit</button>
 							</div>
 						</div>
 					</div>

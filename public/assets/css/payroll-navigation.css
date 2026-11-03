@@ -6,7 +6,11 @@
 .employee-filter-card{border:1px solid #e7ebf0;border-radius:12px;box-shadow:0 3px 14px rgba(25,42,62,.04)}
 .employee-filter-card .form-label{font-size:12px;font-weight:600;color:#455468;margin-bottom:5px}
 .employee-filter-card .form-control,.employee-filter-card .form-select{min-height:40px;border-color:#dfe5ec}
-#employee_details_modal .modal-body{max-height:calc(100vh - 150px);overflow-y:auto}
+#employee_details_modal{position:fixed;inset:0;overflow:hidden;padding:0!important}
+#employee_details_modal .modal-dialog{width:calc(100% - 24px);max-width:1140px;height:90dvh;min-height:0;margin:5dvh auto}
+#employee_details_modal .modal-content{display:flex;max-height:90dvh;min-height:0;overflow:hidden;flex-direction:column}
+#employee_details_modal .modal-body{min-height:0;overflow-y:auto;overscroll-behavior:contain}
+#employee_details_modal .employee-modal-footer{display:flex;justify-content:center;flex:none;margin:0;padding:12px 20px 18px;border-top:1px solid #e7ecef;background:#fff}
 #employee_details_modal .employee-form-layout{display:block}
 #employee_details_modal .employee-form-main{min-width:0}
 #employee_details_modal .employee-form-tabs{display:flex;gap:5px;margin-bottom:12px;padding:4px;overflow-x:auto;border:1px solid #e3e8ed;border-radius:10px;background:#f8fafb}

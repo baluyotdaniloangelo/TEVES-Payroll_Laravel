@@ -1,6 +1,6 @@
 @extends('layouts.layout')
 @push('page_styles')
-<link rel="stylesheet" href="{{ asset('assets/css/attendance-dtr.css') }}?v=20261030-work-hours">
+<link rel="stylesheet" href="{{ asset('assets/css/attendance-dtr.css') }}?v={{ filemtime(public_path('assets/css/attendance-dtr.css')) }}">
 @endpush
 @section('content')
 <div class="page-wrapper"><div class="content container-fluid" id="attendance-dtr-page" data-base="{{ url('/attendance-import') }}" data-token="{{ csrf_token() }}">

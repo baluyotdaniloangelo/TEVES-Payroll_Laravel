@@ -13,6 +13,7 @@
     let pendingDeleteId = null;
     let table;
     let comparisonTable;
+    let savedPayrollsTable;
 
     function showFeedback(type, message) {
         feedback.removeClass('d-none alert-success alert-danger alert-warning')
@@ -157,6 +158,36 @@
 
     document.getElementById('driver-comparison-tab').addEventListener('shown.bs.tab', loadComparisonTable);
 
+    function loadSavedPayrollsTable() {
+        if (savedPayrollsTable) {
+            savedPayrollsTable.columns.adjust();
+            savedPayrollsTable.responsive.recalc();
+            savedPayrollsTable.ajax.reload(null, false);
+            return;
+        }
+        savedPayrollsTable = $('#DriversSavedPayrollsTable').DataTable({
+            processing: true,
+            responsive: true,
+            serverSide: true,
+            ajax: config.savedPayrolls,
+            order: [[5, 'desc']],
+            columns: [
+                { data: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'payroll_no', render: $.fn.dataTable.render.text() },
+                { data: 'employee_full_name', render: $.fn.dataTable.render.text() },
+                { data: 'branch_code', render: $.fn.dataTable.render.text() },
+                { data: 'cutoff_start' },
+                { data: 'cutoff_end' },
+                { data: 'trip_reference', render: $.fn.dataTable.render.text() },
+                { data: 'total_trip_count', orderable: false, searchable: false },
+                { data: 'total_trip_pay', render: $.fn.dataTable.render.number(',', '.', 2, '₱') },
+                { data: 'action', orderable: false, searchable: false }
+            ]
+        });
+    }
+
+    document.getElementById('driver-saved-payrolls-tab').addEventListener('shown.bs.tab', loadSavedPayrollsTable);
+
     $(document).on('click', '.js-recalculate-driver-log', function () {
         const button = $(this).prop('disabled', true).text('Updating…');
         $.ajax({
@@ -215,6 +246,11 @@
         $('#submit_drivers_logs_details .button-label').text('Update trip');
         $.ajax({ url: config.info, method: 'POST', dataType: 'json', data: { DriverlogsID: id, _token: config.csrfToken } })
             .done(function (log) {
+                if (log.payroll_locked) {
+                    table.ajax.reload(null, false);
+                    showFeedback('warning', 'Kasama na sa saved payroll ang trip na ito kaya hindi na ito puwedeng i-edit.');
+                    return;
+                }
                 $('#drivers_logs_id').val(log.drivers_logs_id);
                 loadBranches(log.selected_branch_id).then(function () {
                     return loadDrivers(log.selected_branch_id, log.employee_idx);
@@ -238,6 +274,11 @@
         $('#delete_driver_error').addClass('d-none').empty();
         $.ajax({ url: config.info, method: 'POST', dataType: 'json', data: { DriverlogsID: id, _token: config.csrfToken } })
             .done(function (log) {
+                if (log.payroll_locked) {
+                    table.ajax.reload(null, false);
+                    showFeedback('warning', 'Kasama na sa saved payroll ang trip na ito kaya hindi na ito puwedeng burahin.');
+                    return;
+                }
                 pendingDeleteId = log.drivers_logs_id;
                 $('#delete_driver_name').text(log.employee_full_name || '');
                 $('#delete_driver_date').text(log.travel_date || '');

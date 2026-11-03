@@ -1,44 +1,68 @@
-<!-- Sidebar -->
-<div class="sidebar payroll-sidebar" id="sidebar">
-    <div class="sidebar-inner slimscroll">
-        <div id="sidebar-menu" class="sidebar-menu">
-            <ul class="sidebar-vertical">
-                <li class="menu-title"><span>Payroll Operations</span></li>
-                <li class="submenu">
-                    <a href="#"><i class="la la-clock-o"></i><span>Attendance</span><span class="menu-arrow"></span></a>
-                    <ul>
-                        <li><a class="{{ ($active_link ?? '') === 'employee_attendance_logs' ? 'active' : '' }}" href="{{ route('employee_attendance_logs') }}">Employee Attendance Logs</a></li>
-                        <li><a class="{{ ($active_link ?? '') === 'attendance_dtr_plotting' ? 'active' : '' }}" href="{{ route('attendance-import.index') }}">DTR Plotting</a></li>
-                        <li><a class="{{ ($active_link ?? '') === 'saved_dtr_entries' ? 'active' : '' }}" href="{{ route('attendance-import.saved') }}">Saved DTR Entries</a></li>
-                        <li><a class="{{ ($active_link ?? '') === 'drivers_attendance_logs' ? 'active' : '' }}" href="{{ route('drivers_attendance_logs') }}">Drivers Attendance Logs</a></li>
-                    </ul>
-                </li>
-                <li class="submenu">
-                    <a href="#"><i class="la la-money"></i><span>Compensation</span><span class="menu-arrow"></span></a>
-                    <ul>
-                        <li><a class="{{ ($active_link ?? '') === 'employee_allowance_logs' ? 'active' : '' }}" href="{{ route('employee_allowance_logs') }}">Allowance Logs</a></li>
-                        <li><a class="{{ ($active_link ?? '') === 'employee_deduction_logs' ? 'active' : '' }}" href="{{ route('employee_deduction_logs') }}">Deduction Logs</a></li>
-                        <li><a class="{{ ($active_link ?? '') === 'cut_off' ? 'active' : '' }}" href="{{ route('CutOff') }}">Cut-Off</a></li>
-                    </ul>
-                </li>
-
-                <li class="menu-title"><span>Administration</span></li>
-                <li><a class="{{ ($active_link ?? '') === 'employee' ? 'active' : '' }}" href="{{ route('employee') }}"><i class="la la-users"></i><span>Employees</span></a></li>
-                <li><a class="{{ ($active_link ?? '') === 'branch' ? 'active' : '' }}" href="{{ route('branch') }}"><i class="la la-building"></i><span>Branches</span></a></li>
-                <li><a class="{{ ($active_link ?? '') === 'user' ? 'active' : '' }}" href="{{ route('user') }}"><i class="la la-user"></i><span>Users</span></a></li>
-                <li><a class="{{ ($active_link ?? '') === 'holiday' ? 'active' : '' }}" href="{{ route('holiday') }}"><i class="la la-calendar"></i><span>Holidays</span></a></li>
-                <li><a class="{{ ($active_link ?? '') === 'deduction_type' ? 'active' : '' }}" href="{{ route('deduction_type') }}"><i class="la la-list"></i><span>Deduction Types</span></a></li>
-
-                <li class="menu-title"><span>Payroll</span></li>
-                <li class="submenu">
-                    <a href="#"><i class="la la-calculator"></i><span>Payroll</span><span class="menu-arrow"></span></a>
-                    <ul>
-                        <li><a href="{{ route('CreatePayroll') }}">Create Payroll</a></li>
-                        <li><a class="{{ ($active_link ?? '') === 'drivers_payroll' ? 'active' : '' }}" href="{{ route('drivers_payroll.index') }}">Drivers Payroll</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
+@php
+    $fsmEmployee = $fsmEmployee ?? (isset($user) && strcasecmp(trim((string) $user->user_type), 'Employee') === 0);
+    $fsmGroups = $fsmEmployee ? [
+        'Employee' => [
+            ['my_dtr', 'my-dtr.index', 'My DTR', 'fsm-icon-calendar-days'],
+            ['my_payroll', 'my-payroll.index', 'My Payroll', 'fsm-icon-wallet'],
+            ['my_updates', 'my-updates.index', 'My Updates', 'fsm-icon-bell'],
+            ['my_profile', 'my-profile.index', 'My Profile', 'fsm-icon-user-round'],
+        ],
+    ] : [
+        'Attendance' => [
+            ['employee_attendance_logs', 'employee_attendance_logs', 'Employee Attendance Logs', 'fsm-icon-clock-3'],
+            ['attendance_dtr_plotting', 'attendance-import.index', 'DTR Plotting', 'fsm-icon-calendar-days'],
+            ['saved_dtr_entries', 'attendance-import.saved', 'Saved DTR Entries', 'fsm-icon-book-open-check'],
+            ['drivers_attendance_logs', 'drivers_attendance_logs', 'Drivers Attendance Logs', 'fsm-icon-truck'],
+        ],
+        'Compensation' => [
+            ['employee_allowance_logs', 'employee_allowance_logs', 'Allowance Logs', 'fsm-icon-wallet'],
+            ['employee_deduction_logs', 'employee_deduction_logs', 'Deduction Logs', 'fsm-icon-receipt-text'],
+            ['cut_off', 'CutOff', 'Cut-Off', 'fsm-icon-calendar-clock'],
+        ],
+        'Administration' => [
+            ['employee', 'employee', 'Employees', 'fsm-icon-users'],
+            ['branch', 'branch', 'Branches', 'fsm-icon-building-2'],
+            ['user', 'user', 'Users', 'fsm-icon-user-round'],
+            ['holiday', 'holiday', 'Holidays', 'fsm-icon-calendar-days'],
+            ['deduction_type', 'deduction_type', 'Deduction Types', 'fsm-icon-list'],
+        ],
+        'Payroll' => [
+            ['create_payroll', 'CreatePayroll', 'Create Payroll', 'fsm-icon-calculator'],
+            ['drivers_payroll', 'drivers_payroll.index', 'Drivers Payroll', 'fsm-icon-banknote'],
+        ],
+    ];
+@endphp
+<aside id="sidebar" class="fsm-sidenav" aria-label="Main navigation">
+    <div class="sidebar-brand">
+        <a class="fsm-sidebar-logo" href="{{ $fsmEmployee ? route('my-dtr.index') : route('employee') }}" aria-label="Payroll home">
+            <img src="{{ asset('client_logo/logo.png') }}" alt="Teves Petroleum">
+            <span class="sidebar-label">PAYROLL</span>
+        </a>
+        <button id="desktop-collapse" class="fsm-collapse" type="button" aria-label="Collapse sidebar" aria-expanded="true">
+            <i class="fsm-icon-chevron-right" aria-hidden="true"></i>
+        </button>
     </div>
-</div>
-<!-- /Sidebar -->
+    <nav id="main-nav" class="fsm-main-nav" aria-label="Payroll navigation">
+        @foreach($fsmGroups as $groupName => $links)
+            @php $groupActive = collect($links)->contains(fn ($link) => ($active_link ?? '') === $link[0] || request()->routeIs($link[1])); @endphp
+            <section class="fsm-nav-group" data-nav-group>
+                <button class="sidebar-group-toggle" type="button" aria-expanded="{{ $groupActive ? 'true' : 'false' }}">
+                    <span class="sidebar-group-label">{{ $groupName }}</span>
+                    <i class="fsm-icon-chevron-down sidebar-chevron" aria-hidden="true"></i>
+                </button>
+                <ul class="fsm-nav-items" data-nav-items @if(!$groupActive) hidden @endif>
+                    @foreach($links as $link)
+                        @php $isActive = ($active_link ?? '') === $link[0] || request()->routeIs($link[1]); @endphp
+                        <li>
+                            <a href="{{ route($link[1]) }}" class="sidebar-item {{ $isActive ? 'active' : '' }}" @if($isActive) aria-current="page" @endif>
+                                <i class="{{ $link[3] }}" aria-hidden="true"></i>
+                                <span class="sidebar-label">{{ $link[2] }}</span>
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </section>
+        @endforeach
+    </nav>
+</aside>
+<div class="fsm-sidebar-backdrop" data-fsm-close></div>

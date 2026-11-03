@@ -19,9 +19,5 @@
 		<script src="{{asset('assets/js/jquery.dataTables.min.js')}}"></script>
 		<script src="{{asset('assets/js/dataTables.bootstrap4.min.js')}}"></script>-->
 		
-		 <!-- Theme Settings JS -->
-		<script src="{{asset('assets/js/layout.js')}}"></script>
-		<script src="{{asset('assets/js/theme-settings.js')}}"></script>
-		<script src="{{asset('assets/js/greedynav.js')}}"></script>
-		<!-- Custom JS -->
+		<!-- Legacy page helpers; FSM navigation is handled by payroll-shell.js. -->
 		<script src="{{asset('assets/js/app.js')}}"></script>

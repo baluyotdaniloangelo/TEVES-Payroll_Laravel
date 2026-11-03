@@ -1,0 +1,6 @@
+.driver-payroll-filter .form-control,.driver-payroll-filter .form-select{min-height:42px}
+.driver-payroll-filter-btn{min-height:42px;min-width:170px;padding:0 18px;white-space:nowrap}
+.driver-payroll-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.driver-payroll-actions .btn,.driver-payroll-action-btn{min-height:36px;min-width:76px;display:inline-flex;align-items:center;justify-content:center;padding:6px 12px;white-space:nowrap;font-size:13px;line-height:1.2}
+.driver-payroll-actions .btn-outline-danger{min-width:86px}
+@media(max-width:767px){.driver-payroll-filter-btn{width:100%}.driver-payroll-actions{flex-wrap:nowrap}.driver-payroll-actions .btn{min-width:70px}}

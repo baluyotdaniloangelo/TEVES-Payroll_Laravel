@@ -126,6 +126,7 @@ Route::get('/drivers-attendance-logs', [DriversLogsController::class,'drivers_at
 Route::post('/drivers-item-select', [EmployeeManagementController::class,'getDriversList_for_item_selection'])->name('getDriversList_for_item_selection')->middleware('isLoggedIn');
 Route::get('drivers-logs/list', [DriversLogsController::class, 'getDriversLogsList'])->name('getDriversLogsList')->middleware('isLoggedIn');
 Route::get('drivers-logs/computation-comparison', [DriversLogsController::class, 'getDriversLogsComputationComparison'])->name('getDriversLogsComputationComparison')->middleware('isLoggedIn');
+Route::get('drivers-logs/saved-payrolls', [DriversLogsController::class, 'getDriversSavedPayrollsList'])->name('getDriversSavedPayrollsList')->middleware('isLoggedIn');
 Route::post('/drivers-logs/recalculate', [DriversLogsController::class, 'recalculateDriverLog'])->name('RecalculateDriverLog')->middleware('isLoggedIn');
 Route::post('/submit_drivers_logs_information', [DriversLogsController::class,'submit_drivers_logs_information'])->name('submit_drivers_logs_information')->middleware('isLoggedIn');
 Route::post('/drivers_logs_info', [DriversLogsController::class, 'drivers_logs_info'])->name('DriversLogsInformation')->middleware('isLoggedIn');
@@ -134,6 +135,7 @@ Route::post('/delete_driver_log_confirmed', [DriversLogsController::class, 'dele
 Route::middleware('isLoggedIn')->prefix('drivers-payroll')->name('drivers_payroll.')->group(function () {
     Route::get('/', [DriversPayrollController::class, 'index'])->name('index');
     Route::post('/{employee}', [DriversPayrollController::class, 'save'])->whereNumber('employee')->name('save');
+    Route::post('/{payroll}/revoke', [DriversPayrollController::class, 'revoke'])->whereNumber('payroll')->name('revoke');
     Route::get('/{employee}/print', [DriversPayrollController::class, 'print'])->whereNumber('employee')->name('print');
 });
 

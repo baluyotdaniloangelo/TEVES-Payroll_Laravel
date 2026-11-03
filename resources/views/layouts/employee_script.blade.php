@@ -18,6 +18,9 @@
 			}
 			$(function(){
 				showEmployeeFormTab('identity');
+				$('#employee_details_modal').on('shown.bs.modal', function () {
+					this.querySelector('.modal-body').scrollTop = 0;
+				});
 				$('#employee_details_modal [data-employee-tab]').on('click',function(){
 					showEmployeeFormTab(this.dataset.employeeTab);
 				});
@@ -41,7 +44,7 @@
 					responsive: true,
 					serverSide: true,
 					stateSave: false,
-					layout: { topStart: 'pageLength', topEnd: null, bottomStart: 'info', bottomEnd: 'paging' },
+					layout: { topStart: null, topEnd: null, bottomStart: 'info', bottomEnd: 'paging' },
 					language: { emptyTable: 'No employees match the selected filters.', processing: 'Loading employees...' },
 					//scrollCollapse: true,
 					//scrollY: '500px',
@@ -56,26 +59,38 @@
 						}
 					},
 					columns: [
-							{data: 'DT_RowIndex', name: 'DT_RowIndex' , orderable: false, searchable: false, className: "text-right"},       
-							{data: 'employee_number', className: "text-left"},
-							{data: 'employee_full_name'},
-							{data: 'branch_code', name: 'teves_branch_table.branch_code'},
-							{data: 'department_name', name: 'teves_payroll_department_table.department_name'},
-							{data: 'employee_position'},
-							{data: 'employee_rate'},
-							{data: 'employee_status'},
-							{data: 'employment_type'},
+							{data: 'employee_full_name', name: 'employee_full_name', render: function(data, type, row) {
+								if (type !== 'display') return data || '';
+								const safe = value => $('<div>').text(value || '').html();
+								const initial = safe((data || '?').trim().charAt(0).toUpperCase());
+								return '<div class="directory-person"><span class="directory-avatar">'+initial+'</span><span><strong>'+safe(data)+'</strong><small>'+safe(row.employee_number)+' · '+safe(row.employee_position || 'Employee')+'</small></span></div>';
+							}},
+							{data: 'department_name', name: 'teves_payroll_department_table.department_name', render: function(data, type) {
+								if (type !== 'display') return data || '';
+								return '<span class="directory-department">'+$('<div>').text(data || 'Unassigned').html()+'</span>';
+							}},
+							{data: 'branch_code', name: 'teves_branch_table.branch_code', render: $.fn.dataTable.render.text()},
+							{data: 'employment_type', name: 'teves_payroll_employee_table.employment_type', render: $.fn.dataTable.render.text()},
+							{data: 'employee_status', name: 'teves_payroll_employee_table.employee_status', render: function(data, type) {
+								if (type !== 'display') return data || '';
+								const status = data === 'Active' ? 'active' : 'inactive';
+								return '<span class="directory-status '+status+'">'+$('<div>').text(data || 'Unknown').html()+'</span>';
+							}},
 							{data: 'action', name: 'action', orderable: false, searchable: false, className: "text-center"},
 					]
 				});
 
 				let employeeSearchTimer;
+				$('#employee_page_length').on('change', function () {
+					EmployeeList.page.len(Number(this.value)).draw();
+				});
 				$('#employee_search').on('input', function () {
 					clearTimeout(employeeSearchTimer);
 					const value = this.value;
 					employeeSearchTimer = setTimeout(function () { EmployeeList.search(value).draw(); }, 250);
 				});
 				$('#employee_branch_filter, #employee_department_filter, #employee_status_filter, #employee_type_filter').on('change', function () { EmployeeList.draw(); });
+				$('#apply_employee_filters').on('click', function () { EmployeeList.search($('#employee_search').val()).draw(); });
 				$('#clear_employee_filters').on('click', function () {
 					$('#employee_search').val('');
 					$('#employee_branch_filter, #employee_department_filter, #employee_status_filter, #employee_type_filter').val('');

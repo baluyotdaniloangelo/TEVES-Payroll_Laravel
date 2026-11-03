@@ -26,7 +26,7 @@
 				  <form class="g-2 needs-validation" id="ResetUserPasswordform">
                     					
                     <div class="col-12">
-                      <p>Please Enter your Email Address Registered to your CAMR User Account</p>
+                      <p>Please Enter your Email Address Registered to your Payroll Account</p>
 					  
                       
                     </div>

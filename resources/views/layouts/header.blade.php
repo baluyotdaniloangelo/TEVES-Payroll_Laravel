@@ -1,18 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark"  data-sidebar-size="lg" data-sidebar-image="none">
+<html lang="en" class="fsm-document">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="Smarthr - Bootstrap Admin Template">
 		<meta name="keywords" content="admin, estimates, bootstrap, business, corporate, creative, management, minimal, modern, accounts, invoice, html5, responsive, CRM, Projects">
         <meta name="author" content="Dreamstechnologies - Bootstrap Admin Template">
-        <title>{{ $title }}</title>
+        <title>{{ $title ?? 'Payroll' }}</title>
 		
 
 		<!-- Favicon -->
         <link rel="shortcut icon" type="image/x-icon" href="{{asset('assets/img/favicon.png')}}">
 		
 		<!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="{{ asset('fsm/css/style.css') }}?v={{ filemtime(public_path('fsm/css/style.css')) }}">
+        <link rel="stylesheet" href="{{ asset('fsm/lucide/lucide.css') }}?v={{ filemtime(public_path('fsm/lucide/lucide.css')) }}">
         <link rel="stylesheet" href="{{asset('assets/css/bootstrap.min.css')}}">
 
 		<!-- Fontawesome CSS -->
@@ -40,6 +42,7 @@
 		
 		<!-- Main CSS -->
         <link rel="stylesheet" href="{{asset('assets/css/style.css')}}">
-        <link rel="stylesheet" href="{{ asset('assets/css/payroll-navigation.css') }}">
+        <link rel="stylesheet" href="{{ asset('assets/css/payroll-navigation.css') }}?v={{ filemtime(public_path('assets/css/payroll-navigation.css')) }}">
         @stack('page_styles')
+        <link rel="stylesheet" href="{{ asset('fsm/css/payroll-fsm.css') }}?v={{ filemtime(public_path('fsm/css/payroll-fsm.css')) }}">
     </head>

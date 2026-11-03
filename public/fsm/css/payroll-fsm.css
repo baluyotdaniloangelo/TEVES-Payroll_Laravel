@@ -1,0 +1,329 @@
+/* SmartHR FSM visual bridge for the existing Bootstrap payroll screens. */
+body.fsm-theme {
+    --fsm-ink: #173237;
+    --fsm-sidebar: #102f32;
+    --fsm-green: #1f786f;
+    --fsm-lime: #c7e36f;
+    --fsm-paper: #f2f0e8;
+    --fsm-panel: #fbfaf5;
+    --fsm-line: #dce4dc;
+    color: var(--fsm-ink);
+    background: var(--fsm-paper);
+    font-family: Manrope, Arial, sans-serif;
+}
+body.fsm-theme .main-wrapper { min-height: 100vh; background: var(--fsm-paper); }
+body.fsm-theme .header.fsm-topbar {
+    display: flex; align-items: center; gap: 18px; position: fixed; inset: 0 0 auto 0;
+    width: 100%; height: 76px; padding: 0 26px 0 0; z-index: 1050;
+    background: var(--fsm-panel); border-bottom: 1px solid var(--fsm-line);
+    box-shadow: 0 2px 12px rgba(16,47,50,.05);
+}
+body.fsm-theme .header .header-left.fsm-topbar-brand {
+    position: static; float: none; display: flex; flex: none; align-items: center;
+    width: 268px; height: 76px; padding: 0 20px; background: var(--fsm-sidebar);
+}
+body.fsm-theme .fsm-topbar-brand .logo {
+    display: flex; align-items: center; gap: 12px; width: auto; height: auto;
+    color: #fff; font-weight: 800; letter-spacing: .07em; text-decoration: none;
+}
+body.fsm-theme .fsm-topbar-brand img {
+    width: 42px; height: 42px; object-fit: contain; background: #fff;
+    border-radius: 10px; padding: 3px;
+}
+body.fsm-theme .fsm-menu-toggle {
+    display: grid; place-items: center; width: 38px; height: 38px; flex: none;
+    border: 1px solid var(--fsm-line); border-radius: 10px; background: #fff;
+    color: var(--fsm-ink); font-size: 19px;
+}
+body.fsm-theme .fsm-topbar-heading { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+body.fsm-theme .fsm-topbar-eyebrow { color: var(--fsm-green); font-size: 10px; font-weight: 800; letter-spacing: .12em; }
+body.fsm-theme .fsm-topbar-heading strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 17px; }
+body.fsm-theme .fsm-topbar-spacer { flex: 1; }
+body.fsm-theme .fsm-account-button {
+    display: flex; align-items: center; gap: 9px; max-width: 230px; padding: 5px 10px 5px 5px;
+    border: 1px solid var(--fsm-line); border-radius: 999px; background: #fff;
+    color: var(--fsm-ink); font-weight: 700;
+}
+body.fsm-theme .fsm-avatar { display: grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--fsm-lime); }
+body.fsm-theme .fsm-account-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.fsm-theme .sidebar#sidebar {
+    top: 76px; left: 0; bottom: 0; width: 268px; height: calc(100vh - 76px);
+    background: var(--fsm-sidebar); border: 0; box-shadow: none; z-index: 1040;
+}
+body.fsm-theme .sidebar#sidebar .sidebar-inner { height: 100%; overflow-y: auto; }
+body.fsm-theme .sidebar#sidebar .sidebar-menu { padding: 18px 12px 36px; }
+body.fsm-theme .sidebar#sidebar .sidebar-vertical > li.menu-title { padding: 18px 12px 8px; color: #a7c5bc; }
+body.fsm-theme .sidebar#sidebar .sidebar-vertical > li.menu-title:first-child { padding-top: 4px; }
+body.fsm-theme .sidebar#sidebar .sidebar-vertical li > a {
+    display: flex; align-items: center; gap: 10px; min-height: 41px; padding: 9px 12px;
+    border-radius: 9px; color: #dcebe4; font-weight: 600; font-size: 13px;
+}
+body.fsm-theme .sidebar#sidebar .sidebar-vertical li > a i { font-size: 18px; color: var(--fsm-lime); }
+body.fsm-theme .sidebar#sidebar .sidebar-vertical li > a:hover,
+body.fsm-theme .sidebar#sidebar .sidebar-vertical li > a.active {
+    background: #21494b; color: #fff; border-left: 3px solid var(--fsm-lime);
+}
+body.fsm-theme .sidebar#sidebar .sidebar-vertical .submenu ul { background: transparent; padding: 2px 0 6px 14px; }
+body.fsm-theme .sidebar#sidebar .sidebar-vertical .submenu ul:not([hidden]) { display: block; }
+body.fsm-theme .sidebar#sidebar .sidebar-vertical .submenu ul[hidden] { display: none !important; }
+body.fsm-theme .sidebar#sidebar .sidebar-vertical .submenu ul a { padding-left: 15px; font-size: 12px; min-height: 35px; }
+body.fsm-theme .page-wrapper { margin-left: 268px; padding-top: 76px; background: var(--fsm-paper); min-height: 100vh; }
+body.fsm-theme .page-wrapper > .content { padding: 28px; }
+body.fsm-theme .page-header h1, body.fsm-theme .page-header h2,
+body.fsm-theme .page-title { color: var(--fsm-ink); font-weight: 800; }
+body.fsm-theme .card, body.fsm-theme .modal-content {
+    border: 1px solid var(--fsm-line); border-radius: 16px; background: #fff;
+    box-shadow: 0 7px 24px rgba(16,47,50,.045);
+}
+body.fsm-theme .form-control, body.fsm-theme .form-select {
+    border-color: var(--fsm-line); border-radius: 9px;
+}
+body.fsm-theme .form-control:focus, body.fsm-theme .form-select:focus {
+    border-color: var(--fsm-green); box-shadow: 0 0 0 3px rgba(31,120,111,.13);
+}
+body.fsm-theme .btn-primary, body.fsm-theme .btn-success {
+    background: var(--fsm-green); border-color: var(--fsm-green); color: #fff;
+}
+body.fsm-theme .btn-primary:hover, body.fsm-theme .btn-success:hover { background: #155c55; border-color: #155c55; }
+body.fsm-theme .table thead th { background: #e9f0e8; color: var(--fsm-ink); }
+body.fsm-theme .fsm-sidebar-backdrop { display: none; }
+body.fsm-theme.fsm-collapsed .header .header-left.fsm-topbar-brand { width: 72px; padding: 0 15px; }
+body.fsm-theme.fsm-collapsed .fsm-topbar-brand .logo span { display: none; }
+body.fsm-theme.fsm-collapsed .sidebar#sidebar { width: 72px; }
+body.fsm-theme.fsm-collapsed .sidebar#sidebar .sidebar-vertical li a span,
+body.fsm-theme.fsm-collapsed .sidebar#sidebar .sidebar-vertical .menu-title,
+body.fsm-theme.fsm-collapsed .sidebar#sidebar .sidebar-vertical .submenu ul,
+body.fsm-theme.fsm-collapsed .sidebar#sidebar .sidebar-vertical .menu-arrow { display: none; }
+body.fsm-theme.fsm-collapsed .page-wrapper { margin-left: 72px; }
+@media (max-width: 991px) {
+    body.fsm-theme .header.fsm-topbar { padding-right: 14px; gap: 10px; }
+    body.fsm-theme .header .header-left.fsm-topbar-brand { width: 72px; padding: 0 15px; }
+    body.fsm-theme .fsm-topbar-brand .logo span, body.fsm-theme .fsm-topbar-eyebrow { display: none; }
+    body.fsm-theme .sidebar#sidebar { margin-left: 0 !important; transform: translateX(-100%); transition: transform .2s ease; }
+    body.fsm-theme .page-wrapper, body.fsm-theme.fsm-collapsed .page-wrapper { margin-left: 0; }
+    body.fsm-theme.fsm-mobile-open .sidebar#sidebar { transform: translateX(0); }
+    body.fsm-theme.fsm-mobile-open .fsm-sidebar-backdrop { display: block; position: fixed; inset: 76px 0 0; z-index: 1035; background: rgba(6,24,28,.5); }
+    body.fsm-theme .page-wrapper > .content { padding: 20px 14px; }
+}
+@media (max-width: 575px) {
+    body.fsm-theme .header.fsm-topbar { height: 64px; }
+    body.fsm-theme .header .header-left.fsm-topbar-brand { height: 64px; width: 62px; padding: 0 10px; }
+    body.fsm-theme .sidebar#sidebar { top: 64px; height: calc(100vh - 64px); }
+    body.fsm-theme .page-wrapper { padding-top: 64px; }
+    body.fsm-theme .fsm-account-name { display: none; }
+    body.fsm-theme .fsm-topbar-heading strong { font-size: 14px; }
+    body.fsm-theme.fsm-mobile-open .fsm-sidebar-backdrop { top: 64px; }
+    body.fsm-theme .page-wrapper > .content { padding: 16px 10px; }
+    body.fsm-theme .table-responsive { overflow-x: auto; }
+}
+
+/* FSM sidebar and topbar structure, adapted to real payroll navigation. */
+html { min-height: 100%; background: #f2f0e8; }
+body.fsm-theme { min-height: 100dvh; max-width: none !important; }
+/* FSM animates .modal-open overlays; Bootstrap adds that class to body. */
+body.fsm-theme.modal-open {
+    display: block !important;
+    animation: none !important;
+    transform: none !important;
+}
+body.fsm-theme #main-shell {
+    min-height: 100vh;
+    margin-left: 268px;
+    transition: margin-left .25s ease;
+}
+body.fsm-theme {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+body.fsm-theme .main-wrapper {
+    position: static !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+body.fsm-theme #main-shell {
+    margin-top: 0 !important;
+    padding-top: 76px !important;
+}
+body.fsm-theme .fsm-sidenav {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 1040;
+    display: flex;
+    flex-direction: column;
+    width: 268px;
+    background: #102f32;
+    color: #fff;
+    transition: width .25s ease, transform .25s ease;
+}
+body.fsm-theme .fsm-sidenav .sidebar-brand {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: none;
+    height: 76px;
+    gap: 12px;
+    padding: 0 20px;
+    border-bottom: 1px solid rgba(255,255,255,.13);
+}
+body.fsm-theme .fsm-sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 800;
+    letter-spacing: .08em;
+}
+body.fsm-theme .fsm-sidebar-logo img {
+    width: 40px;
+    height: 40px;
+    flex: none;
+    padding: 3px;
+    object-fit: contain;
+    border-radius: 10px;
+    background: #fff;
+}
+body.fsm-theme .fsm-collapse {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    margin-left: auto;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #a6c1b8;
+}
+body.fsm-theme .fsm-collapse:hover { background: rgba(255,255,255,.1); color: #fff; }
+body.fsm-theme .fsm-main-nav { flex: 1; min-height: 0; padding: 22px 12px; overflow-y: auto; }
+body.fsm-theme .fsm-nav-group { margin-bottom: 20px; }
+body.fsm-theme .sidebar-group-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 12px 9px;
+    border: 0;
+    background: transparent;
+    color: #a8c5bc;
+    text-align: left;
+}
+body.fsm-theme .sidebar-group-label { font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+body.fsm-theme .sidebar-chevron { font-size: 13px; transition: transform .2s; }
+body.fsm-theme .sidebar-group-toggle[aria-expanded="false"] .sidebar-chevron { transform: rotate(-90deg); }
+body.fsm-theme .fsm-nav-items { margin: 0; padding: 0; list-style: none; }
+body.fsm-theme .fsm-nav-items[hidden] { display: none !important; }
+body.fsm-theme .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 39px;
+    margin: 2px 0;
+    padding: 9px 12px;
+    border-radius: 7px;
+    color: #cbded7;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background .15s, color .15s;
+}
+body.fsm-theme .sidebar-item > i { flex: none; width: 18px; font-size: 17px; color: #9dbab0; }
+body.fsm-theme .sidebar-item:hover { background: rgba(255,255,255,.08); color: #fff; }
+body.fsm-theme .sidebar-item.active {
+    background: #1f786f;
+    color: #fff;
+    box-shadow: inset 3px 0 #c7e36f;
+}
+body.fsm-theme .sidebar-item.active > i { color: #c7e36f; }
+body.fsm-theme #app-header.fsm-topbar {
+    position: fixed;
+    top: 0;
+    left: 268px;
+    right: 0;
+    transition: left .25s ease;
+    z-index: 1030;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 76px;
+    gap: 16px;
+    padding: 0 24px;
+    border-bottom: 1px solid #dce4dc;
+    background: rgba(251,250,245,.96);
+    backdrop-filter: blur(12px);
+    margin: 0 !important;
+    top: 0 !important;
+}
+body.fsm-theme .fsm-topbar-start, body.fsm-theme .fsm-topbar-end { display: flex; align-items: center; gap: 14px; min-width: 0; }
+body.fsm-theme .fsm-topbar-title { display: flex; flex-direction: column; min-width: 0; padding-left: 16px; border-left: 1px solid #dce4dc; line-height: 1.3; }
+body.fsm-theme .fsm-topbar-title strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; }
+body.fsm-theme .fsm-topbar-title span { color: #657d7b; font-size: 11px; }
+body.fsm-theme .fsm-mobile-menu, body.fsm-theme .fsm-mobile-logo { display: none; }
+body.fsm-theme .fsm-profile-trigger { display: flex; align-items: center; gap: 8px; padding: 5px 7px; border: 0; border-radius: 8px; background: transparent; color: #173237; font-weight: 700; }
+body.fsm-theme .fsm-profile-trigger:hover { background: #edf2ea; }
+body.fsm-theme .fsm-profile-avatar { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 50%; background: #c7e36f; }
+body.fsm-theme .fsm-profile-name { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+body.fsm-theme .fsm-profile-menu { min-width: 210px; padding: 6px; border: 1px solid #dce4dc; border-radius: 10px; }
+body.fsm-theme .fsm-profile-summary { display: flex; flex-direction: column; padding: 9px 11px; border-bottom: 1px solid #dce4dc; }
+body.fsm-theme .fsm-profile-summary small { color: #1f786f; }
+body.fsm-theme .fsm-profile-menu .dropdown-item { display: flex; align-items: center; gap: 7px; border-radius: 6px; }
+body.fsm-theme #main-shell .page-wrapper {
+    min-height: calc(100vh - 76px);
+    margin: 0;
+    padding: 0;
+    background: #f2f0e8;
+}
+/* Match FSM's collapsed sidebar and content widths exactly. */
+body.fsm-theme.fsm-collapsed #main-shell { margin-left: 82px; }
+body.fsm-theme.fsm-collapsed #app-header.fsm-topbar { left: 82px; }
+body.fsm-theme.fsm-collapsed .fsm-sidenav { width: 82px; }
+body.fsm-theme.fsm-collapsed .fsm-sidenav .sidebar-label,
+body.fsm-theme.fsm-collapsed .fsm-sidenav .sidebar-group-toggle { display: none; }
+body.fsm-theme.fsm-collapsed .fsm-sidenav .sidebar-brand { justify-content: center; gap: 2px; padding: 0 10px; }
+body.fsm-theme.fsm-collapsed .fsm-sidebar-logo img { width: 32px; height: 32px; }
+body.fsm-theme.fsm-collapsed .fsm-collapse {
+    position: static;
+    flex: none;
+    width: 24px;
+    height: 28px;
+    margin-left: auto;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #a6c1b8;
+    box-shadow: none;
+}
+body.fsm-theme.fsm-collapsed .fsm-collapse i { transform: rotate(180deg); }
+body.fsm-theme.fsm-collapsed .fsm-main-nav { padding: 18px 10px; }
+body.fsm-theme.fsm-collapsed .fsm-nav-items { display: block !important; }
+body.fsm-theme.fsm-collapsed .sidebar-item { justify-content: center; padding: 10px; }
+@media (max-width: 991px) {
+    body.fsm-theme #main-shell, body.fsm-theme.fsm-collapsed #main-shell { margin-left: 0; }
+    body.fsm-theme #app-header.fsm-topbar, body.fsm-theme.fsm-collapsed #app-header.fsm-topbar { left: 0; }
+    body.fsm-theme .fsm-sidenav { width: 268px; transform: translateX(-100%); }
+    body.fsm-theme.fsm-collapsed .fsm-sidenav { width: 268px; }
+    body.fsm-theme .fsm-collapse { display: none !important; }
+    body.fsm-theme.fsm-collapsed .fsm-sidenav .sidebar-brand { justify-content: flex-start; gap: 12px; padding: 0 20px; }
+    body.fsm-theme.fsm-collapsed .fsm-sidebar-logo img { width: 40px; height: 40px; }
+    body.fsm-theme.fsm-collapsed .fsm-main-nav { padding: 22px 12px; }
+    body.fsm-theme.fsm-collapsed .fsm-sidenav .sidebar-label { display: inline; }
+    body.fsm-theme.fsm-collapsed .fsm-sidenav .sidebar-group-toggle { display: flex; }
+    body.fsm-theme.fsm-collapsed .sidebar-item { justify-content: flex-start; padding: 9px 12px; }
+    body.fsm-theme.fsm-collapsed .fsm-nav-items[hidden] { display: none !important; }
+    body.fsm-theme.fsm-collapsed .fsm-nav-items:not([hidden]) { display: block !important; }
+    body.fsm-theme.fsm-mobile-open .fsm-sidenav { transform: translateX(0); }
+    body.fsm-theme .fsm-mobile-menu { display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 8px; background: transparent; color: #173237; font-size: 20px; }
+    body.fsm-theme .fsm-mobile-logo { display: block; }
+    body.fsm-theme .fsm-mobile-logo img { width: 34px; height: 34px; object-fit: contain; }
+    body.fsm-theme .fsm-topbar-title { border: 0; padding-left: 0; }
+    body.fsm-theme.fsm-mobile-open .fsm-sidebar-backdrop { display: block; position: fixed; inset: 0; z-index: 1035; background: rgba(6,24,28,.55); }
+}
+@media (max-width: 575px) {
+    body.fsm-theme #main-shell { padding-top: 64px !important; }
+    body.fsm-theme #app-header.fsm-topbar { height: 64px; padding: 0 12px; }
+    body.fsm-theme .fsm-topbar-title span, body.fsm-theme .fsm-profile-name { display: none; }
+    body.fsm-theme #main-shell .page-wrapper { min-height: calc(100vh - 64px); }
+}

@@ -29,6 +29,8 @@ class DriversPayrollController extends Controller
         $savedTrips = collect();
         $cutoffPayrolls = collect();
         $cutoffTotal = 0.0;
+        $latestPayrollIds = collect();
+        $canRevokePayroll = strcasecmp(trim((string) ($data->user_type ?? '')), 'Admin') === 0;
         $hasPeriod = $request->filled(['employee_id', 'cutoff_start', 'cutoff_end']);
 
         if ($hasPeriod) {
@@ -55,14 +57,23 @@ class DriversPayrollController extends Controller
             $cutoffPayrolls = DB::table('driver_payrolls as p')
                 ->join('teves_payroll_employee_table as e', 'e.employee_id', '=', 'p.employee_idx')
                 ->where('p.branch_idx', $employee->branch_idx)
-                ->where('p.cutoff_start', $request->cutoff_start)->where('p.cutoff_end', $request->cutoff_end)
-                ->orderBy('e.employee_full_name')->select('p.*', 'e.employee_number', 'e.employee_full_name')
+                ->where('p.cutoff_start', '<=', $request->cutoff_end)
+                ->where('p.cutoff_end', '>=', $request->cutoff_start)
+                ->orderByDesc('p.cutoff_start')->orderBy('e.employee_full_name')
+                ->select('p.*', 'e.employee_number', 'e.employee_full_name')
                 ->selectSub(DB::table('driver_payroll_items')->selectRaw('COUNT(*)')->whereColumn('driver_payroll_items.driver_payroll_id', 'p.driver_payroll_id'), 'total_trip_count')
                 ->get();
             $cutoffTotal = (float) $cutoffPayrolls->sum('total_trip_pay');
+            if ($cutoffPayrolls->isNotEmpty()) {
+                $latestPayrollIds = DB::table('driver_payrolls')
+                    ->whereIn('employee_idx', $cutoffPayrolls->pluck('employee_idx')->unique())
+                    ->orderByDesc('cutoff_end')->orderByDesc('cutoff_start')->orderByDesc('driver_payroll_id')
+                    ->get(['driver_payroll_id', 'employee_idx'])->unique('employee_idx')
+                    ->pluck('driver_payroll_id', 'employee_idx');
+            }
         }
 
-        return view('payroll.drivers_payroll', compact('data', 'title', 'active_link', 'drivers', 'employee', 'trips', 'saved', 'savedTrips', 'cutoffPayrolls', 'cutoffTotal', 'hasPeriod'));
+        return view('payroll.drivers_payroll', compact('data', 'title', 'active_link', 'drivers', 'employee', 'trips', 'saved', 'savedTrips', 'cutoffPayrolls', 'cutoffTotal', 'latestPayrollIds', 'canRevokePayroll', 'hasPeriod'));
     }
 
     private function availableTrips(int $employeeId, int $branchId, string $start, string $end)
@@ -151,5 +162,71 @@ class DriversPayrollController extends Controller
         $pdf = \PDF::loadView('printables.driver_payroll', compact('payroll', 'items', 'rateLabel', 'branchInformation', 'logoPath'));
         $pdf->setPaper('a4', 'portrait');
         return $pdf->stream($payroll->payroll_no . '.pdf');
+    }
+
+    public function revoke(Request $request, int $payrollId)
+    {
+        $account = User::where('user_id', Session::get('loginID'))->firstOrFail();
+        abort_unless(strcasecmp(trim((string) $account->user_type), 'Admin') === 0, 403);
+        $validated = $request->validate([
+            'reason' => ['required', 'string', 'max:500'],
+            'confirmed' => ['accepted'],
+        ]);
+
+        $result = DB::transaction(function () use ($payrollId, $validated) {
+            $candidate = DB::table('driver_payrolls')->where('driver_payroll_id', $payrollId)->first();
+            abort_unless($candidate, 404);
+            DB::table('teves_payroll_employee_table')->where('employee_id', $candidate->employee_idx)->lockForUpdate()->first();
+            $payroll = DB::table('driver_payrolls')->where('driver_payroll_id', $payrollId)->lockForUpdate()->first();
+            abort_unless($payroll, 404);
+            $latest = DB::table('driver_payrolls')->where('employee_idx', $payroll->employee_idx)
+                ->orderByDesc('cutoff_end')->orderByDesc('cutoff_start')->orderByDesc('driver_payroll_id')
+                ->lockForUpdate()->first();
+            if (!$latest || (int) $latest->driver_payroll_id !== $payrollId) {
+                throw ValidationException::withMessages(['payroll' => 'Ang pinakahuling saved cutoff lang ng driver ang puwedeng i-revoke.']);
+            }
+            if ($payroll->cutoff_idx !== null) {
+                throw ValidationException::withMessages(['payroll' => 'Ang lumang payroll na naka-link sa regular cutoff ay kailangan ng hiwalay na review.']);
+            }
+            $items = DB::table('driver_payroll_items')->where('driver_payroll_id', $payrollId)
+                ->orderBy('driver_payroll_item_id')->lockForUpdate()->get();
+            if ($items->isEmpty()) {
+                throw ValidationException::withMessages(['payroll' => 'Walang trip snapshot ang payroll na ito; hindi ligtas i-revoke.']);
+            }
+            $logCount = DB::table('teves_payroll_drivers_logs')
+                ->whereIn('drivers_logs_id', $items->pluck('drivers_logs_id'))->count();
+            if ($logCount !== $items->count()) {
+                throw ValidationException::withMessages(['payroll' => 'May nawawalang original trip log; kailangan muna itong suriin.']);
+            }
+
+            DB::table('driver_payroll_revocations')->insert([
+                'original_driver_payroll_id' => $payrollId,
+                'employee_idx' => $payroll->employee_idx,
+                'branch_idx' => $payroll->branch_idx,
+                'payroll_no' => $payroll->payroll_no,
+                'cutoff_start' => $payroll->cutoff_start,
+                'cutoff_end' => $payroll->cutoff_end,
+                'payroll_snapshot' => json_encode($payroll, JSON_THROW_ON_ERROR),
+                'items_snapshot' => json_encode($items, JSON_THROW_ON_ERROR),
+                'reason' => trim($validated['reason']),
+                'revoked_by_user_idx' => Session::get('loginID'),
+                'created_at' => now(), 'updated_at' => now(),
+            ]);
+            DB::table('driver_payroll_items')->where('driver_payroll_id', $payrollId)->delete();
+            DB::table('driver_payrolls')->where('driver_payroll_id', $payrollId)->delete();
+            return $payroll;
+        });
+
+        $redirect = route('drivers_payroll.index', [
+            'employee_id' => $result->employee_idx,
+            'cutoff_start' => $result->cutoff_start,
+            'cutoff_end' => $result->cutoff_end,
+            'tab' => 'generate',
+        ]);
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Na-revoke ang latest driver payroll. Available na ulit ang mga trip para sa review at bagong payroll.',
+                'redirect' => $redirect]);
+        }
+        return redirect($redirect)->with('success', 'Na-revoke ang latest driver payroll. Suriin ang trip logs bago mag-save muli.');
     }
 }

@@ -33,8 +33,15 @@ class EmployeeManagementController extends Controller
 			
 			$branch_data = BranchModel::orderby('branch_name')->get();
 			$department_data = DepartmentModel::orderBy('department_name')->get();
+			$employeeSummary = EmployeeModel::query()->selectRaw("
+				COUNT(*) AS total,
+				SUM(CASE WHEN employee_status = 'Active' THEN 1 ELSE 0 END) AS active,
+				SUM(CASE WHEN employee_status = 'Inactive' THEN 1 ELSE 0 END) AS inactive,
+				SUM(CASE WHEN employment_type = 'Probationary' THEN 1 ELSE 0 END) AS probationary,
+				SUM(CASE WHEN employment_type = 'Others' THEN 1 ELSE 0 END) AS others
+			")->first();
 			
-			return view("payroll.employee", compact('data', 'title', 'branch_data', 'department_data', 'active_link'));
+			return view("payroll.employee", compact('data', 'title', 'branch_data', 'department_data', 'active_link', 'employeeSummary'));
 		}
 	} 
 
@@ -74,15 +81,19 @@ class EmployeeManagementController extends Controller
 
 		return DataTables::of($employee_list_data)
 				->addIndexColumn()
+				->filterColumn('employee_full_name', function ($query, $keyword) {
+					$query->where(function ($employeeQuery) use ($keyword) {
+						$employeeQuery->where('teves_payroll_employee_table.employee_full_name', 'like', '%'.$keyword.'%')
+							->orWhere('teves_payroll_employee_table.employee_number', 'like', '%'.$keyword.'%')
+							->orWhere('teves_payroll_employee_table.employee_position', 'like', '%'.$keyword.'%');
+					});
+				})
                 ->addColumn('action', function($row){
 										
-					$actionBtn = '
-					<div class="dropdown dropdown-action">
-						<a href="#" class="action-icon dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="true"><i class="si si-options-vertical" data-bs-toggle="tooltip" aria-label="si-options-vertical" data-bs-original-title="si-options-vertical"></i></a>
-							<div class="dropdown-menu dropdown-menu-right " data-popper-placement="bottom-end" style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate(0px, 34px);">
-								<a class="dropdown-item js-edit-employee" href="#" data-id="'.$row->employee_id.'"><i class="fa-solid fa-pencil m-r-5"></i> Edit</a>
-								<a class="dropdown-item js-delete-employee" href="#" data-id="'.$row->employee_id.'"><i class="fa-regular fa-trash-can m-r-5"></i> Delete</a>
-							</div>
+					$employeeId = (int) $row->employee_id;
+					$actionBtn = '<div class="directory-actions">
+						<button type="button" class="directory-action js-edit-employee" data-id="'.$employeeId.'" aria-label="Edit employee" title="Edit employee"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></button>
+						<button type="button" class="directory-action danger js-delete-employee" data-id="'.$employeeId.'" aria-label="Delete employee" title="Delete employee"><i class="fsm-icon-trash-2" aria-hidden="true"></i></button>
 					</div>';
 					
                     return $actionBtn;

@@ -1,16 +1,19 @@
 @include('layouts.header');
-    <body>
+    <body class="fsm-theme">
 	
 		<!-- Main Wrapper -->
         <div class="main-wrapper">
-			@include('layouts.navigations.header-navigation')     
-			@include('layouts.navigations.sidebar-navigation') 
-				@yield('content')
+            @include('layouts.navigations.sidebar-navigation')
+            <div id="main-shell">
+                @include('layouts.navigations.header-navigation')
+                @yield('content')
+            </div>
        </div>
 		<!-- /Main Wrapper --> 
 		
 		
 @include('layouts.footer')
+<script src="{{ asset('fsm/js/payroll-shell.js') }}" defer></script>
 <?php
 if (Request::is('employee')){
 ?>
